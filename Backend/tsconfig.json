@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2022",
+    "outDir": "./build", // Change the output directory if needed
+    "moduleResolution": "node",
+    // "allowImportingTsExtensions": true,
+    /* Modules */
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+  },
+  "include": [
+    "src/**/*.ts" // Adjust the path pattern based on your project structure
+, "src/scheduler/empFail.scheduler.js", "src/util/calculations/netpay.calculate.js"  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
