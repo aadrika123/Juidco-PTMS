@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { NextFunction, Response } from "express";
 import { sendResponse } from "../sendResponse";
 import { resObj } from "../types";
 
@@ -56,7 +56,8 @@ const CommonRes = Object.freeze({
     message: any,
     data: unknown,
     resObj: resObj,
-    res: Response
+    res: Response,
+    next?: NextFunction
   ): Promise<object> => {
     return sendResponse(
       true,

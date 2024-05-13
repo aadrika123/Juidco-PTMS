@@ -22,9 +22,9 @@ model onBoardedBusDetails {
   id                   Int      @id @default(autoincrement())
   register_no          String
   vin_no               String   @unique
-  pollution_doc        String
-  taxCopy_doc          String
-  registrationCert_doc String
+  pollution_doc        Json
+  taxCopy_doc          Json
+  registrationCert_doc Json
   created_at           DateTime @default(now()) @map("created_at")
   updated_at           DateTime @updatedAt @map("updated_at")
 }
