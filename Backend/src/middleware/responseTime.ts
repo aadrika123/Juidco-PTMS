@@ -5,6 +5,7 @@ export const responseTime = (
   res: Response,
   next: NextFunction
 ): void => {
+  console.log("responsetime called===>");
   const startTime = Date.now();
   res.on("finish", () => {
     const endTime = Date.now();

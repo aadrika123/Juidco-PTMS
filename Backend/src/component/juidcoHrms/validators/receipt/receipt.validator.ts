@@ -1,6 +1,7 @@
 import type { ReceiptType } from "../../../../util/types/receipt/receipt.type";
 import * as Yup from "yup";
-export const receiptRequestData = (receipt: ReceiptType): ReceiptType => {
+
+export const receiptValidatorData = (receipt: ReceiptType): ReceiptType => {
   return {
     receipt_no: receipt.receipt_no,
     amount: receipt.amount,
