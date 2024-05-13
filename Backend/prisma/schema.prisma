@@ -18,7 +18,10 @@ model receipt {
   updated_at DateTime @updatedAt @map("updated_at")
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> fdeba961348cd3d730f14bafb76c0d4dbee6af58
 model onBoardedBusDetails {
   id                   Int      @id @default(autoincrement())
   register_no          String
