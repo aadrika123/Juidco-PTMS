@@ -1,18 +1,24 @@
 import express, { Request, Response } from "express";
-import ReceiptController from "../../controller/receipt/receipt.controller";
+import ReceiptServices from "../../controller/receipt/receipt.services";
 import { baseUrl } from "../../../../util/common";
-class ReceiptRoute {
-  private receiptController: ReceiptController;
+import { responseTime } from "../../../../middleware/responseTime";
 
-  constructor() {
-    this.receiptController = new ReceiptController();
+class ReceiptRoute {
+  constructor(app: express.Application) {
+    const receiptServices = new ReceiptServices();
+    this.init(app, receiptServices);
   }
 
-  configure(app: express.Application): void {
+  init(app: express.Application, receiptServices: ReceiptServices): void {
+    app.route(`${baseUrl}/receipt/create`);
+    // .post((req: Request, res: Response) =>
+    //   receiptServices.post(req, res, "0101")
+    // );
+
     app
-      .route(`${baseUrl}/receipt/create`)
-      .post((req: Request, res: Response) =>
-        this.receiptController.post(req, res, "0101")
+      .route(`${baseUrl}/receipt/get`)
+      .get(responseTime, (req: Request, res: Response) =>
+        receiptServices.get(req, res, "0102")
       );
   }
 }

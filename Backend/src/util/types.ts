@@ -12,4 +12,3 @@ export interface ApiResponse {
   res: Response;
   status?: boolean | true;
 }
-

@@ -1,5 +1,10 @@
 import express from "express";
 import ReceiptRoute from "./route/receipt/receipt.route";
+import { Router } from "express";
+import { baseUrl } from "../../util/common";
+import OnBoardingBusRoute from "./route/onBoardingBus/onBoardingBus.route";
+
+const app = express();
 
 /*
 |--------------------------------------------------------------------------
@@ -17,13 +22,9 @@ import ReceiptRoute from "./route/receipt/receipt.route";
  * | Comman Route for finance
  */
 
-class PtmsRoute {
-  private receiptRoute: ReceiptRoute;
-
+export default class PtmsRoute {
   constructor(app: express.Application) {
-    this.receiptRoute = new ReceiptRoute();
-    this.receiptRoute.configure(app); // 01
+    new ReceiptRoute(app);
+    new OnBoardingBusRoute(app);
   }
 }
-
-export default PtmsRoute;
