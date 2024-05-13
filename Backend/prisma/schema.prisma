@@ -9,6 +9,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model receipt {
+  id         Int      @id @default(autoincrement())
+  receipt_no String
+  amount     Int
+  date       DateTime
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
+
 model onBoardedBusDetails {
   id                   Int      @id @default(autoincrement())
   register_no          String
