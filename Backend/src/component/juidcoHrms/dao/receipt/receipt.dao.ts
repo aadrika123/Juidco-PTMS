@@ -10,11 +10,11 @@ class ReceiptDao {
     return data;
   };
 
-  // post = async (req: Request) => {
-  //   const body = receiptValidatorData(req.body.data);
-  //   const data = await prisma.receipt.create({ data: body });
-  //   return generateRes(data);
-  // };
+  post = async (req: Request) => {
+    const body = receiptValidatorData(req.body.data);
+    const data = await prisma.receipt.create({ data: body });
+    return generateRes(data);
+  };
 }
 
 export default ReceiptDao;
