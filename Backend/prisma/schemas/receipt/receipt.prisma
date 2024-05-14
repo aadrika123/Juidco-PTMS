@@ -1,8 +1,10 @@
 model receipt {
-  id         Int      @id @default(autoincrement())
-  receipt_no String
-  amount     Int
-  date       DateTime
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  id           Int      @id @default(autoincrement())
+  receipt_no   String
+  amount       Int
+  conductor_id String
+  rc_no        String
+  date         DateTime
+  created_at   DateTime @default(now()) @map("created_at")
+  updated_at   DateTime @updatedAt @map("updated_at")
 }

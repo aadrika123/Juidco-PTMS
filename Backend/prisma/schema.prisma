@@ -10,12 +10,14 @@ datasource db {
 }
 
 model receipt {
-  id         Int      @id @default(autoincrement())
-  receipt_no String
-  amount     Int
-  date       DateTime
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  id           Int      @id @default(autoincrement())
+  receipt_no   String
+  amount       Int
+  date         DateTime
+  conductor_id String
+  rc_no        String
+  created_at   DateTime @default(now()) @map("created_at")
+  updated_at   DateTime @updatedAt @map("updated_at")
 }
 
 model onBoardedBusDetails {
@@ -39,7 +41,9 @@ model onBoardedConductorDetails {
   mobileNo       String
   emergencyMobNo String
   emailId        String   @unique
-  adhar_doc      Json
+  cUniqueId      String   @unique
+  // adhar_doc      Json
+  fitness_doc    Json
   created_at     DateTime @default(now()) @map("created_at")
   updated_at     DateTime @updatedAt @map("updated_at")
 }

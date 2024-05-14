@@ -50,7 +50,8 @@ export default class OnBoardingConductorServices {
         mobileNo,
         emailId,
         emergencyMobNo,
-        adhar_doc,
+        // adhar_doc,
+        fitness_doc,
       } = req.body;
 
       //checking if conductor already exist
@@ -75,14 +76,22 @@ export default class OnBoardingConductorServices {
         return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);
       }
 
-      if (!Object.keys(adhar_doc).length) {
-        return CommonRes.VALIDATION_ERROR("adhar_doc is required", resObj, res);
+      // if (!Object.keys(adhar_doc).length) {
+      //   return CommonRes.VALIDATION_ERROR("adhar_doc is required", resObj, res);
+      // }
+
+      if (!Object.keys(fitness_doc).length) {
+        return CommonRes.VALIDATION_ERROR(
+          "fitness_doc is required",
+          resObj,
+          res
+        );
       }
 
       const newOnboardedConductor =
         await this.prisma.onBoardedConductorDetails.create({
           data: {
-            firstName,
+            firstName: firstName,
             middleName,
             lastName,
             age,
@@ -90,13 +99,25 @@ export default class OnBoardingConductorServices {
             mobileNo,
             emailId,
             emergencyMobNo,
-            adhar_doc,
+            // adhar_doc,
+            fitness_doc,
+            cUniqueId: "",
           },
         });
 
       // const uniqueId = generateUnique();
       const cUniqueId = generateUniqueId(newOnboardedConductor?.id);
       console.log(cUniqueId, "uniqueId=================>");
+
+      const updatingConductorDetails =
+        await this.prisma.onBoardedConductorDetails.update({
+          where: {
+            emailId: newOnboardedConductor.emailId,
+          },
+          data: {
+            cUniqueId,
+          },
+        });
 
       const onBoardedConductorWithUniqueId = {
         ...newOnboardedConductor,
