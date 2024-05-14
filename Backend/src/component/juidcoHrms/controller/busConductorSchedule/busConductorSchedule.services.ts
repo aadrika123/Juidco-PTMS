@@ -20,14 +20,19 @@ export default class BusConductorScheduleServices {
     };
 
     try {
-      const { bus_no, conductor_id, date, time } = req.body;
+      const { bus_no, conductor_id, date, from_time, to_time } = req.body;
 
       const setDate = new Date(date).toISOString();
 
       //   const setTime = time.split(":").join(",");
-      const setTime = Number(time.replace(":", "").padStart(4, "0"));
+      const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
+      const setToTime = Number(to_time.replace(":", "").padStart(4, "0"));
 
-      console.log(setTime, "settimegetScheduleBusConductorStatus=========>");
+      console.log(
+        setFromTime,
+        setToTime,
+        "settimegetScheduleBusConductorStatus=========>"
+      );
       console.log(setDate, "setDate============");
 
       //validation error
@@ -42,7 +47,13 @@ export default class BusConductorScheduleServices {
       //checking if schedule already exist
       const isExistingSchedule = await this.prisma.busConductorMapping.findMany(
         {
-          where: { bus_no, conductor_id, date: setDate, time: setTime },
+          where: {
+            bus_no,
+            conductor_id,
+            date: setDate,
+            from_time: setFromTime,
+            to_time: setToTime,
+          },
         }
       );
 
@@ -80,15 +91,21 @@ export default class BusConductorScheduleServices {
     };
 
     try {
-      const { bus_no, conductor_id, date, time } = req.body;
+      const { bus_no, conductor_id, date, from_time, to_time } = req.body;
 
       //validation error
       const isValidated = await ScheduleBusConductorValidationSchema.validate(
         req.body
       );
-      const setTime = Number(time.replace(":", "").padStart(4, "0"));
+      //   const setTime = time.split(":").join(",");
+      const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
+      const setToTime = Number(to_time.replace(":", "").padStart(4, "0"));
 
-      console.log(setTime, "settimegetcreateScheduleBusConductor=========>");
+      console.log(
+        setFromTime,
+        setToTime,
+        "settimegetcreateScheduleBusConductor=========>"
+      );
 
       const setDate = new Date(date).toISOString();
 
@@ -99,7 +116,13 @@ export default class BusConductorScheduleServices {
       //checking if schedule already exist
       const isExistingSchedule = await this.prisma.busConductorMapping.findMany(
         {
-          where: { bus_no, conductor_id, date: setDate, time: setTime },
+          where: {
+            bus_no,
+            conductor_id,
+            date: setDate,
+            from_time: setFromTime,
+            to_time: setToTime,
+          },
         }
       );
 
@@ -116,7 +139,8 @@ export default class BusConductorScheduleServices {
           bus_no,
           conductor_id,
           date: setDate,
-          time: setTime,
+          from_time: setFromTime,
+          to_time: setToTime,
         },
       });
 
@@ -144,7 +168,7 @@ export default class BusConductorScheduleServices {
     };
 
     try {
-      const { bus_no, conductor_id, date, time } = req.body;
+      const { bus_no, conductor_id, date, from_time, to_time } = req.body;
 
       //validation error
       const isValidated = await ScheduleBusConductorValidationSchema.validate(
@@ -153,15 +177,27 @@ export default class BusConductorScheduleServices {
 
       const setDate = new Date(date).toISOString();
 
-      const setTime = time.split(":").join();
-      console.log(setTime, "settimegetupdateScheduleBusConductor=========>");
+      const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
+      const setToTime = Number(to_time.replace(":", "").padStart(4, "0"));
+
+      console.log(
+        setFromTime,
+        setToTime,
+        "settimegetupdateScheduleBusConductor=========>"
+      );
 
       if (!Object.keys(isValidated).length) {
         return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);
       }
 
       const existingSchedule = await this.prisma.busConductorMapping.findFirst({
-        where: { bus_no, conductor_id, date: setDate, time: setTime },
+        where: {
+          bus_no,
+          conductor_id,
+          date: setDate,
+          from_time: setFromTime,
+          to_time: setToTime,
+        },
       });
 
       //updating already existschedule
@@ -172,7 +208,8 @@ export default class BusConductorScheduleServices {
             bus_no,
             conductor_id,
             date: setDate,
-            time: setTime,
+            from_time: setFromTime,
+            to_time: setToTime,
           },
         });
 

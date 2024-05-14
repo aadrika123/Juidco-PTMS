@@ -51,6 +51,7 @@ class ReceiptServices {
     };
 
     const receipt_no = generateUnique("T");
+    console.log(req.body.data, "body data receipt========>>");
 
     try {
       req.body.data.receipt_no = receipt_no;

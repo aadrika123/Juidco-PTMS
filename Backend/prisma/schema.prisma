@@ -54,7 +54,8 @@ model busConductorMapping {
   conductor_id String
   bus_no       String
   date         DateTime
-  time         Int
+  from_time    Int
+  to_time      Int
   created_at   DateTime @default(now()) @map("created_at")
   updated_at   DateTime @updatedAt @map("updated_at")
 }
