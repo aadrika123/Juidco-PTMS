@@ -88,7 +88,7 @@ export default class OnBoardingConductorServices {
       const newOnboardedConductor =
         await this.prisma.onBoardedConductorDetails.create({
           data: {
-            firstName: firstName,
+            firstName,
             middleName,
             lastName,
             age,
@@ -110,7 +110,7 @@ export default class OnBoardingConductorServices {
       const updatingConductorDetails =
         await this.prisma.onBoardedConductorDetails.update({
           where: {
-            emailId: newOnboardedConductor.emailId,
+            adhar_no: newOnboardedConductor.adhar_no,
           },
           data: {
             cUniqueId,

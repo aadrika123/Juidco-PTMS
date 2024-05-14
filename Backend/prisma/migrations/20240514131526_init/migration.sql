@@ -4,8 +4,8 @@ CREATE TABLE "receipt" (
     "receipt_no" TEXT NOT NULL,
     "amount" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "conductor_id" TEXT NOT NULL,
-    "rc_no" TEXT NOT NULL,
+    "time" TEXT NOT NULL,
+    "vehicle" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -53,7 +53,8 @@ CREATE TABLE "busConductorMapping" (
     "conductor_id" TEXT NOT NULL,
     "bus_no" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "time" TEXT NOT NULL,
+    "from_time" INTEGER NOT NULL,
+    "to_time" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -64,7 +65,7 @@ CREATE TABLE "busConductorMapping" (
 CREATE UNIQUE INDEX "onBoardedBusDetails_vin_no_key" ON "onBoardedBusDetails"("vin_no");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "onBoardedConductorDetails_emailId_key" ON "onBoardedConductorDetails"("emailId");
+CREATE UNIQUE INDEX "onBoardedConductorDetails_cUniqueId_key" ON "onBoardedConductorDetails"("cUniqueId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "onBoardedConductorDetails_cUniqueId_key" ON "onBoardedConductorDetails"("cUniqueId");
+CREATE UNIQUE INDEX "onBoardedConductorDetails_adhar_no_key" ON "onBoardedConductorDetails"("adhar_no");
