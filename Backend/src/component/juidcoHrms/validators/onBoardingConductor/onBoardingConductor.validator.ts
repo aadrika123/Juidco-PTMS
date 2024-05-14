@@ -25,4 +25,9 @@ export const OnBoardingConductorDataValidationSchema = Yup.object({
     .matches(phoneRegExp, "Phone number is not valid")
     .min(10, "too short")
     .max(10, "too long"),
+
+  adhar_no: Yup.string()
+    .required("required")
+    .min(12, "too short")
+    .max(12, "too long"),
 });

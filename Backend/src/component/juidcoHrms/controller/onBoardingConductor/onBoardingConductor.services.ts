@@ -46,23 +46,10 @@ export default class OnBoardingConductorServices {
         mobileNo,
         emailId,
         emergencyMobNo,
-        // adhar_doc,
+        adhar_doc,
+        adhar_no,
         fitness_doc,
       } = req.body;
-
-      //checking if conductor already exist
-      const isExistingConductor =
-        await this.prisma.onBoardedConductorDetails.findUnique({
-          where: { emailId: emailId },
-        });
-
-      if (isExistingConductor) {
-        return CommonRes.VALIDATION_ERROR(
-          "Already registered Conductor",
-          resObj,
-          res
-        );
-      }
 
       //validation of request body with files and json
       const isValidated =
@@ -72,13 +59,27 @@ export default class OnBoardingConductorServices {
         return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);
       }
 
-      // if (!Object.keys(adhar_doc).length) {
-      //   return CommonRes.VALIDATION_ERROR("adhar_doc is required", resObj, res);
-      // }
-
       if (!Object.keys(fitness_doc).length) {
         return CommonRes.VALIDATION_ERROR(
           "fitness_doc is required",
+          resObj,
+          res
+        );
+      }
+
+      if (!Object.keys(adhar_doc).length) {
+        return CommonRes.VALIDATION_ERROR("adhar_doc is required", resObj, res);
+      }
+
+      //checking if conductor already exist
+      const isExistingConductor =
+        await this.prisma.onBoardedConductorDetails.findUnique({
+          where: { adhar_no },
+        });
+
+      if (isExistingConductor) {
+        return CommonRes.VALIDATION_ERROR(
+          "Already registered Conductor",
           resObj,
           res
         );
@@ -95,7 +96,8 @@ export default class OnBoardingConductorServices {
             mobileNo,
             emailId,
             emergencyMobNo,
-            // adhar_doc,
+            adhar_doc,
+            adhar_no,
             fitness_doc,
             cUniqueId: "",
           },

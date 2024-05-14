@@ -39,11 +39,25 @@ CREATE TABLE "onBoardedConductorDetails" (
     "emailId" TEXT NOT NULL,
     "cUniqueId" TEXT NOT NULL,
     "adhar_doc" JSONB NOT NULL,
+    "adhar_no" TEXT NOT NULL,
     "fitness_doc" JSONB NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "onBoardedConductorDetails_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "busConductorMapping" (
+    "id" SERIAL NOT NULL,
+    "conductor_id" TEXT NOT NULL,
+    "bus_no" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "time" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "busConductorMapping_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
