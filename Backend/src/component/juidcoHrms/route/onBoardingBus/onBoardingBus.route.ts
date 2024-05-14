@@ -5,25 +5,17 @@ import OnBoardingBusServices from "../../controller/onBoardingBus/onBoardingBus.
 
 export default class OnBoardingBusRoute {
   constructor(app: express.Application) {
-    const upload = multer({ dest: "public", limits: { fileSize: 2000000 } });
-    // const storage = multer.diskStorage({
-    //   destination: './public/',
-    //   filename: function(req, file, cb) {
-    //     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-    //   }
-    // });
     const onBoardingBusServices = new OnBoardingBusServices();
-    this.init(app, onBoardingBusServices, upload);
+    this.init(app, onBoardingBusServices);
   }
 
   init(
     app: express.Application,
-    onBoardingBusServices: OnBoardingBusServices,
-    upload: Multer
+    onBoardingBusServices: OnBoardingBusServices
   ): void {
     app
       .route(`${baseUrl}/onBoardingBus`)
-      .post(upload.any(), (req: Request, res: Response) =>
+      .post((req: Request, res: Response) =>
         onBoardingBusServices.onBoardingNewBus(req, res, "021G")
       );
   }

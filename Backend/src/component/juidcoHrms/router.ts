@@ -3,6 +3,8 @@ import ReceiptRoute from "./route/receipt/receipt.route";
 import { Router } from "express";
 import { baseUrl } from "../../util/common";
 import OnBoardingBusRoute from "./route/onBoardingBus/onBoardingBus.route";
+import OnBoardingConductorRoute from "./route/onBoardingConductor/onBoardingConductor.route";
+import UploadImgRoute from "./route/uploadImage/uploadImg.route";
 
 const app = express();
 
@@ -26,5 +28,7 @@ export default class PtmsRoute {
   constructor(app: express.Application) {
     new ReceiptRoute(app);
     new OnBoardingBusRoute(app);
+    new OnBoardingConductorRoute(app);
+    new UploadImgRoute(app);
   }
 }

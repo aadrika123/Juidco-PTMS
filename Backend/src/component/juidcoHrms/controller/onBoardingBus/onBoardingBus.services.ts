@@ -9,9 +9,9 @@ import CommonRes from "../../../../util/helper/commonResponse";
 type TOnBoardingBusData = {
   registration_no: string;
   vin_no: string;
-  taxCopy_cert: string;
-  registration_cert: string;
-  pollution_cert: string;
+  taxCopy_cert: {};
+  registration_cert: {};
+  pollution_cert: {};
 };
 
 export default class OnBoardingBusServices {
@@ -29,32 +29,26 @@ export default class OnBoardingBusServices {
     };
 
     try {
-      const { registration_no, vin_no } = req.body;
-      const fileData = req.files;
+      const {
+        registration_no,
+        vin_no,
+        taxCopy_cert,
+        registration_cert,
+        pollution_cert,
+      } = req.body;
+
+      console.log(registration_no, "registration_no==>>");
 
       let newBusData: TOnBoardingBusData = {
         registration_no: "",
         vin_no: "",
-        taxCopy_cert: "",
-        registration_cert: "",
-        pollution_cert: "",
+        taxCopy_cert: {},
+        registration_cert: {},
+        pollution_cert: {},
       };
 
-      //checking if bus already exist
-      const isExistingBus = await this.prisma.onBoardedBusDetails.findUnique({
-        where: { vin_no },
-      });
-
-      if (isExistingBus) {
-        return CommonRes.VALIDATION_ERROR(
-          "Already registered vehicle",
-          resObj,
-          res
-        );
-      }
-
       //validation of request body with files and json
-      if (!registration_no || registration_no == "") {
+      if (!registration_no) {
         return CommonRes.VALIDATION_ERROR(
           "Registration Number is required",
           resObj,
@@ -74,53 +68,96 @@ export default class OnBoardingBusServices {
         newBusData = { ...newBusData, vin_no };
       }
 
-      if (fileData && Array.isArray(fileData)) {
-        const taxCopy_cert = fileData.find(
-          (data: any) => data.fieldname === "taxCopy_cert"
-        );
-
-        const registration_cert = fileData.find(
-          (data: any) => data.fieldname === "registration_cert"
-        );
-        const pollution_cert = fileData.find(
-          (data: any) => data.fieldname === "pollution_cert"
-        );
-
-        if (taxCopy_cert == undefined || taxCopy_cert == null) {
-          return CommonRes.VALIDATION_ERROR(
-            "Tax Copy document is required",
-            resObj,
-            res
-          );
-        } else {
-          newBusData = { ...newBusData, taxCopy_cert: taxCopy_cert.path };
-        }
-
-        if (registration_cert == undefined || registration_cert == null) {
-          return CommonRes.VALIDATION_ERROR(
-            "Registartion Certificate document is required",
-            resObj,
-            res
-          );
-        } else {
-          newBusData = {
-            ...newBusData,
-            registration_cert: registration_cert.path,
-          };
-        }
-
-        if (pollution_cert == undefined || pollution_cert == null) {
-          return CommonRes.VALIDATION_ERROR(
-            "Pollution Certificate document is required",
-            resObj,
-            res
-          );
-        } else {
-          newBusData = { ...newBusData, pollution_cert: pollution_cert.path };
-        }
-      } else {
+      if (!Object.keys(taxCopy_cert).length) {
         return CommonRes.VALIDATION_ERROR(
-          "No file data available or fileData is not an array",
+          "TaxCopy document is required",
+          resObj,
+          res
+        );
+      } else {
+        newBusData = { ...newBusData, taxCopy_cert };
+      }
+
+      if (!Object.keys(registration_cert).length) {
+        return CommonRes.VALIDATION_ERROR(
+          "Registration certificate document is required",
+          resObj,
+          res
+        );
+      } else {
+        newBusData = { ...newBusData, registration_cert };
+      }
+
+      if (!Object.keys(pollution_cert).length) {
+        return CommonRes.VALIDATION_ERROR(
+          "Pollution certificate document is required",
+          resObj,
+          res
+        );
+      } else {
+        newBusData = { ...newBusData, pollution_cert };
+      }
+
+      // if (fileData && Array.isArray(fileData)) {
+      //   const taxCopy_cert = fileData.find(
+      //     (data: any) => data.fieldname === "taxCopy_cert"
+      //   );
+
+      //   const registration_cert = fileData.find(
+      //     (data: any) => data.fieldname === "registration_cert"
+      //   );
+      //   const pollution_cert = fileData.find(
+      //     (data: any) => data.fieldname === "pollution_cert"
+      //   );
+
+      //   if (taxCopy_cert == undefined || taxCopy_cert == null) {
+      //     return CommonRes.VALIDATION_ERROR(
+      //       "Tax Copy document is required",
+      //       resObj,
+      //       res
+      //     );
+      //   } else {
+      //     newBusData = { ...newBusData, taxCopy_cert: taxCopy_cert.path };
+      //   }
+
+      //   if (registration_cert == undefined || registration_cert == null) {
+      //     return CommonRes.VALIDATION_ERROR(
+      //       "Registartion Certificate document is required",
+      //       resObj,
+      //       res
+      //     );
+      //   } else {
+      //     newBusData = {
+      //       ...newBusData,
+      //       registration_cert: registration_cert.path,
+      //     };
+      //   }
+
+      //   if (pollution_cert == undefined || pollution_cert == null) {
+      //     return CommonRes.VALIDATION_ERROR(
+      //       "Pollution Certificate document is required",
+      //       resObj,
+      //       res
+      //     );
+      //   } else {
+      //     newBusData = { ...newBusData, pollution_cert: pollution_cert.path };
+      //   }
+      // } else {
+      //   return CommonRes.VALIDATION_ERROR(
+      //     "No file data available or fileData is not an array",
+      //     resObj,
+      //     res
+      //   );
+      // }
+
+      //checking if bus already exist
+      const isExistingBus = await this.prisma.onBoardedBusDetails.findUnique({
+        where: { vin_no: vin_no },
+      });
+
+      if (isExistingBus) {
+        return CommonRes.VALIDATION_ERROR(
+          "Already registered vehicle",
           resObj,
           res
         );
