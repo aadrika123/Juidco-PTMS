@@ -15,8 +15,8 @@ model receipt {
   amount     Int
   date       DateTime
   time       String
+  // vehicle  onBoardedConductorDetails[]
   conductor  String
-  rc         String
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
 }
@@ -33,7 +33,7 @@ model onBoardedBusDetails {
 }
 
 model onBoardedConductorDetails {
-  id             Int      @id @default(autoincrement())
+  id             Int    @id @default(autoincrement())
   firstName      String
   middleName     String
   lastName       String
@@ -41,13 +41,14 @@ model onBoardedConductorDetails {
   bloodGrp       String
   mobileNo       String
   emergencyMobNo String
-  emailId        String   @unique
-  cUniqueId      String   @unique
+  emailId        String
+  cUniqueId      String @unique
   adhar_doc      Json
-  adhar_no       String   @unique
+  adhar_no       String @unique
   fitness_doc    Json
-  created_at     DateTime @default(now()) @map("created_at")
-  updated_at     DateTime @updatedAt @map("updated_at")
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
 }
 
 model busConductorMapping {
@@ -57,6 +58,8 @@ model busConductorMapping {
   date         DateTime
   from_time    Int
   to_time      Int
+  // receipts     receipt  @relation(fields: [receipt_id], references: [id])
+  // receipt_id
   created_at   DateTime @default(now()) @map("created_at")
   updated_at   DateTime @updatedAt @map("updated_at")
 }
