@@ -42,7 +42,8 @@ model onBoardedConductorDetails {
   emergencyMobNo String
   emailId        String   @unique
   cUniqueId      String   @unique
-  // adhar_doc      Json
+  adhar_doc      Json
+  adhar_no       String   @unique
   fitness_doc    Json
   created_at     DateTime @default(now()) @map("created_at")
   updated_at     DateTime @updatedAt @map("updated_at")
@@ -53,7 +54,7 @@ model busConductorMapping {
   conductor_id String
   bus_no       String
   date         DateTime
-  time         DateTime
+  time         Int
   created_at   DateTime @default(now()) @map("created_at")
   updated_at   DateTime @updatedAt @map("updated_at")
 }

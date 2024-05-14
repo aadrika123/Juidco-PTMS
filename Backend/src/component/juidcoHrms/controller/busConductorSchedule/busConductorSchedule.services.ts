@@ -23,6 +23,11 @@ export default class BusConductorScheduleServices {
       const { bus_no, conductor_id, date, time } = req.body;
 
       const setDate = new Date(date).toISOString();
+
+      //   const setTime = time.split(":").join(",");
+      const setTime = Number(time.replace(":", "").padStart(4, "0"));
+
+      console.log(setTime, "settimegetScheduleBusConductorStatus=========>");
       console.log(setDate, "setDate============");
 
       //validation error
@@ -37,11 +42,13 @@ export default class BusConductorScheduleServices {
       //checking if schedule already exist
       const isExistingSchedule = await this.prisma.busConductorMapping.findMany(
         {
-          where: { bus_no, conductor_id, date: setDate, time },
+          where: { bus_no, conductor_id, date: setDate, time: setTime },
         }
       );
 
-      if (isExistingSchedule) {
+      console.log(isExistingSchedule, "isexistingsche=============>>");
+
+      if (isExistingSchedule.length > 0) {
         return CommonRes.SUCCESS(
           "Schedule already exists",
           isExistingSchedule,
@@ -79,6 +86,11 @@ export default class BusConductorScheduleServices {
       const isValidated = await ScheduleBusConductorValidationSchema.validate(
         req.body
       );
+      const setTime = Number(time.replace(":", "").padStart(4, "0"));
+
+      console.log(setTime, "settimegetcreateScheduleBusConductor=========>");
+
+      const setDate = new Date(date).toISOString();
 
       if (!Object.keys(isValidated).length) {
         return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);
@@ -87,11 +99,11 @@ export default class BusConductorScheduleServices {
       //checking if schedule already exist
       const isExistingSchedule = await this.prisma.busConductorMapping.findMany(
         {
-          where: { bus_no, conductor_id, date, time },
+          where: { bus_no, conductor_id, date: setDate, time: setTime },
         }
       );
 
-      if (isExistingSchedule) {
+      if (isExistingSchedule.length > 0) {
         return CommonRes.VALIDATION_ERROR(
           "Schedule already exists",
           resObj,
@@ -103,8 +115,8 @@ export default class BusConductorScheduleServices {
         data: {
           bus_no,
           conductor_id,
-          date,
-          time,
+          date: setDate,
+          time: setTime,
         },
       });
 
@@ -139,12 +151,17 @@ export default class BusConductorScheduleServices {
         req.body
       );
 
+      const setDate = new Date(date).toISOString();
+
+      const setTime = time.split(":").join();
+      console.log(setTime, "settimegetupdateScheduleBusConductor=========>");
+
       if (!Object.keys(isValidated).length) {
         return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);
       }
 
       const existingSchedule = await this.prisma.busConductorMapping.findFirst({
-        where: { bus_no, conductor_id, date, time },
+        where: { bus_no, conductor_id, date: setDate, time: setTime },
       });
 
       //updating already existschedule
@@ -154,8 +171,8 @@ export default class BusConductorScheduleServices {
           data: {
             bus_no,
             conductor_id,
-            date,
-            time,
+            date: setDate,
+            time: setTime,
           },
         });
 
