@@ -1,9 +1,7 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { resObj } from "../../../../util/types";
-import multer from "multer";
 import { OnBoardingBusDataValidationSchema } from "../../validators/onBoardingBus/onBoardingBus.validator";
-import { Prisma } from "@prisma/client";
 import CommonRes from "../../../../util/helper/commonResponse";
 
 type TOnBoardingBusData = {
@@ -102,52 +100,6 @@ export default class OnBoardingBusServices {
       //   const taxCopy_cert = fileData.find(
       //     (data: any) => data.fieldname === "taxCopy_cert"
       //   );
-
-      //   const registration_cert = fileData.find(
-      //     (data: any) => data.fieldname === "registration_cert"
-      //   );
-      //   const pollution_cert = fileData.find(
-      //     (data: any) => data.fieldname === "pollution_cert"
-      //   );
-
-      //   if (taxCopy_cert == undefined || taxCopy_cert == null) {
-      //     return CommonRes.VALIDATION_ERROR(
-      //       "Tax Copy document is required",
-      //       resObj,
-      //       res
-      //     );
-      //   } else {
-      //     newBusData = { ...newBusData, taxCopy_cert: taxCopy_cert.path };
-      //   }
-
-      //   if (registration_cert == undefined || registration_cert == null) {
-      //     return CommonRes.VALIDATION_ERROR(
-      //       "Registartion Certificate document is required",
-      //       resObj,
-      //       res
-      //     );
-      //   } else {
-      //     newBusData = {
-      //       ...newBusData,
-      //       registration_cert: registration_cert.path,
-      //     };
-      //   }
-
-      //   if (pollution_cert == undefined || pollution_cert == null) {
-      //     return CommonRes.VALIDATION_ERROR(
-      //       "Pollution Certificate document is required",
-      //       resObj,
-      //       res
-      //     );
-      //   } else {
-      //     newBusData = { ...newBusData, pollution_cert: pollution_cert.path };
-      //   }
-      // } else {
-      //   return CommonRes.VALIDATION_ERROR(
-      //     "No file data available or fileData is not an array",
-      //     resObj,
-      //     res
-      //   );
       // }
 
       //checking if bus already exist
@@ -178,10 +130,38 @@ export default class OnBoardingBusServices {
         resObj,
         res
       );
-
-      // const existingBus = await this.prisma.onBoardingBusDetails.findUnique({ where: {vin_no}})
     } catch (err) {
       console.log(err, "error in onboarding new bus");
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
+  getAllBusList = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const getAllBusData = await this.prisma.onBoardedBusDetails.findMany();
+
+      if (!getAllBusData.length)
+        return CommonRes.NOT_FOUND(
+          "Data not found",
+          getAllBusData,
+          resObj,
+          res
+        );
+
+      return CommonRes.SUCCESS(
+        "Successfully fetched all bus details",
+        getAllBusData,
+        resObj,
+        res
+      );
+    } catch (err) {
+      console.log(err, "error in fetching bus list");
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };

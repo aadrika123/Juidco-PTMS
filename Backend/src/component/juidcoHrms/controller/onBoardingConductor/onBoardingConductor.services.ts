@@ -1,14 +1,10 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { resObj } from "../../../../util/types";
-import multer from "multer";
 import { OnBoardingBusDataValidationSchema } from "../../validators/onBoardingBus/onBoardingBus.validator";
-import { Prisma } from "@prisma/client";
 import CommonRes from "../../../../util/helper/commonResponse";
 import { OnBoardingConductorDataValidationSchema } from "../../validators/onBoardingConductor/onBoardingConductor.validator";
-import generateUniqueId, {
-  generateUnique,
-} from "../../../../util/helper/generateUniqueNo";
+import generateUniqueId from "../../../../util/helper/generateUniqueNo";
 
 type TOnBoardingConductorData = {
   firstName: string;
@@ -132,6 +128,37 @@ export default class OnBoardingConductorServices {
       );
     } catch (err) {
       console.log(err, "error in onboarding new bus");
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
+  getAllConductorList = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const getAllConductorData =
+        await this.prisma.onBoardedConductorDetails.findMany();
+
+      if (!getAllConductorData.length)
+        return CommonRes.NOT_FOUND(
+          "Data not found",
+          getAllConductorData,
+          resObj,
+          res
+        );
+
+      return CommonRes.SUCCESS(
+        "Successfully fetched all bus details",
+        getAllConductorData,
+        resObj,
+        res
+      );
+    } catch (err) {
+      console.log(err, "error in fetching bus list");
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };

@@ -5,6 +5,7 @@ import { baseUrl } from "../../util/common";
 import OnBoardingBusRoute from "./route/onBoardingBus/onBoardingBus.route";
 import OnBoardingConductorRoute from "./route/onBoardingConductor/onBoardingConductor.route";
 import UploadImgRoute from "./route/uploadImage/uploadImg.route";
+import BusConductorScheduleRoute from "./route/busConductorSchedule/busConductorSchedule.route";
 
 const app = express();
 
@@ -30,5 +31,6 @@ export default class PtmsRoute {
     new OnBoardingBusRoute(app);
     new OnBoardingConductorRoute(app);
     new UploadImgRoute(app);
+    new BusConductorScheduleRoute(app);
   }
 }

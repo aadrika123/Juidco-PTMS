@@ -47,3 +47,13 @@ model onBoardedConductorDetails {
   created_at     DateTime @default(now()) @map("created_at")
   updated_at     DateTime @updatedAt @map("updated_at")
 }
+
+model busConductorMapping {
+  id           Int      @id @default(autoincrement())
+  conductor_id String
+  bus_no       String
+  date         DateTime
+  time         DateTime
+  created_at   DateTime @default(now()) @map("created_at")
+  updated_at   DateTime @updatedAt @map("updated_at")
+}
