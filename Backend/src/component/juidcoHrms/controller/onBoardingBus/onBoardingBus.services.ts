@@ -36,7 +36,8 @@ export default class OnBoardingBusServices {
         registration_cert,
         pollution_cert,
       } = req.body;
-      const fileData = req.files;
+
+      console.log(registration_no, "registration_no==>>");
 
       let newBusData: TOnBoardingBusData = {
         registration_no: "",
@@ -46,21 +47,8 @@ export default class OnBoardingBusServices {
         pollution_cert: {},
       };
 
-      //checking if bus already exist
-      const isExistingBus = await this.prisma.onBoardedBusDetails.findUnique({
-        where: { vin_no },
-      });
-
-      if (isExistingBus) {
-        return CommonRes.VALIDATION_ERROR(
-          "Already registered vehicle",
-          resObj,
-          res
-        );
-      }
-
       //validation of request body with files and json
-      if (!registration_no || registration_no == "") {
+      if (!registration_no) {
         return CommonRes.VALIDATION_ERROR(
           "Registration Number is required",
           resObj,
@@ -161,6 +149,19 @@ export default class OnBoardingBusServices {
       //     res
       //   );
       // }
+
+      //checking if bus already exist
+      const isExistingBus = await this.prisma.onBoardedBusDetails.findUnique({
+        where: { vin_no: vin_no },
+      });
+
+      if (isExistingBus) {
+        return CommonRes.VALIDATION_ERROR(
+          "Already registered vehicle",
+          resObj,
+          res
+        );
+      }
 
       const newOnboardedBus = await this.prisma.onBoardedBusDetails.create({
         data: {

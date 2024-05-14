@@ -5,25 +5,17 @@ import OnBoardingConductorServices from "../../controller/onBoardingConductor/on
 
 export default class OnBoardingConductorRoute {
   constructor(app: express.Application) {
-    const upload = multer({ dest: "public", limits: { fileSize: 2000000 } });
-    // const storage = multer.diskStorage({
-    //   destination: './public/',
-    //   filename: function(req, file, cb) {
-    //     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-    //   }
-    // });
-    const onBoardingBusServices = new OnBoardingConductorServices();
-    this.init(app, onBoardingBusServices, upload);
+    const onBoardingConductorServices = new OnBoardingConductorServices();
+    this.init(app, onBoardingConductorServices);
   }
 
   init(
     app: express.Application,
-    onBoardingConductorServices: OnBoardingConductorServices,
-    upload: Multer
+    onBoardingConductorServices: OnBoardingConductorServices
   ): void {
     app
       .route(`${baseUrl}/onBoardingConductor`)
-      .post(upload.any(), (req: Request, res: Response) =>
+      .post((req: Request, res: Response) =>
         onBoardingConductorServices.onBoardingNewConductor(req, res, "021G")
       );
   }
