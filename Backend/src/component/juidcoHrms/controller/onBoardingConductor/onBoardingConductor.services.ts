@@ -6,6 +6,9 @@ import { OnBoardingBusDataValidationSchema } from "../../validators/onBoardingBu
 import { Prisma } from "@prisma/client";
 import CommonRes from "../../../../util/helper/commonResponse";
 import { OnBoardingConductorDataValidationSchema } from "../../validators/onBoardingConductor/onBoardingConductor.validator";
+import generateUniqueId, {
+  generateUnique,
+} from "../../../../util/helper/generateUniqueNo";
 
 type TOnBoardingConductorData = {
   firstName: string;
@@ -31,7 +34,6 @@ export default class OnBoardingConductorServices {
     res: Response,
     apiId: string
   ) => {
-    console.log("clicked111===============>>");
     const resObj: resObj = {
       apiId,
       action: "GET",
@@ -39,7 +41,6 @@ export default class OnBoardingConductorServices {
     };
 
     try {
-      console.log("clicked===============>>");
       const {
         firstName,
         middleName,
@@ -49,34 +50,23 @@ export default class OnBoardingConductorServices {
         mobileNo,
         emailId,
         emergencyMobNo,
-        adhar_doc,
+        // adhar_doc,
+        fitness_doc,
       } = req.body;
 
-      let newConductorData: TOnBoardingConductorData = {
-        firstName: "",
-        middleName: "",
-        lastName: "",
-        age: "",
-        bloodGrp: "",
-        mobileNo: "",
-        emailId: "",
-        emergencyMobNo: "",
-        adhar_doc: {},
-      };
+      //checking if conductor already exist
+      const isExistingConductor =
+        await this.prisma.onBoardedConductorDetails.findUnique({
+          where: { emailId: emailId },
+        });
 
-      //checking if bus already exist
-      // const isExistingConductor =
-      // await this.prisma.onBoardedBusDetails.findUnique({
-      //   where: { emailId: emailId },
-      // });
-
-      // if (isExistingConductor) {
-      //   return CommonRes.VALIDATION_ERROR(
-      //     "Already registered Conductor",
-      //     resObj,
-      //     res
-      //   );
-      // }
+      if (isExistingConductor) {
+        return CommonRes.VALIDATION_ERROR(
+          "Already registered Conductor",
+          resObj,
+          res
+        );
+      }
 
       //validation of request body with files and json
       const isValidated =
@@ -86,32 +76,60 @@ export default class OnBoardingConductorServices {
         return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);
       }
 
-      if (!Object.keys(adhar_doc).length) {
-        return CommonRes.VALIDATION_ERROR("adhar_doc is required", resObj, res);
+      // if (!Object.keys(adhar_doc).length) {
+      //   return CommonRes.VALIDATION_ERROR("adhar_doc is required", resObj, res);
+      // }
+
+      if (!Object.keys(fitness_doc).length) {
+        return CommonRes.VALIDATION_ERROR(
+          "fitness_doc is required",
+          resObj,
+          res
+        );
       }
 
-      // const newOnboardedBus = await this.prisma.onBoardedBusDetails.create({
-      //   data: {
-      //     firstName,
-      //     middleName,
-      //     lastName,
-      //     age,
-      //     bloodGrp,
-      //     mobileNo,
-      //     emailId,
-      //     emergencyMobNo,
-      //     adhar_doc,
-      //   },
-      // });
+      const newOnboardedConductor =
+        await this.prisma.onBoardedConductorDetails.create({
+          data: {
+            firstName: firstName,
+            middleName,
+            lastName,
+            age,
+            bloodGrp,
+            mobileNo,
+            emailId,
+            emergencyMobNo,
+            // adhar_doc,
+            fitness_doc,
+            cUniqueId: "",
+          },
+        });
 
-      // return CommonRes.SUCCESS(
-      //   "Successfully added the bus",
-      //   newOnboardedBus,
-      //   resObj,
-      //   res
-      // );
+      // const uniqueId = generateUnique();
+      const cUniqueId = generateUniqueId(newOnboardedConductor?.id);
+      console.log(cUniqueId, "uniqueId=================>");
 
-      // const existingBus = await this.prisma.onBoardingBusDetails.findUnique({ where: {vin_no}})
+      const updatingConductorDetails =
+        await this.prisma.onBoardedConductorDetails.update({
+          where: {
+            emailId: newOnboardedConductor.emailId,
+          },
+          data: {
+            cUniqueId,
+          },
+        });
+
+      const onBoardedConductorWithUniqueId = {
+        ...newOnboardedConductor,
+        cUniqueId,
+      };
+
+      return CommonRes.SUCCESS(
+        "Successfully registered the conductor",
+        onBoardedConductorWithUniqueId,
+        resObj,
+        res
+      );
     } catch (err) {
       console.log(err, "error in onboarding new bus");
       return CommonRes.SERVER_ERROR(err, resObj, res);
