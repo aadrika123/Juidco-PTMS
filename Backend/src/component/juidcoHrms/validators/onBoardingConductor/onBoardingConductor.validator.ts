@@ -13,21 +13,19 @@ export const OnBoardingConductorDataValidationSchema = Yup.object({
   mobileNo: Yup.string()
     .required("required")
     .matches(phoneRegExp, "Phone number is not valid")
-    .min(10, "too short")
-    .max(10, "too long"),
+    .min(10, "mobile number must be 10 digit")
+    .max(10, "mobile number must be 10 digit"),
 
-  emailId: Yup.string()
-    .email("Please enter a valid email address")
-    .required("Email is required"),
+  emailId: Yup.string().email("Please enter a valid email address"),
 
   emergencyMobNo: Yup.string()
     .required("required")
     .matches(phoneRegExp, "Phone number is not valid")
-    .min(10, "too short")
-    .max(10, "too long"),
+    .min(10, "mobile number must be 10 digit")
+    .max(10, "mobile number must be 10 digit"),
 
   adhar_no: Yup.string()
     .required("required")
-    .min(12, "too short")
-    .max(12, "too long"),
+    .min(12, "adhar no must be 12 digits")
+    .max(12, "adhar no must be 12 digits"),
 });
