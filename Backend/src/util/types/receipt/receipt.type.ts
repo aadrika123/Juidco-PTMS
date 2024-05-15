@@ -4,6 +4,5 @@ export type ReceiptType = {
   amount: number;
   date: Date;
   time: string;
-  conductor: string;
-  vehicle: string;
+  conductor_id: string;
 };

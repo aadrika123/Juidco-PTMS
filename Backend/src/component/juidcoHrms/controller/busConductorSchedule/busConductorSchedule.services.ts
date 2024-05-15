@@ -22,6 +22,11 @@ export default class BusConductorScheduleServices {
     try {
       const { bus_no, conductor_id, date, from_time, to_time } = req.body;
 
+      //validation error
+      const isValidated = await ScheduleBusConductorValidationSchema.validate(
+        req.body
+      );
+
       const setDate = new Date(date).toISOString();
 
       //   const setTime = time.split(":").join(",");
@@ -34,11 +39,6 @@ export default class BusConductorScheduleServices {
         "settimegetScheduleBusConductorStatus=========>"
       );
       console.log(setDate, "setDate============");
-
-      //validation error
-      const isValidated = await ScheduleBusConductorValidationSchema.validate(
-        req.body
-      );
 
       if (!Object.keys(isValidated).length) {
         return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);

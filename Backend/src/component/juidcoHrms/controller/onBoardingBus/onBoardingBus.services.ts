@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { resObj } from "../../../../util/types";
 import { OnBoardingBusDataValidationSchema } from "../../validators/onBoardingBus/onBoardingBus.validator";
 import CommonRes from "../../../../util/helper/commonResponse";
+import { excludeFields } from "../../../../util/helper/excludeFieldsfromdbData";
 
 type TOnBoardingBusData = {
   registration_no: string;
@@ -146,6 +147,16 @@ export default class OnBoardingBusServices {
     try {
       const getAllBusData = await this.prisma.onBoardedBusDetails.findMany();
 
+      const filteredBusData = await excludeFields(getAllBusData, [
+        "pollution_doc",
+        "taxCopy_doc",
+        "registrationCert_doc",
+        "created_at",
+        "updated_at",
+      ]);
+
+      console.log(filteredBusData, "========>>>>filtered data");
+
       if (!getAllBusData.length)
         return CommonRes.NOT_FOUND(
           "Data not found",
@@ -156,7 +167,7 @@ export default class OnBoardingBusServices {
 
       return CommonRes.SUCCESS(
         "Successfully fetched all bus details",
-        getAllBusData,
+        filteredBusData,
         resObj,
         res
       );

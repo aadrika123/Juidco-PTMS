@@ -11,24 +11,36 @@ export default class BusConductorScheduleRoute {
 
   init(
     app: express.Application,
-    onBoardingBusServices: BusConductorScheduleServices
+    busConductorScheduleServices: BusConductorScheduleServices
   ): void {
     app
       .route(`${baseUrl}/schedule/create-new-schedule`)
       .post((req: Request, res: Response) =>
-        onBoardingBusServices.createScheduleBusConductor(req, res, "041P")
+        busConductorScheduleServices.createScheduleBusConductor(
+          req,
+          res,
+          "041P"
+        )
       );
 
     app
       .route(`${baseUrl}/schedule/get-scheduleStatus`)
-      .get((req: Request, res: Response) =>
-        onBoardingBusServices.getScheduleBusConductorStatus(req, res, "041G")
+      .post((req: Request, res: Response) =>
+        busConductorScheduleServices.getScheduleBusConductorStatus(
+          req,
+          res,
+          "041G"
+        )
       );
 
     app
       .route(`${baseUrl}/schedule/update-schedule`)
       .put((req: Request, res: Response) =>
-        onBoardingBusServices.updateScheduleBusConductor(req, res, "042P")
+        busConductorScheduleServices.updateScheduleBusConductor(
+          req,
+          res,
+          "042P"
+        )
       );
   }
 }

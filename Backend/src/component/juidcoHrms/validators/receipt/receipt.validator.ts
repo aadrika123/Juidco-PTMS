@@ -7,8 +7,7 @@ export const receiptValidatorData = (receipt: ReceiptType): ReceiptType => {
     amount: receipt.amount,
     date: receipt.date,
     time: receipt.time,
-    conductor: receipt.conductor,
-    vehicle: receipt.vehicle,
+    conductor_id: receipt.conductor_id,
   };
 };
 
@@ -17,6 +16,5 @@ export const receiptValidationSchema = Yup.object({
   amount: Yup.number().required(),
   date: Yup.date().required(),
   time: Yup.string().required(),
-  conductor: Yup.string().required(),
-  vehicle: Yup.string().required(),
+  conductor_id: Yup.string().required(),
 });
