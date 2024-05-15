@@ -18,5 +18,11 @@ export default class OnBoardingConductorRoute {
       .post((req: Request, res: Response) =>
         onBoardingConductorServices.onBoardingNewConductor(req, res, "021G")
       );
+
+    app
+      .route(`${baseUrl}/getAllConductorsList`)
+      .get((req: Request, res: Response) =>
+        onBoardingConductorServices.getAllConductorList(req, res, "021G")
+      );
   }
 }

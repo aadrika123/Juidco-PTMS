@@ -4,7 +4,6 @@ import CommonRes from "../../../../util/helper/commonResponse";
 import { resMessage } from "../../../../util/common";
 import { resObj } from "../../../../util/types";
 import { receiptValidationSchema } from "../../validators/receipt/receipt.validator";
-import { generateUnique } from "../../../../util/helper/generateUniqueNo";
 
 class ReceiptServices {
   private receiptDao: ReceiptDao;
@@ -50,18 +49,17 @@ class ReceiptServices {
       version: "1.0",
     };
 
-    const receipt_no = generateUnique("T");
     console.log(req.body.data, "body data receipt========>>");
 
     try {
-      req.body.data.receipt_no = receipt_no;
+      req.body.data.receipt_no = "123445";
       req.body.data.date = new Date();
-      const receipt_No =
-        "T" +
-        new Date(req.body.data.date).toString() +
-        "-" +
-        Math.random().toString(36);
-      console.log(receipt_No);
+      // const receipt_No =
+      //   "T" +
+      //   new Date(req.body.data.date).toString() +
+      //   "-" +
+      //   Math.random().toString(36);
+      // console.log(receipt_No);
 
       await receiptValidationSchema.validate(req.body.data);
 

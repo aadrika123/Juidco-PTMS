@@ -18,5 +18,11 @@ export default class OnBoardingBusRoute {
       .post((req: Request, res: Response) =>
         onBoardingBusServices.onBoardingNewBus(req, res, "021G")
       );
+
+    app
+      .route(`${baseUrl}/getAllBusList`)
+      .get((req: Request, res: Response) =>
+        onBoardingBusServices.getAllBusList(req, res, "021G")
+      );
   }
 }

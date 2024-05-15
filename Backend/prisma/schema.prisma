@@ -10,15 +10,15 @@ datasource db {
 }
 
 model receipt {
-  id         Int      @id @default(autoincrement())
-  receipt_no String
-  amount     Int
-  date       DateTime
-  time       String
-  // vehicle  onBoardedConductorDetails[]
-  conductor  String
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  id                 Int                   @id @default(autoincrement())
+  receipt_no         String                @unique
+  amount             Int
+  date               DateTime              @db.Date
+  time               String
+  bus_conductor_data busConductorMapping[]
+  conductor_id       String
+  created_at         DateTime              @default(now()) @map("created_at")
+  updated_at         DateTime              @updatedAt @map("updated_at")
 }
 
 model onBoardedBusDetails {
@@ -33,7 +33,7 @@ model onBoardedBusDetails {
 }
 
 model onBoardedConductorDetails {
-  id             Int    @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   firstName      String
   middleName     String
   lastName       String
@@ -42,24 +42,22 @@ model onBoardedConductorDetails {
   mobileNo       String
   emergencyMobNo String
   emailId        String
-  cUniqueId      String @unique
+  cUniqueId      String   @unique
   adhar_doc      Json
-  adhar_no       String @unique
+  adhar_no       String   @unique
   fitness_doc    Json
-
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  created_at     DateTime @default(now()) @map("created_at")
+  updated_at     DateTime @updatedAt @map("updated_at")
 }
 
 model busConductorMapping {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   conductor_id String
   bus_no       String
   date         DateTime
   from_time    Int
   to_time      Int
-  // receipts     receipt  @relation(fields: [receipt_id], references: [id])
-  // receipt_id
-  created_at   DateTime @default(now()) @map("created_at")
-  updated_at   DateTime @updatedAt @map("updated_at")
+  receipts     receipt[]
+  created_at   DateTime  @default(now()) @map("created_at")
+  updated_at   DateTime  @updatedAt @map("updated_at")
 }

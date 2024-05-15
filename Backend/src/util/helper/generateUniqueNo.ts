@@ -10,6 +10,16 @@ export const generateUnique = (initialString?: string): string => {
   return initialString ? initialString + unqId : unqId;
 };
 
+export const generateReceiptNumber = (id: any) => {
+  let increementNumber = 50000;
+  const fixedDigits = "T00";
+
+  increementNumber = increementNumber + Number(id);
+  let receiptNumber = fixedDigits + increementNumber;
+
+  return receiptNumber;
+};
+
 export default function generateUniqueId(unique: any) {
   const length = 8;
   const possibleDigits = "0123456789"; // All possible digits

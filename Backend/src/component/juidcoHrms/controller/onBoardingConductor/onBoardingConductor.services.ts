@@ -5,6 +5,7 @@ import { OnBoardingBusDataValidationSchema } from "../../validators/onBoardingBu
 import CommonRes from "../../../../util/helper/commonResponse";
 import { OnBoardingConductorDataValidationSchema } from "../../validators/onBoardingConductor/onBoardingConductor.validator";
 import generateUniqueId from "../../../../util/helper/generateUniqueNo";
+import { excludeFields } from "../../../../util/helper/excludeFieldsfromdbData";
 
 type TOnBoardingConductorData = {
   firstName: string;
@@ -145,6 +146,13 @@ export default class OnBoardingConductorServices {
       const getAllConductorData =
         await this.prisma.onBoardedConductorDetails.findMany();
 
+      const filteredBusData = await excludeFields(getAllConductorData, [
+        "adhar_doc",
+        "fitness_doc",
+        "created_at",
+        "updated_at",
+      ]);
+
       if (!getAllConductorData.length)
         return CommonRes.NOT_FOUND(
           "Data not found",
@@ -155,7 +163,7 @@ export default class OnBoardingConductorServices {
 
       return CommonRes.SUCCESS(
         "Successfully fetched all bus details",
-        getAllConductorData,
+        filteredBusData,
         resObj,
         res
       );
