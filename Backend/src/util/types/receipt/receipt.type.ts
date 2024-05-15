@@ -4,5 +4,7 @@ export type ReceiptType = {
   amount: number;
   date: Date;
   conductor_id: string;
-  rc_no: string;
+  rc: string;
+  time: string;
+  conductor: string;
 };

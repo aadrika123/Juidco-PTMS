@@ -11,7 +11,7 @@ class ReceiptRoute {
 
   init(app: express.Application, receiptServices: ReceiptServices): void {
     app
-      .route(`${baseUrl}/receipt/create`)
+      .route(`${baseUrl}/receipt/cnreate`)
       .post((req: Request, res: Response) =>
         receiptServices.post(req, res, "0101")
       );
