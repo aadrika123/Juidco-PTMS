@@ -120,7 +120,7 @@ export default class ConductorGenerateReportServices {
       console.log("first", query);
 
       const totalAmount = query.reduce((total, item) => total + item.amount, 0);
-      const newRes = { ...query, totalAmount };
+      const newRes = { data: query, totalAmount };
 
       return CommonRes.SUCCESS(
         "Monthly collection generated successfully",
