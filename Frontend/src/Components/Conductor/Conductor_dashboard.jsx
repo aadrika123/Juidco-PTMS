@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function Conductor_dashboard() {
   const navigate = useNavigate();
-
   return (
     <div className="flex items-center justify-between h-screen w-screen">
       <div className="flex flex-1 flex-col justify-between bg-white h-screen ">
