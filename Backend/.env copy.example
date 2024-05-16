@@ -1,7 +1,0 @@
-# Server Configuration
-PORT=5001
-
-# Database Configuration
-# DATABASE_URL="postgresql://postgres:root@localhost:5432/juidco_hrms?schema=public"
-# "postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
-DATABASE_URL="postgresql://postgres:123456@localhost:5432/juidco_ptms"
