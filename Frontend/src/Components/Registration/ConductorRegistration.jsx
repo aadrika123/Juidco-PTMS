@@ -6,6 +6,7 @@ import bus1 from "../../assets/bus-2.png";
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import * as Yup from "yup";
 import {
@@ -16,13 +17,17 @@ import {
   Button,
 } from "@mui/material";
 
+const FILE_SIZE = 2 * 1024 * 1024; // 2MB
+
 const initialValues = {
   Name: "",
   Middle_Name: "",
+  Adhar_NO: "",
   last_Name: "",
   Age: "",
   Blood_Group: "",
   Fitness_Certificate_selectedFile: null,
+  Adhar_card_selectedFile: null,
   Contact_Number: "",
   Emergency_Contact_Number: "",
   EmailId: "",
@@ -34,6 +39,10 @@ const validationSchema = Yup.object({
     .matches(/^[0-9]+$/, "Must be only digits")
     .required("Age is required"),
   Blood_Group: Yup.string().required("Blood Group is required"),
+  Adhar_NO: Yup.string()
+    .required("Adhar Number is required")
+    .matches(/^[0-9]{12}$/, "Adhar Number must be exactly 12 digits")
+    .max(12, "Adhar Number must be exactly 12 digits"),
   Contact_Number: Yup.string()
     .matches(/^[0-9]+$/, "Must be only digits")
     .max(10, "Must be 10 digits")
@@ -41,35 +50,99 @@ const validationSchema = Yup.object({
   Emergency_Contact_Number: Yup.string()
     .matches(/^[0-9]+$/, "Must be only digits")
     .max(10, "Must be 10 digits"),
-  Fitness_Certificate_selectedFile: Yup.mixed().required(
-    "Fitness Certificate File is required"
-  ),
+  Fitness_Certificate_selectedFile: Yup.mixed()
+    .required("Fitness Certificate File is required")
+    .test(
+      "fileSize",
+      "File too large, maximum size is 2MB",
+      (value) => !value || (value && value.size <= FILE_SIZE)
+    ),
+  Adhar_card_selectedFile: Yup.mixed()
+    .required("Adhar Card is required")
+    .test(
+      "fileSize",
+      "File too large, maximum size is 2MB",
+      (value) => !value || (value && value.size <= FILE_SIZE)
+    ),
 });
+
+const handle_Image_upload = async (
+  file,
+  type,
+  setUploadedFiles,
+  setUploading
+) => {
+  const formData = new FormData();
+  formData.append("img", file);
+
+  try {
+    setUploading(true);
+    const response = await axios.post(
+      `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
+  } catch (error) {
+    console.error("Error uploading image:", error);
+  } finally {
+    setUploading(false);
+  }
+};
+
 export default function ConductorRegistration() {
   const [openDialog, setOpenDialog] = React.useState(false); // State to control dialog
   const navigate = useNavigate();
+  const [uploadedFiles, setUploadedFiles] = React.useState({});
+  const [uploading, setUploading] = React.useState(false);
+  const [loading, set_loading] = React.useState(false);
+  const [error, set_error] = React.useState({});
+  const [success, set_success] = React.useState({});
+  const [opeen_error_dialog, set_open_error_dialog] = React.useState(false);
 
-  const onSubmit = (values, { setSubmitting }) => {
-    // Handle form submission here
+  console.log(uploadedFiles);
+  const onSubmit = async (values) => {
     console.log(values);
-    setOpenDialog(true);
-    setSubmitting(false);
+    set_loading(true);
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/onBoardingConductor`,
+        {
+          firstName: values.Name,
+          middleName: values?.Middle_Name,
+          lastName: values?.last_Name,
+          bloodGrp: values.Blood_Group,
+          mobileNo: values.Contact_Number.toString(),
+          emailId: values.EmailId,
+          emergencyMobNo: values.Emergency_Contact_Number.toString(),
+          age: values.Age.toString(),
+          adhar_no: values.Adhar_NO.toString(),
+          adhar_doc: uploadedFiles?.Adhar_card,
+          fitness_doc: uploadedFiles?.Fitness_Certificate,
+        }
+      );
+      set_loading(false);
+      set_success(response.data?.data);
+      setOpenDialog(true);
+    } catch (error) {
+      console.error("Error making POST request:", error);
+      set_loading(false);
+      set_error(error.response.data);
+      set_open_error_dialog(true);
+    }
   };
-
   return (
     <div className="flex flex-1 items-center justify-center h-screen w-screen">
       <div className="flex flex-1 flex-col bg-white h-screen ">
         <div
           onClick={() => navigate(-1)}
-          className="relative w-fit h-fit top-4 left-4"
+          className="relative w-fit h-fit top-4 left-4 md:hidden"
         >
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 96 96"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg width="40" height="40" viewBox="0 0 96 96" fill="none">
             <path
               d="M54 15.1515L45.8098 8L0 48L45.8098 88L54 80.8485L16.3805 48L54 15.1515Z"
               fill="#414141"
@@ -131,10 +204,31 @@ export default function ConductorRegistration() {
               validationSchema={validationSchema}
               onSubmit={onSubmit}
             >
-              {({ values, setFieldValue }) => (
+              {({ values, setFieldValue, resetForm }) => (
                 <Form className="flex flex-col flex-1 gap-4">
                   <div className="flex flex-col sm:flex-row mt-4">
                     {" "}
+                    <div className="flex flex-1 flex-col mt-4">
+                      <label className="mb-2 ml-4" htmlFor="Adhar_NO">
+                        Adhar Number
+                      </label>
+                      <Field
+                        type="number"
+                        id="Adhar_NO"
+                        name="Adhar_NO"
+                        className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
+                        style={{ boxShadow: "0 1px 4px #fff" }}
+                        onFocus={(e) =>
+                          (e.target.style.boxShadow = "0 1px 4px #000")
+                        }
+                        onBlur={(e) => (e.target.style.boxShadow = "none")}
+                      />
+                      <ErrorMessage
+                        name="Adhar_NO"
+                        component="div"
+                        className="text-red-500 ml-4"
+                      />
+                    </div>
                     <div className="flex flex-1 flex-col mt-4">
                       <label className="mb-2 ml-4" htmlFor="Name">
                         Name
@@ -251,8 +345,8 @@ export default function ConductorRegistration() {
                       >
                         Fitness Certificate
                       </label>
-                      <Field
-                        type="File"
+                      <input
+                        type="file"
                         id="Fitness_Certificate_selectedFile"
                         name="Fitness_Certificate_selectedFile"
                         accept="image/*"
@@ -262,12 +356,98 @@ export default function ConductorRegistration() {
                           (e.target.style.boxShadow = "0 1px 4px #000")
                         }
                         onBlur={(e) => (e.target.style.boxShadow = "none")}
+                        onChange={(e) =>
+                          setFieldValue(
+                            "Fitness_Certificate_selectedFile",
+                            e.target.files[0]
+                          )
+                        }
                       />
                       <ErrorMessage
                         name="Fitness_Certificate_selectedFile"
                         component="div"
                         className="text-red-500 ml-4"
                       />
+                      {values.Fitness_Certificate_selectedFile && (
+                        <div className="flex flex-1 justify-end mr-8 ml-8 mt-2">
+                          <button
+                            type="button"
+                            className="flex justify-end items-end  ml-4 px-4 w-fit py-2 bg-[#4245D9] text-white rounded"
+                            onClick={() =>
+                              handle_Image_upload(
+                                values.Fitness_Certificate_selectedFile,
+                                "Fitness_Certificate",
+                                setUploadedFiles,
+                                setUploading
+                              )
+                            }
+                            disabled={uploading}
+                          >
+                            {uploading ? "Uploading..." : "Upload"}
+                          </button>
+                        </div>
+                      )}
+                      {uploadedFiles.Fitness_Certificate && (
+                        <div className="text-green-500 ml-4 mt-2">
+                          Fitness Certificate Uploaded
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-1 flex-col mt-4">
+                      <label
+                        className="mb-2 ml-4"
+                        htmlFor="Adhar_card_selectedFile"
+                      >
+                        Adhar card
+                      </label>
+                      <input
+                        type="file"
+                        id="Adhar_card_selectedFile"
+                        name="Adhar_card_selectedFile"
+                        accept="image/*"
+                        className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
+                        style={{ boxShadow: "0 1px 4px #fff" }}
+                        onFocus={(e) =>
+                          (e.target.style.boxShadow = "0 1px 4px #000")
+                        }
+                        onBlur={(e) => (e.target.style.boxShadow = "none")}
+                        onChange={(e) =>
+                          setFieldValue(
+                            "Adhar_card_selectedFile",
+                            e.target.files[0]
+                          )
+                        }
+                      />
+                      <ErrorMessage
+                        name="Adhar_card_selectedFile"
+                        component="div"
+                        className="text-red-500 ml-4"
+                      />
+                      {values.Adhar_card_selectedFile && (
+                        <div className="flex flex-1 justify-end mr-8 ml-8 mt-2">
+                          <button
+                            type="button"
+                            className="flex justify-end items-end  ml-4 px-4 w-fit py-2 bg-[#4245D9] text-white rounded"
+                            onClick={() =>
+                              handle_Image_upload(
+                                values.Adhar_card_selectedFile,
+                                "Adhar_card",
+                                setUploadedFiles,
+                                setUploading
+                              )
+                            }
+                            disabled={uploading}
+                          >
+                            {uploading ? "Uploading..." : "Upload"}
+                          </button>
+                        </div>
+                      )}
+                      {uploadedFiles.Adhar_card && (
+                        <div className="text-green-500 ml-4 mt-2">
+                          Adhar Card Uploaded
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-col md:flex-row">
@@ -348,29 +528,40 @@ export default function ConductorRegistration() {
 
                   <div className="flex flex-1 flex-row mt-5">
                     <div className="flex flex-1 justify-center items-center ">
-                      <div className="flex w-20 h-10 md:w-[80%] border border-[#4245D9] rounded-md shadow-md justify-center items-center">
+                      <button
+                        onClick={() => navigate(-1)}
+                        className="flex w-20 h-10 md:w-[80%] border border-[#4245D9] rounded-md shadow-md justify-center items-center"
+                      >
                         <h2 className="flex text-[#4245D9] font-semibold">
                           Cancel
                         </h2>
-                      </div>
+                      </button>
                     </div>
                     <div className="flex flex-1 justify-center items-center ">
                       <div className="flex flex-1 justify-center items-center ">
-                        <div className="flex w-20 h-10 md:w-[80%] border border-[#4245D9] rounded-md shadow-md justify-center items-center">
+                        <button
+                          onClick={() => {
+                            resetForm();
+                            setUploadedFiles({});
+                            window.location.reload();
+                          }}
+                          className="flex w-20 h-10 md:w-[80%] border border-[#4245D9] rounded-md shadow-md justify-center items-center"
+                        >
                           <h2 className="flex text-[#4245D9] font-semibold">
                             Reset
                           </h2>
-                        </div>
+                        </button>
                       </div>
                     </div>
                     <div className="flex flex-1 justify-center items-center ">
                       <div className="flex flex-1 justify-center items-center ">
                         <button
                           type="submit"
+                          disabled={loading}
                           className="flex w-20 h-10 md:w-[80%] border bg-[#4245D9] rounded-md shadow-md justify-center items-center"
                         >
                           <h2 className="flex text-white font-semibold">
-                            Save
+                            {loading ? "Loading..." : "Save"}
                           </h2>
                         </button>
                       </div>
@@ -381,12 +572,14 @@ export default function ConductorRegistration() {
             </Formik>
           </div>
 
-          <div className="flex flex-1 mt-10 mb-5 w-full bg-white">
-            <img
-              src={background_image}
-              className="flex flex-1 max-w-full h-auto md:w-fit md:h-[50vh] object-cover"
-              alt="Background"
-            />
+          <div className="flex flex-1 justify-center items-center">
+            <div className="flex mt-10 mb-5 w-fit justify-center items-center bg-white">
+              <img
+                src={background_image}
+                className="flex flex-1 max-w-full h-auto md:w-fit md:h-[50vh] object-cover"
+                alt="Background"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -419,12 +612,57 @@ export default function ConductorRegistration() {
               <div className="flex text-black font-semibold">
                 Your Conductor ID :
               </div>
-              <div className="flex ml-2 text-[#4A4545]">003626565</div>
+              <div className="flex ml-2 text-[#4A4545]">
+                {success?.cUniqueId}
+              </div>
             </div>
           </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={opeen_error_dialog}
+        onClose={() => set_open_error_dialog(false)}
+      >
+        <DialogContent className="bg-red-100">
+          {/* <p>Your form has been submitted successfully.</p> */}
+          <div className="flex flex-1 flex-col justify-center items-center bg-red-100">
+            <div className="flex rounded-full bg-red-500 h-20 w-20 justify-center items-center">
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 61 61"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M47.7261 13.0517L12.726 48.0517M12.7261 13.0517L47.7261 48.0517"
+                  stroke="white"
+                  stroke-width="3.75"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <div className="flex mt-5 text-xl font-semibold ml-10 mr-10">
+              <h2>Something went wrong</h2>
+            </div>
+            <div className="flex mt-5 flex-row justify-around">
+              <div className="flex ml-2 text-[#4A4545]">{error?.message}</div>
+            </div>
+          </div>
+        </DialogContent>
+        <DialogActions className="bg-red-100">
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => set_open_error_dialog(false)}
+          >
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
     </div>
