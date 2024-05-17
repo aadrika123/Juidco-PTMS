@@ -15,7 +15,7 @@ export const generateReceiptNumber = (id: any) => {
   const fixedDigits = "T00";
 
   increementNumber = increementNumber + Number(id);
-  let receiptNumber = fixedDigits + increementNumber;
+  const receiptNumber = fixedDigits + increementNumber;
 
   return receiptNumber;
 };

@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import PtmsRoute from "./component/juidcoHrms/router";
+import PtmsRoute from "./component/juidcoPTMS/router";
 import cors from "cors";
 import bodyParser from "body-parser";
 // import { client } from "./db";
