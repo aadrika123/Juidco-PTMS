@@ -6,7 +6,6 @@ import {
   ConductorReportMonthlyValidationSchema,
   ConductorReportValidationSchema,
 } from "../../validators/conductorReportGen/conductorReportValidator";
-import { toNumber } from "lodash";
 
 type TQuery = [
   {
@@ -21,7 +20,7 @@ type TQuery = [
   }
 ];
 
-export default class ConductorGenerateReportServices {
+export default class BusGenerateReportServices {
   public prisma = new PrismaClient();
 
   constructor() {}
@@ -34,8 +33,7 @@ export default class ConductorGenerateReportServices {
     };
 
     try {
-      const { currentDate, conductor_id } = req.body;
-      const intConductorId = parseInt(conductor_id);
+      const { currentDate, bus_id } = req.body;
 
       //validation
       await ConductorReportValidationSchema.validate(req.body);
@@ -55,19 +53,19 @@ export default class ConductorGenerateReportServices {
       select rr.bus_id, rr.total_amount, ss.from_time, ss.to_time from (
       (SELECT r.bus_id, SUM(r.amount)::INTEGER AS "total_amount"
       FROM receipts r 
-      WHERE r.conductor_id = ${intConductorId}
+      WHERE r.bus_id = ${bus_id}
       AND r.date::date = ${setDate}::date
       GROUP BY r.bus_id) rr
       
       left join 
       
       (select * from scheduler s
-      where s.date::date = ${setDate}::date and s.conductor_id = ${intConductorId}) ss 
+      where s.date::date = ${setDate}::date and s.bus_id = ${bus_id}) ss 
       
       on rr.bus_id = ss.bus_id);
      `;
 
-      console.log(intConductorId);
+      console.log(bus_id);
 
       console.log(dailyCollectionReport, "dailyCollectionReport=========>>");
 
@@ -116,7 +114,7 @@ export default class ConductorGenerateReportServices {
     };
 
     try {
-      const { time, conductor_id } = req.body;
+      const { time, bus_id } = req.body;
 
       //validation
       await ConductorReportMonthlyValidationSchema.validate(req.body);
@@ -134,9 +132,7 @@ export default class ConductorGenerateReportServices {
       const query: TQuery = await this.prisma.$queryRaw`SELECT *
         from 
         receipts
-        where conductor_id = ${Number(
-          conductor_id
-        )} and EXTRACT(MONTH FROM date) = ${Number(
+        where bus_id = ${bus_id} and EXTRACT(MONTH FROM date) = ${Number(
         onlyMonth
       )} and EXTRACT(YEAR FROM date) = ${Number(onlyYear)}
         `;

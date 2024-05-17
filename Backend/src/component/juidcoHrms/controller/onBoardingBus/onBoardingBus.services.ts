@@ -104,7 +104,7 @@ export default class OnBoardingBusServices {
       // }
 
       //checking if bus already exist
-      const isExistingBus = await this.prisma.onBoardedBusDetails.findUnique({
+      const isExistingBus = await this.prisma.bus_master.findUnique({
         where: { vin_no: vin_no },
       });
 
@@ -116,7 +116,7 @@ export default class OnBoardingBusServices {
         );
       }
 
-      const newOnboardedBus = await this.prisma.onBoardedBusDetails.create({
+      const newOnboardedBus = await this.prisma.bus_master.create({
         data: {
           pollution_doc: newBusData?.pollution_cert,
           registrationCert_doc: newBusData?.registration_cert,
@@ -145,7 +145,7 @@ export default class OnBoardingBusServices {
     };
 
     try {
-      const getAllBusData = await this.prisma.onBoardedBusDetails.findMany();
+      const getAllBusData = await this.prisma.bus_master.findMany();
 
       const filteredBusData = await excludeFields(getAllBusData, [
         "pollution_doc",

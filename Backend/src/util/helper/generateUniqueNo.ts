@@ -11,7 +11,7 @@ export const generateUnique = (initialString?: string): string => {
 };
 
 export const generateReceiptNumber = (id: any) => {
-  let increementNumber = 50000;
+  let increementNumber = 500000;
   const fixedDigits = "T00";
 
   increementNumber = increementNumber + Number(id);

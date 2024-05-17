@@ -33,29 +33,20 @@ export default class BusConductorScheduleServices {
       const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
       const setToTime = Number(to_time.replace(":", "").padStart(4, "0"));
 
-      console.log(
-        setFromTime,
-        setToTime,
-        "settimegetScheduleBusConductorStatus=========>"
-      );
-      console.log(setDate, "setDate============");
-
       if (!Object.keys(isValidated).length) {
         return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);
       }
 
       //checking if schedule already exist
-      const isExistingSchedule = await this.prisma.busConductorMapping.findMany(
-        {
-          where: {
-            bus_no,
-            conductor_id,
-            date: setDate,
-            from_time: setFromTime,
-            to_time: setToTime,
-          },
-        }
-      );
+      const isExistingSchedule = await this.prisma.scheduler.findMany({
+        where: {
+          bus_id: bus_no,
+          conductor_id,
+          date: setDate,
+          from_time: setFromTime,
+          to_time: setToTime,
+        },
+      });
 
       console.log(isExistingSchedule, "isexistingsche=============>>");
 
@@ -92,6 +83,7 @@ export default class BusConductorScheduleServices {
 
     try {
       const { bus_no, conductor_id, date, from_time, to_time } = req.body;
+      console.log(req.body, "============req body");
 
       //validation error
       const isValidated = await ScheduleBusConductorValidationSchema.validate(
@@ -100,12 +92,7 @@ export default class BusConductorScheduleServices {
       //   const setTime = time.split(":").join(",");
       const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
       const setToTime = Number(to_time.replace(":", "").padStart(4, "0"));
-
-      console.log(
-        setFromTime,
-        setToTime,
-        "settimegetcreateScheduleBusConductor=========>"
-      );
+      const intConductorId = parseInt(conductor_id);
 
       const setDate = new Date(date).toISOString();
 
@@ -114,17 +101,15 @@ export default class BusConductorScheduleServices {
       }
 
       //checking if schedule already exist
-      const isExistingSchedule = await this.prisma.busConductorMapping.findMany(
-        {
-          where: {
-            bus_no,
-            conductor_id,
-            date: setDate,
-            from_time: setFromTime,
-            to_time: setToTime,
-          },
-        }
-      );
+      const isExistingSchedule = await this.prisma.scheduler.findMany({
+        where: {
+          bus_id: bus_no,
+          conductor_id: intConductorId,
+          date: setDate,
+          from_time: setFromTime,
+          to_time: setToTime,
+        },
+      });
 
       if (isExistingSchedule.length > 0) {
         return CommonRes.VALIDATION_ERROR(
@@ -134,10 +119,10 @@ export default class BusConductorScheduleServices {
         );
       }
 
-      const createNewSchedule = await this.prisma.busConductorMapping.create({
+      const createNewSchedule = await this.prisma.scheduler.create({
         data: {
-          bus_no,
-          conductor_id,
+          bus_id: bus_no,
+          conductor_id: intConductorId,
           date: setDate,
           from_time: setFromTime,
           to_time: setToTime,
@@ -151,7 +136,7 @@ export default class BusConductorScheduleServices {
         res
       );
     } catch (err) {
-      console.log(err, "error in onboarding new bus");
+      console.log(err, "error in ceating schedule");
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
@@ -179,21 +164,16 @@ export default class BusConductorScheduleServices {
 
       const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
       const setToTime = Number(to_time.replace(":", "").padStart(4, "0"));
-
-      console.log(
-        setFromTime,
-        setToTime,
-        "settimegetupdateScheduleBusConductor=========>"
-      );
+      const intConductorId = parseInt(conductor_id);
 
       if (!Object.keys(isValidated).length) {
         return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);
       }
 
-      const existingSchedule = await this.prisma.busConductorMapping.findFirst({
+      const existingSchedule = await this.prisma.scheduler.findFirst({
         where: {
-          bus_no,
-          conductor_id,
+          bus_id: bus_no,
+          conductor_id: intConductorId,
           date: setDate,
           from_time: setFromTime,
           to_time: setToTime,
@@ -201,17 +181,16 @@ export default class BusConductorScheduleServices {
       });
 
       //updating already existschedule
-      const updatingExistingSchedule =
-        await this.prisma.busConductorMapping.update({
-          where: { id: existingSchedule?.id },
-          data: {
-            bus_no,
-            conductor_id,
-            date: setDate,
-            from_time: setFromTime,
-            to_time: setToTime,
-          },
-        });
+      const updatingExistingSchedule = await this.prisma.scheduler.update({
+        where: { id: existingSchedule?.id },
+        data: {
+          bus_id: bus_no,
+          conductor_id: intConductorId,
+          date: setDate,
+          from_time: setFromTime,
+          to_time: setToTime,
+        },
+      });
 
       return CommonRes.SUCCESS(
         "Successfully created Scheduled!!",
