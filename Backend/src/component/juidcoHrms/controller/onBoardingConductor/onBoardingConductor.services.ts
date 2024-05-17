@@ -73,10 +73,11 @@ export default class OnBoardingConductorServices {
       }
 
       //checking if conductor already exist
-      const isExistingConductor =
-        await this.prisma.onBoardedConductorDetails.findUnique({
+      const isExistingConductor = await this.prisma.conductor_master.findUnique(
+        {
           where: { adhar_no },
-        });
+        }
+      );
 
       if (isExistingConductor) {
         return CommonRes.VALIDATION_ERROR(
@@ -86,46 +87,45 @@ export default class OnBoardingConductorServices {
         );
       }
 
-      const newOnboardedConductor =
-        await this.prisma.onBoardedConductorDetails.create({
-          data: {
-            firstName,
-            middleName,
-            lastName,
-            age,
-            bloodGrp,
-            mobileNo,
-            emailId,
-            emergencyMobNo,
-            adhar_doc,
-            adhar_no,
-            fitness_doc,
-            cUniqueId: "",
-          },
-        });
+      const newOnboardedConductor = await this.prisma.conductor_master.create({
+        data: {
+          first_name: firstName,
+          middle_name: middleName,
+          last_name: lastName,
+          age,
+          blood_grp: bloodGrp,
+          mobile_no: mobileNo,
+          email_id: emailId,
+          emergency_mob_no: emergencyMobNo,
+          adhar_doc,
+          adhar_no,
+          fitness_doc,
+          cunique_id: 123,
+        },
+      });
 
       // const uniqueId = generateUnique();
       const cUniqueId = generateUniqueId(newOnboardedConductor?.id);
       console.log(cUniqueId, "uniqueId=================>");
 
       const updatingConductorDetails =
-        await this.prisma.onBoardedConductorDetails.update({
+        await this.prisma.conductor_master.update({
           where: {
             adhar_no: newOnboardedConductor.adhar_no,
           },
           data: {
-            cUniqueId,
+            cunique_id: parseInt(cUniqueId),
           },
         });
 
       const onBoardedConductorWithUniqueId = {
         ...newOnboardedConductor,
-        cUniqueId,
+        cunique_id: cUniqueId,
       };
 
       return CommonRes.SUCCESS(
         "Successfully registered the conductor",
-        onBoardedConductorWithUniqueId,
+        updatingConductorDetails,
         resObj,
         res
       );
@@ -143,8 +143,7 @@ export default class OnBoardingConductorServices {
     };
 
     try {
-      const getAllConductorData =
-        await this.prisma.onBoardedConductorDetails.findMany();
+      const getAllConductorData = await this.prisma.conductor_master.findMany();
 
       const filteredBusData = await excludeFields(getAllConductorData, [
         "adhar_doc",
