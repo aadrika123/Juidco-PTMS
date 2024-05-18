@@ -51,19 +51,19 @@ export default class ConductorGenerateReportServices {
       // `;
 
       const dailyCollectionReport = await this.prisma.$queryRaw<any[]>`
-      select rr.bus_id, rr.total_amount, ss.from_time, ss.to_time from (
-      (SELECT r.bus_id, SUM(r.amount)::INTEGER AS "total_amount"
-      FROM receipts r 
-      WHERE r.conductor_id = ${intConductorId}
-      AND r.date::date = ${setDate}::date
-      GROUP BY r.bus_id) rr
-      
-      left join 
-      
-      (select * from scheduler s
-      where s.date::date = ${setDate}::date and s.conductor_id = ${intConductorId}) ss 
-      
-      on rr.bus_id = ss.bus_id);
+        select rr.bus_id, rr.total_amount, ss.from_time, ss.to_time from (
+        (SELECT r.bus_id, SUM(r.amount)::INTEGER AS "total_amount"
+        FROM receipts r 
+        WHERE r.conductor_id = ${intConductorId}
+        AND r.date::date = ${setDate}::date
+        GROUP BY r.bus_id) rr
+        
+        left join 
+        
+        (select * from scheduler s
+        where s.date::date = ${setDate}::date and s.conductor_id = ${intConductorId}) ss 
+        
+        on rr.bus_id = ss.bus_id);
      `;
 
       console.log(intConductorId);

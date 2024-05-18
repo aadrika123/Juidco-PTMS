@@ -114,20 +114,10 @@ class ReceiptDao {
     ]);
     return generateRes({ data, count, page, limit });
   };
-  // ======================== GET RECEIPTS =========================================//
 
-  getReceiptTotalAmnt = async (req: Request) => {
-    const { from_date, to_date } = req.body;
 
-    // ------------ CONDUCTOR COLLECTED --------------------//
-    const query: Prisma.receiptsGroupByArgs = {
-      by: "date",
-      _sum: { amount: true },
-    };
+  
 
-    // const data = await prisma.receipts.groupBy(query);
-    // ------------ BUS COLLECTED --------------------//
-  };
 }
 
 export default ReceiptDao;

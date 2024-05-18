@@ -84,35 +84,6 @@ class ReceiptServices {
       return CommonRes.SERVER_ERROR(error, resObj, res);
     }
   };
-
-  getReceiptTotalAmnt = async (req: Request, res: Response, apiId: string) => {
-    const resObj: resObj = {
-      apiId,
-      action: "GET",
-      version: "1.0",
-    };
-
-    try {
-      const data = await this.receiptDao.getReceiptTotalAmnt(req);
-      // if (!data) {
-      //   return CommonRes.NOT_FOUND(
-      //     resMessage(this.initMsg).NOT_FOUND,
-      //     data,
-      //     resObj,
-      //     res
-      //   );
-      // }
-
-      return CommonRes.SUCCESS(
-        resMessage(this.initMsg).FOUND,
-        data,
-        resObj,
-        res
-      );
-    } catch (error) {
-      return CommonRes.SERVER_ERROR(error, resObj, res);
-    }
-  };
 }
 
 export default ReceiptServices;

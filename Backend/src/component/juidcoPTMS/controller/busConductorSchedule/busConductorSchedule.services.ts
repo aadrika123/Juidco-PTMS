@@ -190,4 +190,33 @@ export default class BusConductorScheduleServices {
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
+  deleteScheduleBusConductor = async (
+    req: Request,
+    res: Response,
+    apiId: string
+  ) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.busConductorSchedule.deleteScheduleBusConductor(
+        req
+      );
+      if (!data) {
+        return CommonRes.NOT_FOUND("Schedule Not Found", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS(
+        "Successfully updated Schedule",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
 }

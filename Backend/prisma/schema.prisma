@@ -10,12 +10,13 @@ datasource db {
 }
 
 model bus_master {
-  id                   Int    @id @default(autoincrement())
-  register_no          String @unique
-  vin_no               String @unique
+  id                   Int     @id @default(autoincrement())
+  register_no          String  @unique
+  vin_no               String  @unique
   pollution_doc        Json
   taxCopy_doc          Json
   registrationCert_doc Json
+  status               String? @default("Not Scheduled")// ---> scheduled || not_scheduled
 
   schedules scheduler[]
   receipts  receipts[]
@@ -33,7 +34,7 @@ model conductor_master {
   blood_grp        String
   mobile_no        String
   emergency_mob_no String
-  email_id         String
+  email_id         String @unique
   cunique_id       String @unique
   adhar_doc        Json
   adhar_no         String @unique
@@ -52,9 +53,8 @@ model scheduler {
   conductor_id String
   conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
 
-  bus_id String
-  bus    bus_master @relation(fields: [bus_id], references: [register_no])
-
+  bus_id    String
+  bus       bus_master @relation(fields: [bus_id], references: [register_no])
   date      DateTime
   from_time Int
   to_time   Int

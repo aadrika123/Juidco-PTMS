@@ -1,27 +1,36 @@
 import express, { Request, Response } from "express";
 import { baseUrl } from "../../../../util/common";
-import BusGenerateReportServices from "../../controller/reportGeneration/busReport.services";
+// import BusGenerateReportServices from "../../controller/reportGeneration/busReport.services";
+import ReportController from "../../controller/report/report.controller";
 
 export default class BusReportRoute {
   constructor(app: express.Application) {
-    const busGenerateReportServices = new BusGenerateReportServices();
-    this.init(app, busGenerateReportServices);
+    // const busGenerateReportServices = new BusGenerateReportServices();
+    const reportController = new ReportController();
+    // this.init(app, busGenerateReportServices);
+    this.init(app, reportController);
   }
 
   init(
     app: express.Application,
-    busGenerateReportServices: BusGenerateReportServices
+    // busGenerateReportServices: BusGenerateReportServices
+    reportGeneration: ReportController
   ): void {
     app
       .route(`${baseUrl}/report/bus-daywise`)
       .post((req: Request, res: Response) =>
-        busGenerateReportServices.getDayCollection(req, res, "051P")
+        reportGeneration.get(req, res, "0501")
       );
 
     app
-      .route(`${baseUrl}/report/bus-monthwise`)
+      .route(`${baseUrl}/report/bus-daywise/total`)
       .post((req: Request, res: Response) =>
-        busGenerateReportServices.getMonthlyCollection(req, res, "051G")
+        reportGeneration.getTotalAmount(req, res, "0502")
       );
+    // app
+    //   .route(`${baseUrl}/report/bus-monthwise`)
+    //   .post((req: Request, res: Response) =>
+    //     busGenerateReportServices.getMonthlyCollection(req, res, "051G")
+    //   );
   }
 }

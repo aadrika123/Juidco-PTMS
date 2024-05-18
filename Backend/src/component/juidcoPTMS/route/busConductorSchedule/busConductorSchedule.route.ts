@@ -47,5 +47,11 @@ export default class BusConductorScheduleRoute {
       .get((req: Request, res: Response) =>
         busConductorScheduleServices.getScheduleBusConductor(req, res, "042P")
       );
+
+    app
+      .route(`${baseUrl}/schedule/delete`)
+      .get((req: Request, res: Response) =>
+        busConductorScheduleServices.deleteScheduleBusConductor(req, res, "042P")
+      );
   }
 }

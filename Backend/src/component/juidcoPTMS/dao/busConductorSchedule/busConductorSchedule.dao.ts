@@ -6,34 +6,20 @@ const prisma = new PrismaClient();
 
 class BusConductorScheduleDao {
   createScheduleBusConductor = async (req: Request) => {
-    const { bus_no, conductor_id, date, from_time, to_time } = req.body;
+    const { bus_no, conductor_id, date, from_time, to_time, is_scheduled } =
+      req.body;
 
     const setDate = new Date(date).toISOString();
 
     const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
     const setToTime = Number(to_time.replace(":", "").padStart(4, "0"));
 
-    // // console.log(first)
-    // //checking if schedule already exist
-    // const isExistingSchedule = await prisma.scheduler.findFirst({
-    //   select: { id: true },
-    //   where: {
-    //     bus_id: bus_no,
-    //     conductor_id: conductor_id,
-    //     from_time: setFromTime,
-    //     to_time: setToTime
-    //   },
-    // });
-
-    console.log(setFromTime, setToTime);
     try {
       const isExistingSchedule = await prisma.$queryRawUnsafe<any[]>(`
     select * from scheduler where
     not ((${setFromTime} <= from_time and ${setToTime} <= from_time)
     or  (${setFromTime} >= to_time and ${setToTime} >= to_time)) 
     `);
-
-      console.log(isExistingSchedule, "exist");
 
       if (isExistingSchedule) {
         return generateRes({
@@ -56,6 +42,17 @@ class BusConductorScheduleDao {
       },
     });
 
+    if (createNewSchedule && is_scheduled) {
+      await prisma.bus_master.update({
+        data: {
+          status: is_scheduled,
+        },
+        where: {
+          register_no: bus_no,
+        },
+      });
+    }
+
     return generateRes(createNewSchedule);
   };
 
@@ -75,8 +72,27 @@ class BusConductorScheduleDao {
         date: true,
         from_time: true,
         to_time: true,
-        bus: true,
-        conductor: true,
+        bus: {
+          select: {
+            id: true,
+            register_no: true,
+            vin_no: true,
+          },
+        },
+        conductor: {
+          select: {
+            first_name: true,
+            middle_name: true,
+            last_name: true,
+            age: true,
+            blood_grp: true,
+            mobile_no: true,
+            emergency_mob_no: true,
+            email_id: true,
+            cunique_id: true,
+            adhar_no: true,
+          },
+        },
       },
     };
 
@@ -110,7 +126,11 @@ class BusConductorScheduleDao {
       };
     }
 
-    if (conductor_id !== "" && conductor_id !== "undefined") {
+    if (
+      conductor_id !== "" &&
+      typeof bus_no === "string" &&
+      conductor_id !== "undefined"
+    ) {
       query.where = {
         OR: [
           {
@@ -145,7 +165,8 @@ class BusConductorScheduleDao {
   };
 
   updateScheduleBusConductor = async (req: Request) => {
-    const { id, bus_no, conductor_id, date, from_time, to_time } = req.body;
+    const { id, bus_no, conductor_id, date, from_time, to_time, is_scheduled } =
+      req.body;
 
     const setDate = new Date(date).toISOString();
 
@@ -167,6 +188,30 @@ class BusConductorScheduleDao {
       },
     };
     const data = await prisma.scheduler.update(query);
+
+    if (data && is_scheduled) {
+      await prisma.bus_master.update({
+        data: {
+          status: is_scheduled,
+        },
+        where: {
+          register_no: bus_no,
+        },
+      });
+    }
+
+    return generateRes(data);
+  };
+
+  deleteScheduleBusConductor = async (req: Request) => {
+    const id = Number(req.body.id);
+
+    const data = await prisma.scheduler.delete({
+      where: {
+        id: id,
+      },
+    });
+
     return generateRes(data);
   };
 }
