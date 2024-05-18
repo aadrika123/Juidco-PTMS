@@ -1,23 +1,18 @@
 import { Request } from "express";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { generateRes } from "../../../../util/generateRes";
 import { generateReceiptNumber } from "../../../../util/helper/generateUniqueNo";
+import { addMethod } from "yup";
 
 const prisma = new PrismaClient();
 
 export const genrateDate = () => {};
 class ReceiptDao {
-  get = async () => {
-    const data = await prisma.$queryRaw`select * from receipts`;
-    return data;
-  };
-
   post = async (req: Request) => {
-    // const body = receiptValidatorData(req.body.data);
     console.log("before creating");
     console.log(req.body.data, "req.body.data");
 
-    const time = Number(req.body.data.time);
+    // const time = Number(req.body.data.time);
     //const date = new Date(`${req.body.data.date}T10:19:58.523Z`);
     const date = new Date(req.body.data.date);
 
@@ -51,6 +46,87 @@ class ReceiptDao {
     });
 
     return generateRes(dataWithReceiptNo);
+  };
+
+  // ======================== GET RECEIPTS =========================================//
+  get = async (req: Request) => {
+    const { from_date, to_date } = req.body;
+    const page: number = Number(req.query.page);
+    const limit: number = Number(req.query.limit);
+    const search: string = String(req.query.search);
+
+    console.log(search, new Date(from_date), to_date, "datee");
+
+    const query: Prisma.receiptsFindManyArgs = {
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        amount: true,
+        bus: true,
+        date: true,
+        conductor: true,
+        time: true,
+        receipt_no: true,
+      },
+    };
+
+    if (search !== "" && typeof search === "string" && search !== "undefined") {
+      query.where = {
+        OR: [
+          {
+            bus: {
+              register_no: { contains: search, mode: "insensitive" },
+            },
+          },
+
+          {
+            bus: {
+              vin_no: { contains: search, mode: "insensitive" },
+            },
+          },
+        ],
+      };
+    }
+
+    if (
+      from_date !== "" &&
+      from_date !== undefined &&
+      to_date !== "" &&
+      to_date !== undefined
+    ) {
+      const d1 = new Date(from_date);
+      const d2 = new Date(to_date);
+      query.where = {
+        OR: [
+          {
+            date: {
+              gte: d1,
+              lte: d2,
+            },
+          },
+        ],
+      };
+    }
+
+    const [data, count] = await prisma.$transaction([
+      prisma.receipts.findMany(query),
+      prisma.receipts.count(),
+    ]);
+    return generateRes({ data, count, page, limit });
+  };
+  // ======================== GET RECEIPTS =========================================//
+
+  getReceiptTotalAmnt = async (req: Request) => {
+    const { from_date, to_date } = req.body;
+
+    // ------------ CONDUCTOR COLLECTED --------------------//
+    const query: Prisma.receiptsGroupByArgs = {
+      by: "date",
+      _sum: { amount: true },
+    };
+
+    // const data = await prisma.receipts.groupBy(query);
+    // ------------ BUS COLLECTED --------------------//
   };
 }
 

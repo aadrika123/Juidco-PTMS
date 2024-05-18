@@ -13,22 +13,37 @@ class BusConductorScheduleDao {
     const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
     const setToTime = Number(to_time.replace(":", "").padStart(4, "0"));
 
-    //checking if schedule already exist
-    const isExistingSchedule = await prisma.scheduler.findMany({
-      where: {
-        bus_id: bus_no,
-        conductor_id: conductor_id,
-        date: setDate,
-        from_time: setFromTime,
-        to_time: setToTime,
-      },
-    });
+    // // console.log(first)
+    // //checking if schedule already exist
+    // const isExistingSchedule = await prisma.scheduler.findFirst({
+    //   select: { id: true },
+    //   where: {
+    //     bus_id: bus_no,
+    //     conductor_id: conductor_id,
+    //     from_time: setFromTime,
+    //     to_time: setToTime
+    //   },
+    // });
 
-    if (isExistingSchedule) {
-      return generateRes({
-        error_type: "VALIDATION",
-        validation_error: "Already Exist",
-      });
+    console.log(setFromTime, setToTime);
+    try {
+      const isExistingSchedule = await prisma.$queryRawUnsafe<any[]>(`
+    select * from scheduler where
+    not ((${setFromTime} <= from_time and ${setToTime} <= from_time)
+    or  (${setFromTime} >= to_time and ${setToTime} >= to_time)) 
+    `);
+
+      console.log(isExistingSchedule, "exist");
+
+      if (isExistingSchedule) {
+        return generateRes({
+          error_type: "VALIDATION",
+          id: isExistingSchedule[0].id,
+          validation_error: "Already Exist",
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
 
     const createNewSchedule = await prisma.scheduler.create({
@@ -137,6 +152,8 @@ class BusConductorScheduleDao {
     const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
     const setToTime = Number(to_time.replace(":", "").padStart(4, "0"));
 
+    console.log(id, conductor_id, bus_no, "ll");
+
     const query: Prisma.schedulerUpdateArgs = {
       data: {
         bus_id: bus_no,
@@ -145,7 +162,9 @@ class BusConductorScheduleDao {
         from_time: setFromTime,
         to_time: setToTime,
       },
-      where: id,
+      where: {
+        id: parseInt(id),
+      },
     };
     const data = await prisma.scheduler.update(query);
     return generateRes(data);

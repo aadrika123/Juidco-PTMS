@@ -21,7 +21,7 @@ class ReceiptServices {
     };
 
     try {
-      const data = await this.receiptDao.get();
+      const data = await this.receiptDao.get(req);
       if (!data) {
         return CommonRes.NOT_FOUND(
           resMessage(this.initMsg).NOT_FOUND,
@@ -49,7 +49,7 @@ class ReceiptServices {
       version: "1.0",
     };
 
-    // console.log(req.body.data, "body data receipt========>>");
+    console.log(req.body.data, "body data receipt========>>");
 
     try {
       const setTime = req.body.data.time.replace(":", "").padStart(4, "0");
@@ -65,14 +65,43 @@ class ReceiptServices {
       await receiptValidationSchema.validate(req.body.data);
       const data = await this.receiptDao.post(req);
 
-      if (!data) {
-        return CommonRes.NOT_FOUND(
-          resMessage(this.initMsg).NOT_FOUND,
-          data,
-          resObj,
-          res
-        );
-      }
+      // if (!data) {
+      //   return CommonRes.NOT_FOUND(
+      //     resMessage(this.initMsg).NOT_FOUND,
+      //     data,
+      //     resObj,
+      //     res
+      //   );
+      // }
+
+      return CommonRes.SUCCESS(
+        resMessage(this.initMsg).FOUND,
+        data,
+        resObj,
+        res
+      );
+    } catch (error) {
+      return CommonRes.SERVER_ERROR(error, resObj, res);
+    }
+  };
+
+  getReceiptTotalAmnt = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.receiptDao.getReceiptTotalAmnt(req);
+      // if (!data) {
+      //   return CommonRes.NOT_FOUND(
+      //     resMessage(this.initMsg).NOT_FOUND,
+      //     data,
+      //     resObj,
+      //     res
+      //   );
+      // }
 
       return CommonRes.SUCCESS(
         resMessage(this.initMsg).FOUND,

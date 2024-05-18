@@ -64,7 +64,7 @@ class BusOnboarding {
       },
     };
 
-    if (search !== "" && typeof search === "string") {
+    if (search !== "" && typeof search === "string" && search !== "undefined") {
       query.where = {
         OR: [
           {

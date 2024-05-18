@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { resObj } from "../../../../util/types";
 import { ScheduleBusConductorValidationSchema } from "../../validators/scheduleBusConductor/scheduleBusConductor.validator";
 import BusConductorScheduleDao from "../../dao/busConductorSchedule/busConductorSchedule.dao";
+import { sendResponse } from "../../../../util/sendResponse";
 
 export default class BusConductorScheduleServices {
   public prisma = new PrismaClient();
@@ -99,9 +100,14 @@ export default class BusConductorScheduleServices {
         req
       );
       if (data.error_type === "VALIDATION") {
-        return CommonRes.VALIDATION_ERROR(
-          "Vehicle Already Registered",
-          resObj,
+        return sendResponse(
+          true,
+          "Already Exist",
+          data,
+          403,
+          resObj.action,
+          resObj.apiId,
+          resObj.version,
           res
         );
       }

@@ -34,8 +34,7 @@ export class UploadImgServices {
       resMessage("Image uploaded successfully").FOUND,
       data,
       resObj,
-      res,
-      next
+      res
     );
   };
 }

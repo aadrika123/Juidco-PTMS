@@ -20,8 +20,14 @@ class ReceiptRoute {
 
     app
       .route(`${baseUrl}/receipt/get`)
-      .get(responseTime, (req: Request, res: Response) =>
+      .post(responseTime, (req: Request, res: Response) =>
         receiptServices.get(req, res, "0102")
+      );
+
+    app
+      .route(`${baseUrl}/receipt/total`)
+      .post(responseTime, (req: Request, res: Response) =>
+        receiptServices.getReceiptTotalAmnt(req, res, "0103")
       );
   }
 }
