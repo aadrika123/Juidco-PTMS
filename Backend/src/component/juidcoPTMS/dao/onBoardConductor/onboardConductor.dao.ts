@@ -68,8 +68,14 @@ class ConductorOnBoarding {
     return generateRes(data);
   };
 
-  getAllConductorList = async () => {
+  getAllConductorList = async (req: Request) => {
+    const id = String(req.query.id);
+    const page: number = Number(req.query.page);
+    const limit: number = Number(req.query.limit);
+    const search: string = String(req.query.search);
     const query: Prisma.conductor_masterFindManyArgs = {
+      skip: (page - 1) * limit,
+      take: limit,
       select: {
         first_name: true,
         middle_name: true,
@@ -84,8 +90,29 @@ class ConductorOnBoarding {
       },
     };
 
-    const data = await prisma.conductor_master.findMany(query);
-    return generateRes(data);
+    if (id !== "" && id !== "undefined") {
+      query.where = {
+        cunique_id: id,
+      };
+    }
+
+    if (search !== "" && typeof search === "string" && search !== "undefined") {
+      query.where = {
+        OR: [
+          {
+            cunique_id: { contains: search, mode: "insensitive" },
+          },
+          {
+            first_name: { contains: search, mode: "insensitive" },
+          },
+        ],
+      };
+    }
+    const [data, count] = await prisma.$transaction([
+      prisma.conductor_master.findMany(query),
+      prisma.conductor_master.count(),
+    ]);
+    return generateRes({ data, count, page, limit });
   };
 }
 

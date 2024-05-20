@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { generateRes } from "../../../../util/generateRes";
 
 const prisma = new PrismaClient();
@@ -7,127 +7,98 @@ class ReportDao {
   generateReport = async (req: Request) => {
     const { conductor_id, bus_id, from_date, to_date } = req.body;
     let amounts: any = [];
+    let query: string = "";
+    const conductor: string = ", receipts.conductor_id ";
 
-    console.log(conductor_id);
-    const query: Prisma.receiptsFindManyArgs = {
-      select: {
-        id: true,
-        amount: true,
-        bus: {
-          select: {
-            id: true,
-            register_no: true,
-            vin_no: true,
-          },
-        },
-        conductor: {
-          select: {
-            first_name: true,
-            middle_name: true,
-            last_name: true,
-            age: true,
-            blood_grp: true,
-            mobile_no: true,
-            emergency_mob_no: true,
-            email_id: true,
-            cunique_id: true,
-            adhar_no: true,
-          },
-        },
-        date: true,
-      },
-    };
+    function query_fn(extend_query: string, conductor?: string): string {
+      return `
+        select bus_id, sum(amount)::INT as total_collection ,date, bm.status ${
+          conductor || ""
+        } from receipts 
+        LEFT JOIN bus_master as bm ON receipts.bus_id = bm.register_no
+        LEFT JOIN conductor_master as cm ON receipts.conductor_id = cm.cunique_id
+        ${extend_query} group by bus_id, date, bm.status ${
+        conductor || ""
+      } order by date ASC
+      `;
+    }
+
+    query = query_fn("");
 
     if (conductor_id) {
-      query.where = {
-        OR: [
-          {
-            conductor_id: conductor_id,
-          },
-        ],
-      };
+      const query_extend = `where receipts.conductor_id = '${conductor_id}' `;
+      query = query_fn(query_extend, conductor);
 
       amounts = await prisma.$queryRawUnsafe(`
-        select conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts group by conductor_id, amount, date
+        select conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts 
+        group by conductor_id, amount, date
       `);
     }
 
     if (bus_id) {
-      query.where = {
-        OR: [
-          {
-            bus_id: bus_id,
-          },
-        ],
-      };
+      const query_extend = `where receipts.bus_id = '${bus_id}' `;
+      query = query_fn(query_extend);
 
       amounts = await prisma.$queryRawUnsafe(`
-      select bus_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts group by bus_id, amount, date
+        select bus_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts 
+        where bus_id = '${bus_id}'
+        group by bus_id, amount, date
       `);
     }
 
     // ======================== BY CONDUCTOR ================================//
     if (from_date && conductor_id) {
-      query.where = {
-        OR: [
-          {
-            date: new Date(from_date),
-          },
-        ],
-      };
+      const query_extend = `where receipts.conductor_id = '${conductor_id}' AND date::text = '${from_date}'`;
+      query = query_fn(query_extend, conductor);
 
       amounts = await prisma.$queryRawUnsafe(`
-        select conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts group by conductor_id, amount, date
+        select conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts 
+        group by conductor_id, amount, date
         having date = '${from_date}'`);
     }
 
     if (from_date && to_date && conductor_id) {
-      query.where = {
-        OR: [
-          {
-            date: {
-              gte: new Date(from_date),
-              lte: new Date(to_date),
-            },
-          },
-        ],
-      };
+      const query_extend = `where date::text between '${from_date}' and '${to_date}'
+                            AND receipts.conductor_id = '${conductor_id}'`;
+      query = query_fn(query_extend, conductor);
+
+      amounts = await prisma.$queryRawUnsafe(`
+        select bus_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts
+        WHERE conductor_id = '${conductor_id}' AND date BETWEEN '${from_date}' AND '${to_date}'
+        group by bus_id, amount, date
+        ORDER BY date ASC`);
     }
     // ======================== BY CONDUCTOR ================================//
 
     // ======================== BY BUS================================//
     if (from_date && bus_id) {
-      query.where = {
-        OR: [
-          {
-            date: new Date(from_date),
-          },
-        ],
-      };
+      const query_extend = `where receipts.bus_id = '${bus_id}' AND date::text = '${from_date}'`;
+      query = query_fn(query_extend);
 
       amounts = await prisma.$queryRawUnsafe(`
-      select bus_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts group by bus_id, amount, date
-      having date = '${from_date}'`);
+        select bus_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts 
+        where bus_id = '${bus_id}'
+        group by bus_id, amount, date
+        having date = '${from_date}'`);
     }
 
     if (from_date && to_date && bus_id) {
-      query.where = {
-        OR: [
-          {
-            date: {
-              gte: new Date(from_date),
-              lte: new Date(to_date),
-            },
-          },
-        ],
-      };
+      const query_extend = `where date::text between '${from_date}' and '${to_date}'
+                            AND receipts.bus_id = '${bus_id}'`;
+      query = query_fn(query_extend);
       amounts = await prisma.$queryRawUnsafe(`
-      select bus_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts group by bus_id, amount, date
-      having date between '${from_date}' AND '${to_date}' ORDER BY date ASC`);
+        select bus_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts
+        WHERE bus_id = '${bus_id}' AND date BETWEEN '${from_date}' AND '${to_date}'
+        group by bus_id, amount, date
+        ORDER BY date ASC`);
     }
     // ======================== BY BUS================================//
 
-    const [data] = await prisma.$transaction([prisma.receipts.findMany(query)]);
+    const [data] = await prisma.$transaction([
+      prisma.$queryRawUnsafe<any[]>(`${query}`),
+    ]);
+
+    console.log(data);
 
     const result = {
       data: [...data],
@@ -137,25 +108,50 @@ class ReportDao {
   };
 
   getTotalAmount = async (req: Request) => {
-    const { bus_id, conductor_id } = req.body;
-
-    const byConductor = await prisma.receipts.groupBy({
-      by: "conductor_id",
-      _sum: { amount: true },
-      orderBy: { conductor_id: "asc" },
-    });
-
-    const byBus = await prisma.receipts.groupBy({
-      by: "bus_id",
-      _sum: { amount: true },
-      orderBy: { bus_id: "asc" },
-    });
-
-    if (bus_id) {
-      return generateRes(byBus);
-    } else if (conductor_id) {
-      return generateRes(byConductor);
+    const { bus_id, conductor_id, from_date, to_date } = req.body;
+    let query: string = "";
+    function query_fn(extend_query: string): string {
+      return `
+        select sum(amount)::INT as total_bus_collection from receipts ${extend_query}
+      `;
     }
+
+    query = query_fn("");
+
+    //   ------------------------- FILTER BY BUS -----------------------------//
+    if (bus_id) {
+      query = query_fn(`where bus_id = '${bus_id}'`);
+    }
+
+    if (bus_id && from_date) {
+      query = query_fn(`WHERE bus_id = '${bus_id}' AND date = '${from_date}'`);
+    }
+    if (bus_id && from_date && to_date) {
+      query = query_fn(
+        `where bus_id = '${bus_id}' AND date BETWEEN '${from_date}' AND '${to_date}'`
+      );
+    }
+    //   ------------------------- FILTER BY BUS -----------------------------//
+
+    //   ------------------------- FILTER BY CONDUCTOR-----------------------------//
+    if (conductor_id) {
+      query = query_fn(`where conductor_id = '${conductor_id}'`);
+    }
+    if (conductor_id && from_date) {
+      query = query_fn(
+        ` where conductor_id = '${conductor_id}' AND date = '${from_date}'`
+      );
+    }
+    if (conductor_id && from_date && to_date) {
+      query = query_fn(
+        `where conductor_id = '${conductor_id}' AND date BETWEEN '${from_date}' AND '${to_date}'`
+      );
+    }
+    //   ------------------------- FILTER BY CONDUCTOR-----------------------------//
+
+    const data = await prisma.$queryRawUnsafe(`${query}`);
+
+    return generateRes(data);
   };
 }
 

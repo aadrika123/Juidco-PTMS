@@ -2,7 +2,6 @@ import { Request } from "express";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { generateRes } from "../../../../util/generateRes";
 import { generateReceiptNumber } from "../../../../util/helper/generateUniqueNo";
-import { addMethod } from "yup";
 
 const prisma = new PrismaClient();
 
@@ -62,11 +61,30 @@ class ReceiptDao {
       take: limit,
       select: {
         amount: true,
-        bus: true,
-        date: true,
-        conductor: true,
+        bus: {
+          select: {
+            id: true,
+            register_no: true,
+            vin_no: true,
+          },
+        },
+        conductor: {
+          select: {
+            first_name: true,
+            middle_name: true,
+            last_name: true,
+            age: true,
+            blood_grp: true,
+            mobile_no: true,
+            emergency_mob_no: true,
+            email_id: true,
+            cunique_id: true,
+            adhar_no: true,
+          },
+        },
         time: true,
         receipt_no: true,
+        date: true,
       },
     };
 
@@ -114,10 +132,6 @@ class ReceiptDao {
     ]);
     return generateRes({ data, count, page, limit });
   };
-
-
-  
-
 }
 
 export default ReceiptDao;

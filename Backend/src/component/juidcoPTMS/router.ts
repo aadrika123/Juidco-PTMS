@@ -1,16 +1,16 @@
 import express from "express";
 import ReceiptRoute from "./route/receipt/receipt.route";
-import { Router } from "express";
-import { baseUrl } from "../../util/common";
+// import { Router } from "express";
+// import { baseUrl } from "../../util/common";
 import OnBoardingBusRoute from "./route/onBoardingBus/onBoardingBus.route";
 import OnBoardingConductorRoute from "./route/onBoardingConductor/onBoardingConductor.route";
 import UploadImgRoute from "./route/uploadImage/uploadImg.route";
 import BusConductorScheduleRoute from "./route/busConductorSchedule/busConductorSchedule.route";
 import ConductorReportRoute from "./route/conductorReport/conductorReport.route";
-import BusGenerateReportServices from "./controller/reportGeneration/busReport.services";
+// import BusGenerateReportServices from "./controller/reportGeneration/busReport.services";
 import BusReportRoute from "./route/busReport/busReport.route";
 
-const app = express();
+// const app = express();
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +25,7 @@ const app = express();
 |
 */
 /**
- * | Comman Route for finance
+ * | Comman Route for ptms
  */
 
 export default class PtmsRoute {

@@ -50,6 +50,7 @@ class BusOnboarding {
   };
 
   getAllBusList = async (req: Request) => {
+    const id = String(req.query.id);
     const page: number = Number(req.query.page);
     const limit: number = Number(req.query.limit);
     const search: string = String(req.query.search);
@@ -63,6 +64,12 @@ class BusOnboarding {
         vin_no: true,
       },
     };
+
+    if (id !== "" && id !== "undefined") {
+      query.where = {
+        register_no: id,
+      };
+    }
 
     if (search !== "" && typeof search === "string" && search !== "undefined") {
       query.where = {
