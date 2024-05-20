@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model bus_master {
+  id                   Int    @id @default(autoincrement())
+  register_no          String @unique
+  vin_no               String @unique
+  pollution_doc        Json
+  taxCopy_doc          Json
+  registrationCert_doc Json
+
+  schedules scheduler[]
+  receipts  receipts[]
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
+
+model conductor_master {
+  id               Int    @id @default(autoincrement())
+  first_name       String
+  middle_name      String
+  last_name        String
+  age              String
+  blood_grp        String
+  mobile_no        String
+  emergency_mob_no String
+  email_id         String
+  cunique_id       String @unique
+  adhar_doc        Json
+  adhar_no         String @unique
+  fitness_doc      Json
+
+  schedules scheduler[]
+  receipts  receipts[]
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
+
+model scheduler {
+  id Int @id @default(autoincrement())
+
+  conductor_id String
+  conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
+
+  bus_id String
+  bus    bus_master @relation(fields: [bus_id], references: [register_no])
+
+  date      DateTime
+  from_time Int
+  to_time   Int
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
+
+model receipts {
+  id Int @id @default(autoincrement())
+
+  conductor_id String
+  conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
+
+  bus_id String
+  bus    bus_master @relation(fields: [bus_id], references: [register_no])
+
+  receipt_no String   @unique
+  amount     Int
+  date       DateTime @db.Date
+  time       String
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}

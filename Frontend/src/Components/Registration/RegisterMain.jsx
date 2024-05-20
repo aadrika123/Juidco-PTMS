@@ -90,7 +90,7 @@ export default function BusRegistration() {
                 <div className="flex flex-1 flex-col ">
                   <button
                     onClick={() => {
-                      navigate("/registerBus");
+                      navigate("/Bus-onboarding");
                     }}
                     className="flex m-4 flex-row w-[90%] text-2xl border-2 text-black hover:text-white font-md border-[#4338CA] hover:bg-[#4338CA] p-2 rounded-md justify-center items-center hover:fill-white"
                   >
@@ -107,7 +107,7 @@ export default function BusRegistration() {
                     </svg>
                   </button>
                   <button
-                    onClick={() => navigate("/ConductorRegistration")}
+                    onClick={() => navigate("/Conductor-onboarding")}
                     className="flex flex-1  m-4 flex-row w-[90%] text-2xl border-2 text-black hover:text-white font-md border-[#4338CA] hover:bg-[#4338CA] p-2 rounded-md justify-center items-center hover:fill-white"
                   >
                     Conductor Onboarding

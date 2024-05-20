@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 import background_image from "../../assets/background_image_2.png";
@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 
 import * as Yup from "yup";
+import Scheduled_Table from "../Tables/Scheduled_Table";
 const initialValues = {
   Bus_information: "",
   Conductor_Information: "",
@@ -46,6 +47,7 @@ export default function ChangeScheduling() {
   const [success, set_success] = React.useState({});
   const [OpenError, set_openError] = React.useState(false);
   const [Error, set_Error] = React.useState({});
+  const [scheID, setScheID] = useState(null);
 
   const navigate = useNavigate();
 
@@ -54,6 +56,11 @@ export default function ChangeScheduling() {
     setOpenConfirmationDialog(true);
     setSubmitting(false);
   };
+  console.log(scheID);
+  useEffect(() => {
+    const id = sessionStorage.getItem("id");
+    setScheID(id);
+  }, [Error]);
 
   const handleConfirmation = async () => {
     set_loading(true);
@@ -67,21 +74,28 @@ export default function ChangeScheduling() {
           date: Form_values?.Date,
           from_time: Form_values?.In_Time,
           to_time: Form_values?.Out_Time,
+          is_scheduled: "Scheduled",
         }
       );
       set_loading(false);
       console.log(response);
       set_success(response.data?.data);
+      sessionStorage.clear("id");
+      setScheID(null);
       setOpenDialog(true);
     } catch (error) {
       set_loading(false);
+      if (scheID === null) {
+        sessionStorage.setItem("id", error.response?.data?.data?.id);
+      }
+
       set_Error(error.response.data);
       set_openError(true);
     }
     setOpenConfirmationDialog(false);
   };
 
-  const Update_Schedule = async () => {
+  const Update_Schedule = async (id) => {
     console.log("Updated Schedule button clicked");
     try {
       const response = await axios.put(
@@ -92,11 +106,16 @@ export default function ChangeScheduling() {
           date: Form_values?.Date,
           from_time: Form_values?.In_Time,
           to_time: Form_values?.Out_Time,
+          id: scheID,
+          is_scheduled: "Scheduled",
         }
       );
       set_openError(false);
       set_success(response.data?.data);
       setOpenDialog(true);
+
+      sessionStorage.clear("id");
+      setScheID(null);
     } catch (error) {
       set_loading(false);
       set_Error(error.response.data);
@@ -107,14 +126,18 @@ export default function ChangeScheduling() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList`) // Replace with your actual API endpoint
-      .then((response) => setBusOptions(response.data.data))
+      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=100&page=1`) // Replace with your actual API endpoint
+      .then((response) => {
+        setBusOptions(response.data.data.data);
+      })
       .catch((error) => console.error("Error fetching bus data:", error));
 
     // Fetch conductor information
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllConductorsList`) // Replace with your actual API endpoint
-      .then((response) => setConductorOptions(response.data.data))
+      .get(
+        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=100&page=1`
+      ) // Replace with your actual API endpoint
+      .then((response) => setConductorOptions(response.data.data.data))
       .catch((error) => console.error("Error fetching conductor data:", error));
   }, []);
 
@@ -249,11 +272,11 @@ export default function ChangeScheduling() {
                             <option className="flex flex-1" value=" ">
                               -Please Select-
                             </option>
-                            {ConductorOptions.map((conductor) => (
+                            {ConductorOptions?.map((conductor) => (
                               <option
                                 key={conductor.id}
-                                value={conductor.cUniqueId}
-                              >{`${conductor.firstName} - ${conductor.cUniqueId}`}</option>
+                                value={conductor.cunique_id}
+                              >{`${conductor.first_name}- ${conductor.cunique_id}`}</option>
                             ))}
                           </Field>
                           <ErrorMessage
@@ -370,6 +393,7 @@ export default function ChangeScheduling() {
               </Formik>
             </div>
           </div>
+
           <div className="flex flex-1 justify-center items-center">
             <div className="flex mt-10 mb-5 w-fit justify-center items-center bg-white">
               <img
@@ -466,7 +490,9 @@ export default function ChangeScheduling() {
           <Button
             variant="contained"
             color="secondary"
-            onClick={Update_Schedule}
+            onClick={() => {
+              Update_Schedule(Error?.data?.id);
+            }}
           >
             Update
           </Button>

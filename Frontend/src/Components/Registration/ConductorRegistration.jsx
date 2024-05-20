@@ -613,7 +613,7 @@ export default function ConductorRegistration() {
                 Your Conductor ID :
               </div>
               <div className="flex ml-2 text-[#4A4545]">
-                {success?.cUniqueId}
+                {success?.cunique_id}
               </div>
             </div>
           </div>

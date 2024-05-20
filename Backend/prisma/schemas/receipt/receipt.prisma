@@ -1,0 +1,11 @@
+model receipt {
+  id                 Int                   @id @default(autoincrement())
+  receipt_no         String                @unique
+  amount             Int
+  date               DateTime              @db.Date
+  time               String
+  bus_conductor_data busConductorMapping[]
+  conductor_id       String
+  created_at         DateTime              @default(now()) @map("created_at")
+  updated_at         DateTime              @updatedAt @map("updated_at")
+}

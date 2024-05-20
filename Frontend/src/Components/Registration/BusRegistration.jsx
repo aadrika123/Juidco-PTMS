@@ -216,10 +216,21 @@ export default function BusRegistration() {
                         name="registration_No"
                         className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
                         style={{ boxShadow: "0 1px 4px #fff" }}
+                        maxlength={10}
                         onFocus={(e) =>
                           (e.target.style.boxShadow = "0 1px 4px #000")
                         }
                         onBlur={(e) => (e.target.style.boxShadow = "none")}
+                        onKeyPress={(e) => {
+                          if (
+                            !(
+                              (e.key >= "0" || e.key >= "A") &&
+                              (e.key <= "9" || e.key <= "Z")
+                            )
+                          ) {
+                            e.preventDefault();
+                          }
+                        }}
                       />
                       <ErrorMessage
                         name="registration_No"
