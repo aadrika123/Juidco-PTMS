@@ -535,7 +535,7 @@ export default function ReportGeneration_main() {
                             label="Bus Wise Report"
                           />
                         </RadioGroup>
-                        <div className="flex flex-1">
+                        <div className="flex md:flex-row flex-col flex-1">
                           {values.reportType && (
                             <>
                               <div className="flex flex-1 flex-col ml-4 mr-4">
@@ -565,7 +565,7 @@ export default function ReportGeneration_main() {
                                 />
                               </div>
 
-                              <div className="flex flex-1 flex-col ml-20 mr-4 ">
+                              <div className="flex flex-1 flex-col md:ml-20 ml-5 mr-4 ">
                                 <label htmlFor="fromDate">From Date </label>
                                 <Field
                                   as="input"
@@ -651,7 +651,7 @@ export default function ReportGeneration_main() {
               </div>
             </div>
           </div>
-          <div className="flex flex-1 flex-row   ml-4 mr-4 mt-4 ">
+          <div className="flex flex-1 flex-col md:flex-row   ml-4 mr-4 mt-4 ">
             <div className="flex flex-1 m-4  bg-white shadow-lg p-8 rounded-lg ">
               {conductor_details?.data ? (
                 <div className="flex flex-1 flex-col ">

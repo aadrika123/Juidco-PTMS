@@ -160,7 +160,7 @@ export default function BusRegistration() {
                   </button>
                   <button
                     onClick={() => {
-                      setOpenDialog(true);
+                      navigate("/ReportGeneration-main");
                     }}
                     className="flex flex-1 m-4 flex-row w-[90%] text-2xl border-2 text-black hover:text-white font-md border-[#4338CA] hover:bg-[#4338CA] p-2 rounded-md justify-center items-center hover:fill-white"
                   >

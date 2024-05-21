@@ -47,12 +47,12 @@ export default function Report_Generation() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList`, {
+      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=10&page=1`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }) // Replace with ygetAllBusListur actual API endpoint
-      .then((response) => set_BusOptions(response.data.data))
+      .then((response) => set_BusOptions(response.data.data?.data))
       .catch((error) => console.error("Error fetching conductor data:", error));
   }, []);
 
@@ -174,7 +174,7 @@ export default function Report_Generation() {
                             <option className="flex flex-1" value="">
                               -Please Select-
                             </option>
-                            {BusOptions.map((Bus) => (
+                            {BusOptions?.map((Bus) => (
                               <option
                                 key={Bus.id}
                                 value={Bus.register_no}

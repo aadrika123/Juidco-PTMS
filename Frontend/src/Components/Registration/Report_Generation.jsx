@@ -97,11 +97,14 @@ export default function Report_Generation() {
   useEffect(() => {
     // Fetch conductor information
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllConductorsList`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }) // Replace with your actual API endpoint
+      .get(
+        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=10&page=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      ) // Replace with your actual API endpoint
       .then((response) => setConductorOptions(response.data?.data?.data))
       .catch((error) => console.error("Error fetching conductor data:", error));
   }, []);
