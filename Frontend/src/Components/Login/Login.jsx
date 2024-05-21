@@ -15,6 +15,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/slice/slice";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 //import { HRMS_URL } from "@/utils/api/urls";
 //import { useWorkingAnimation } from "@/components/Helpers/Widgets/useWorkingAnimation";
 
@@ -26,6 +27,7 @@ const Login = () => {
   */
   // const [hide, setHide] = useState(true);
 
+  const route = useNavigate();
   const LoginSchema = Yup.object().shape({
     user_id: Yup.string().required("User Id is required"),
     password: Yup.string().required("Password is required"),
@@ -37,6 +39,20 @@ const Login = () => {
   const handleLogin = async (values) => {
     try {
       //activateWorkingAnimation();
+      // const res = await axios({})
+      //   .then((response) => {
+      //     console.log(response);
+
+      //     SetData(response?.data?.data);
+      //     alert("true");
+      //     route("/");
+
+      //     Cookies.set("accesstoken", data?.token);
+      //   })
+      //   .catch((e) => {
+      //     console.log(e);
+      //   });
+
       const res = await axios({
         url: `${process.env.REACT_APP_AUTH_URL}/login`,
         method: "POST",
@@ -44,46 +60,18 @@ const Login = () => {
           email: values.user_id,
           password: values.password,
         },
-      })
-        .then((response) => {
-          console.log(response);
-          SetData(response?.data?.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      });
 
-      console.log("user data", data);
-      sessionStorage.setItem("user_details", JSON.stringify(data?.userDetails));
+      if (res) {
+        Cookies.set("accesstoken", res.data?.data?.token);
+        sessionStorage.setItem(
+          "user_details",
+          JSON.stringify(res?.data?.data?.userDetails)
+        );
+        window.location.reload();
+      }
 
       //! EMPLOYEE ID WILL COME FROM USER TABLE
-      if (data) {
-        Cookies.set("accesstoken", data?.token);
-        /*         alert("Login Successful");
-         */ window.location.reload();
-
-        /* 
-        if (typeof window !== "undefined") {
-          const storedData = sessionStorage.getItem("user_details");
-          const data = storedData && JSON.parse(storedData);
-          if (data?.user_type === "Employee") {
-            dispatch(login(data)), "a";
-            if (typeof window !== "undefined")
-              window.location.replace("/hrms/employee/attendance-management");
-          } else if (data?.user_type === "TL") {
-            dispatch(login(data)), "a";
-            if (typeof window !== "undefined")
-              window.location.replace("/hrms/employee/attendance-management");
-          } else {
-            dispatch(login(data));
-            if (typeof window !== "undefined")
-              window.location.replace("/hrms/ems/dashboard");
-          }
-        } */
-      } else {
-        //hideWorkingAnimation();
-        setErrorMsg("You have entered wrong credentials !!");
-      }
     } catch (error) {
       //hideWorkingAnimation();
       setErrorMsg("Something Went Wrong!!");

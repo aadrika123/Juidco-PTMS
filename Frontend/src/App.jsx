@@ -29,6 +29,7 @@ function App() {
     if (token) {
       const userDetails = sessionStorage.getItem("user_details");
       const type = JSON.parse(userDetails).user_type;
+      console.log(type, "type");
       set_userType(type);
     }
     console.log(token);
