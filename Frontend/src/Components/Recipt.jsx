@@ -12,17 +12,6 @@ export default function Recipt() {
   const token = Cookies.get("accesstoken");
 
   useEffect(() => {
-    const postData = {
-      data: {
-        amount: receiptData.Amount,
-        bus_id: "1BNC",
-        conductor_id: "PTM06292529",
-        date: receiptData.Date,
-        time: receiptData.Time,
-        receipt_no: "15815487",
-      },
-    };
-
     axios
       //.post("http://192.168.100.71:6001/api/ptms/v1/receipt/create", postData)
       .post(`${process.env.REACT_APP_BASE_URL}/receipt/create`, postData, {
@@ -132,7 +121,10 @@ export default function Recipt() {
       </div>
       <div className="flex w-[80%] h-10 mt-5 justify-center items-center  ">
         <div className="flex bg-[#1436C3] h-full w-1/2 justify-center items-center rounded-md shadow-lg">
-          <div className="flex text-center font-bold text-white">
+          <div
+            
+            className="flex text-center font-bold text-white"
+          >
             Print Recipt
           </div>
         </div>
