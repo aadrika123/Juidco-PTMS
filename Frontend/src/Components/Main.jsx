@@ -31,9 +31,9 @@ export default function Main() {
   const token = Cookies.get("accesstoken");
 
   const printTextData = (data) => {
-    const date = moment(data?.date).format("DD-MM-YYYY");
+    const date = moment(data?.created_at).format("DD-MM-YYYY");
     // const time = moment(data?.date).format('hh:mm'); am pm formate
-    const time = moment(data?.date).format("HH:mm");
+    const time = moment(data?.created_at).format("HH:mm");
     const printTxt =
       "[C]" +
       "Ranchi Municipal Corporation" +
@@ -47,7 +47,7 @@ export default function Main() {
       time +
       "\n \n" +
       "Bus No: " +
-      data?.bus_recipt_id +
+      data?.bus_id +
       "\n \n" +
       "Amount: " +
       data?.amount +
@@ -77,32 +77,37 @@ export default function Main() {
   };
 
   const handle_Click = async (Amount, color, border_color) => {
-    const postData = {
-      data: {
-        amount: Amount,
-        bus_id: "1BNC",
-        conductor_id: "PTM06292529",
-        date: "2024-05-16",
-        time: "04:00",
-        receipt_no: "15815487",
-      },
-    };
-    try {
-      const res = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/receipt/create`,
-        postData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    let result = confirm("Are you sure?");
+    if (result) {
+      const postData = {
+        data: {
+          amount: Amount,
+          bus_id: "1BNC",
+          conductor_id: "PTM06292529",
+          date: "2024-05-16",
+          time: "04:00",
+          receipt_no: "15815487",
+        },
+      };
+      try {
+        const res = await axios.post(
+          `${process.env.REACT_APP_BASE_URL}/receipt/create`,
+          postData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(res?.data?.data);
+        if (res?.data?.status) {
+          printToBTPrinter(res?.data?.data);
         }
-      );
-      console.log(res?.data?.data);
-      if (res?.data?.status) {
-        printToBTPrinter(res?.data?.data);
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
+    } else {
+      console.log("Err");
     }
   };
 
