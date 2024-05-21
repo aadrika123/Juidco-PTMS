@@ -32,6 +32,7 @@ const initialValues = {
   Emergency_Contact_Number: "",
   EmailId: "",
 };
+import Cookies from "js-cookie";
 
 const validationSchema = Yup.object({
   Name: Yup.string().required("Name is required"),
@@ -108,6 +109,8 @@ export default function ConductorRegistration() {
   const onSubmit = async (values) => {
     console.log(values);
     set_loading(true);
+    const token = Cookies.get("accesstoken");
+
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/onBoardingConductor`,
@@ -123,6 +126,11 @@ export default function ConductorRegistration() {
           adhar_no: values.Adhar_NO.toString(),
           adhar_doc: uploadedFiles?.Adhar_card,
           fitness_doc: uploadedFiles?.Fitness_Certificate,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       set_loading(false);

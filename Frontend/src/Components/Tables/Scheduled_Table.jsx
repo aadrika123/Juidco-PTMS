@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 import Button from "@mui/material/Button";
+import Cookies from "js-cookie";
 
 const formatDate = (dateString) => {
   const options = {
@@ -33,11 +34,15 @@ const formatTime = (time) => {
 };
 
 const ScheduledTable = () => {
+  const token = Cookies.get("accesstoken");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [allScheduled, setAllScheduled] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
+
+  console.log("Allscheduled ---> ",allScheduled);
 
   useEffect(() => {
     fetchScheduledData();
@@ -45,17 +50,28 @@ const ScheduledTable = () => {
 
   const fetchScheduledData = async () => {
     try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/schedule/getAll`,
-        {
+      const response = await axios
+        .get(
+          `${process.env.REACT_APP_BASE_URL}/schedule/getAll?limit=${
+            page + 1
+          }&page=${rowsPerPage}`,
+          /*{
           params: {
             limit: rowsPerPage,
             page: page + 1, // Backend pagination is 1-based
           },
-        }
-      );
-      setAllScheduled(response.data?.data?.data || []);
-      setTotalRecords(response.data?.data?.total || 0);
+        },*/
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response.data.data);
+          setAllScheduled(response.data?.data?.data);
+          setTotalRecords(response.data?.data?.total);
+        });
     } catch (error) {
       console.error("Failed to fetch scheduled data:", error);
     }
@@ -74,7 +90,7 @@ const ScheduledTable = () => {
     setPage(0);
   };
 
-  const filteredData = allScheduled.filter((row) => {
+  const filteredData = allScheduled?.filter((row) => {
     const conductorName =
       `${row.conductor.first_name} ${row.conductor.middle_name} ${row.conductor.last_name}`.toLowerCase();
     const busNo = row.bus.register_no.toLowerCase();
@@ -165,7 +181,7 @@ const ScheduledTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredData.map((row, index) => (
+            {filteredData?.map((row, index) => (
               <TableRow
                 key={index}
                 className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}

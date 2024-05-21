@@ -18,7 +18,8 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-
+import Cookies from "js-cookie";
+const token = Cookies.get("accesstoken");
 const FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 const initialValues = {
@@ -83,7 +84,7 @@ const handle_Image_upload = async (
       formData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -103,6 +104,7 @@ export default function Conductor_Onboarding() {
   const location = useLocation();
   const path = location.pathname;
   console.log(location);
+   const [isAdult, setIsAdult] = React.useState (false)
 
   const [uploading, setUploading] = React.useState({
     Pollution: false,
@@ -133,6 +135,11 @@ export default function Conductor_Onboarding() {
           adhar_no: values.Adhar_NO.toString(),
           adhar_doc: uploadedFiles?.Adhar_card,
           fitness_doc: uploadedFiles?.Fitness_Certificate,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       set_loading(false);
@@ -145,6 +152,21 @@ export default function Conductor_Onboarding() {
       set_opeen_error_dialog(true);
     }
   };
+
+  const validateDob = (e) => {
+    const dob = new Date(e.target.value);
+    const isAtLeast18 =
+      new Date(dob.getFullYear() + 18, dob.getMonth() - 1, dob.getDate()) <=
+      new Date();
+    if (isAtLeast18) {
+      setIsAdult(false);
+    } else {
+      setIsAdult(true);
+    }
+    console.log(isAtLeast18);
+
+  };
+
 
   return (
     <div className="flex flex-1 flex-col justify-between h-screen bg-white">
@@ -577,7 +599,7 @@ export default function Conductor_Onboarding() {
                             onFocus={(e) =>
                               (e.target.style.boxShadow = "0 1px 4px #000")
                             }
-                            onBlur={(e) => (e.target.style.boxShadow = "none")}
+                            onBlur={validateDob}
                           />
                           <ErrorMessage
                             name="Age"

@@ -15,8 +15,10 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-
+import Cookies from "js-cookie";
 export default function Report_Generation() {
+  const token = Cookies.get("accesstoken");
+
   const initialValues = {
     Bus_Information: "",
     Date: "",
@@ -45,7 +47,11 @@ export default function Report_Generation() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList`) // Replace with ygetAllBusListur actual API endpoint
+      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }) // Replace with ygetAllBusListur actual API endpoint
       .then((response) => set_BusOptions(response.data.data))
       .catch((error) => console.error("Error fetching conductor data:", error));
   }, []);

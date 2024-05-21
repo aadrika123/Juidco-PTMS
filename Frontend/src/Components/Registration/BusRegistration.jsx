@@ -15,7 +15,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-
+import Cookies from "js-cookie";
 const FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 const initialValues = {
@@ -74,7 +74,7 @@ const handle_Image_upload = async (
       formData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -91,7 +91,7 @@ export default function BusRegistration() {
   const [openDialog, setOpenDialog] = React.useState(false); // State to control dialog
   const [opeen_error_dialog, set_opeen_error_dialog] = React.useState(false);
   const [uploadedFiles, setUploadedFiles] = React.useState({});
-
+  const token = Cookies.get("accesstoken");
   const [uploading, setUploading] = React.useState({
     Pollution: false,
     Tax: false,
@@ -115,6 +115,11 @@ export default function BusRegistration() {
           taxCopy_cert: uploadedFiles?.Tax,
           vin_no: values.VIN_Number,
           registration_cert: uploadedFiles?.Registration,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       set_loading(false);

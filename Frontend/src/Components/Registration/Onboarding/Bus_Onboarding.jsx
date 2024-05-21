@@ -10,7 +10,8 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import * as Yup from "yup";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-
+import Cookies from "js-cookie";
+const token = Cookies.get("accesstoken");
 import {
   Dialog,
   DialogTitle,
@@ -18,7 +19,6 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import Cookies from "js-cookie";
 
 const FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
@@ -76,7 +76,7 @@ const handle_Image_upload = async (
       formData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -128,6 +128,11 @@ export default function Bus_Onboarding() {
           taxCopy_cert: uploadedFiles?.Tax,
           vin_no: values.VIN_Number,
           registration_cert: uploadedFiles?.Registration,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       set_loading(false);
@@ -819,104 +824,3 @@ export default function Bus_Onboarding() {
     </div>
   );
 }
-
-/**
- * 
- * 
- * 
- * 
- * 
- * 
- * <div className="flex p-4 mt-5 ml-4 mr-4 rounded-md justify-start items-start shadow-md h-fit bg-white">
-            <div className="flex ">
-              <img src={busstop} className="ml-4 w-14 h-14" />
-            </div>
-            <div className="flex flex-1 ml-2 h-fit flex-col">
-              <div className="flex mb-4">Search Filter</div>
-              <div className="flex justofy-between flex-1">
-                <Formik
-                  initialValues={{ busNumber: "", vinNumber: "", status: "" }}
-                  onSubmit={(values) => {
-                    console.log(values);
-                  }}
-                >
-                  {({ values, handleChange, handleSubmit }) => (
-                    <Form
-                      onSubmit={handleSubmit}
-                      className="flex flex-1 flex-row space-x-4"
-                    >
-                      <Field
-                        as="select"
-                        name="busNumber"
-                        className="flex flex-1 border border-gray-300 rounded-md p-2"
-                        value={values.busNumber}
-                        onChange={handleChange}
-                      >
-                        <option value="" label="Select bus number" />
-                        <option value="Bus 1" label="Bus 1" />
-                        <option value="Bus 2" label="Bus 2" />
-                        <option value="Bus 3" label="Bus 3" />
-                      </Field>
-                      <Field
-                        as="select"
-                        name="vinNumber"
-                        className="flex flex-1 border border-gray-300 rounded-md p-2"
-                        value={values.vinNumber}
-                        onChange={handleChange}
-                      >
-                        <option value="" label="Select VIN number" />
-                        <option value="VIN 1234" label="VIN 1234" />
-                        <option value="VIN 5678" label="VIN 5678" />
-                        <option value="VIN 9101" label="VIN 9101" />
-                      </Field>
-                      <Field
-                        as="select"
-                        name="status"
-                        className="flex flex-1 border border-gray-300 rounded-md p-2"
-                        value={values.status}
-                        onChange={handleChange}
-                      >
-                        <option value="" label="Select status" />
-                        <option value="Active" label="Active" />
-                        <option value="Inactive" label="Inactive" />
-                        <option value="Maintenance" label="Maintenance" />
-                      </Field>
-                      <button
-                        type="submit"
-                        className="bg-[#6366F1] text-white px-4 py-2 rounded-md"
-                      >
-                        <div className="flex flex-1 flex-row justify-center items-center">
-                          <div className="flex">
-                            {" "}
-                            <svg
-                              width="20"
-                              height="24"
-                              viewBox="0 0 20 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M12.4996 19.4344C12.533 19.7136 12.4496 20.0114 12.258 20.2068C12.1809 20.2931 12.0893 20.3615 11.9885 20.4082C11.8877 20.4549 11.7796 20.479 11.6705 20.479C11.5613 20.479 11.4532 20.4549 11.3524 20.4082C11.2516 20.3615 11.16 20.2931 11.083 20.2068L7.74129 16.475C7.6504 16.3758 7.58129 16.2545 7.53937 16.1205C7.49745 15.9865 7.48384 15.8435 7.49962 15.7026V10.9379L3.50795 5.23319C3.37263 5.03918 3.31157 4.79324 3.33811 4.54912C3.36466 4.30499 3.47665 4.08252 3.64962 3.93032C3.80795 3.80004 3.98295 3.72559 4.16629 3.72559H15.833C16.0163 3.72559 16.1913 3.80004 16.3496 3.93032C16.5226 4.08252 16.6346 4.30499 16.6611 4.54912C16.6877 4.79324 16.6266 5.03918 16.4913 5.23319L12.4996 10.9379V19.4344ZM5.86629 5.58682L9.16629 10.2957V15.4328L10.833 17.294V10.2864L14.133 5.58682H5.86629Z"
-                                fill="white"
-                              />
-                            </svg>
-                          </div>
-                          <div className="flex flex-1 text-white text-md">
-                            Search Result
-                          </div>
-                        </div>
-                      </button>
-                    </Form>
-                  )}
-                </Formik>
-              </div>
-            </div>
-          </div>
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */

@@ -26,8 +26,9 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-
+import Cookies from "js-cookie";
 export default function ReportGeneration_main() {
+  const token = Cookies.get("accesstoken");
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
@@ -57,6 +58,8 @@ export default function ReportGeneration_main() {
   const [conductor_details, set_conductor_details] = useState();
   const [bus_details, set_bus_details] = useState();
   const [openDialog, setOpenDialog] = React.useState(false); // State to control dialog
+  const [total_amount, set_total_amount] = useState([]);
+  console.log("Total Amount Array >>> ", total_amount);
 
   console.log("report state >>> ", report);
   console.log("Total state >>", total_collection);
@@ -76,7 +79,12 @@ export default function ReportGeneration_main() {
     if (values.reportType === "conductor") {
       await axios
         .get(
-          `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?id=${values.id}&limit=10&page=1`
+          `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?id=${values.id}&limit=10&page=1`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         )
         .then((response) => {
           console.log(response.data.data);
@@ -87,9 +95,19 @@ export default function ReportGeneration_main() {
         });
 
       await axios
-        .post(`${process.env.REACT_APP_BASE_URL}/report/bus-daywise/total`, {
-          conductor_id: values.id,
-        })
+        .post(
+          `${process.env.REACT_APP_BASE_URL}/report/bus-daywise/total`,
+          {
+            conductor_id: values.id,
+            from_date: values.fromDate,
+            to_date: values.toDate,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then((response) => {
           console.log("Total >>>>>>  ", response.data.data);
           set_total_collection(response.data.data);
@@ -99,23 +117,41 @@ export default function ReportGeneration_main() {
         });
 
       await axios
-        .post(`${process.env.REACT_APP_BASE_URL}/report/bus-daywise`, {
-          conductor_id: values.id,
-          from_date: values.fromDate,
-          to_date: values.toDate,
-        })
+        .post(
+          `${process.env.REACT_APP_BASE_URL}/report/bus-daywise`,
+          {
+            conductor_id: values.id,
+            from_date: values.fromDate,
+            to_date: values.toDate,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then((response) => {
           console.log("Report data >>>", response.data);
           set_report(response.data.data);
+          console.log(response?.data?.data?.amounts);
+          set_total_amount(response.data.data.result.amounts);
         })
         .catch((error) => {
           console.log(error);
         });
     } else if (values.reportType === "bus") {
       await axios
-        .post(`${process.env.REACT_APP_BASE_URL}/report/bus-daywise/total`, {
-          bus_id: values.id,
-        })
+        .post(
+          `${process.env.REACT_APP_BASE_URL}/report/bus-daywise/total`,
+          {
+            bus_id: values.id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then((response) => {
           console.log("Bus Total >>>>>>  ", response.data.data);
           set_bus_total_collection(response.data.data);
@@ -126,7 +162,12 @@ export default function ReportGeneration_main() {
 
       await axios
         .get(
-          `${process.env.REACT_APP_BASE_URL}/getAllBusList?id=${values.id}&limit=10&page=1`
+          `${process.env.REACT_APP_BASE_URL}/getAllBusList?id=${values.id}&limit=10&page=1`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         )
         .then((response) => {
           console.log("Bus details", response.data.data);
@@ -137,11 +178,19 @@ export default function ReportGeneration_main() {
         });
 
       await axios
-        .post(`${process.env.REACT_APP_BASE_URL}/report/bus-daywise`, {
-          bus_id: values.id,
-          from_date: values.fromDate,
-          to_date: values.toDate,
-        })
+        .post(
+          `${process.env.REACT_APP_BASE_URL}/report/bus-daywise`,
+          {
+            bus_id: values.id,
+            from_date: values.fromDate,
+            to_date: values.toDate,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then((response) => {
           console.log(response.data);
           set_bus_report(response.data.data);
@@ -724,7 +773,7 @@ export default function ReportGeneration_main() {
               <></>
             )}
           </div>
-          <div className="flex flex-1 bg-white rounded-lg ml-4 mr-4 mt-4 shadow-xl">
+          <div className="flex flex-1 flex-col bg-white rounded-lg ml-4 mr-4 mt-4 shadow-xl">
             {report_type === "" ? (
               <div className="flex flex-1 justify-center items-center text-gray-500 font-bold">
                 No data Found, please select the id
@@ -736,9 +785,6 @@ export default function ReportGeneration_main() {
                   report?.result?.data.map((bus) => (
                     <div
                       key={bus.bus_id}
-                      onClick={() => {
-                        setOpenDialog(true);
-                      }}
                       className="flex cursor-pointer flex-col h-[180px] w-[180px] m-4 rounded-md border-2 justify-center items-center border-blue-400 bg-white"
                     >
                       <div className="flex flex-1 flex-col justify-center items-center m-4">
@@ -770,6 +816,14 @@ export default function ReportGeneration_main() {
                     No data Found
                   </div>
                 )}
+                <div
+                  onClick={() => {
+                    setOpenDialog(true);
+                  }}
+                  className="flex flex-1 justify-center items-center"
+                >
+                  View All
+                </div>
               </div>
             ) : (
               <div className="flex flex-1 flex-wrap m-4">
@@ -828,229 +882,52 @@ export default function ReportGeneration_main() {
               <div className="flex mt-2 text-[#6D63E8]">Bus: {1}</div>
               <div className="flex flex-1 flex-col">
                 <div className="felx mt-1 ">Total Collection</div>
-                <div className="flex">{20325}</div>
               </div>
             </div>
-            <div className="flex flex-1 mr-4 ml-4 ">
-              <div className="flex flex-1 flex-col justify-center items-center  mr-4 ml-4 ">
-                <div
-                  style={{ boxShadow: " 0 1px 4px #FF8B8B" }}
-                  className="flex flex-row w-[95px] h-[95px] rounded-full justify-center items-center shadow-inner bg-[#FFE7E7]"
-                >
-                  <div className="flex ">
-                    <svg
-                      width="17"
-                      height="17"
-                      viewBox="0 0 17 17"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
+            {total_amount.map((amounts) => (
+              <div className="flex flex-1 mr-4 ml-4 ">
+                {true && (
+                  <div className="flex flex-1 flex-col justify-center items-center  mr-4 ml-4 ">
+                    <div
+                      style={{ boxShadow: " 0 1px 4px #FF8B8B" }}
+                      className="flex flex-row w-[95px] h-[95px] rounded-full justify-center items-center shadow-inner bg-[#FFE7E7]"
                     >
-                      <path
-                        d="M5.66602 1.61914H14.5708M5.66602 5.44189H14.5708M11.9736 15.381L5.66602 9.26464H7.89221C12.8395 9.26464 12.8395 1.61914 7.89221 1.61914"
-                        stroke="#585858"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                      <div className="flex ">
+                        <svg
+                          width="17"
+                          height="17"
+                          viewBox="0 0 17 17"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M5.66602 1.61914H14.5708M5.66602 5.44189H14.5708M11.9736 15.381L5.66602 9.26464H7.89221C12.8395 9.26464 12.8395 1.61914 7.89221 1.61914"
+                            stroke="#585858"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                      <div
+                        style={{ fontWeight: 700 }}
+                        className="text-2xl text-[#5B2B17] font-bold ml-1"
+                      >
+                        {amounts?.amount}
+                      </div>
+                    </div>
+                    <div className="flex flex-col mt-4">
+                      <div className="flex text-[#887FEC] font-bold text-xl border-b-2 border-[#887FEC]">
+                        {amounts?.count}
+                      </div>
+                      <div className="flex text-green-500 font-bold text-xl">
+                        {amounts?.sum}
+                      </div>
+                    </div>
                   </div>
-                  <div
-                    style={{ fontWeight: 700 }}
-                    className="text-2xl text-[#5B2B17] font-bold ml-1"
-                  >
-                    5/-
-                  </div>
-                </div>
-                <div className="flex flex-col mt-4">
-                  <div className="flex text-[#887FEC] font-bold text-xl border-b-2 border-[#887FEC]">
-                    10
-                  </div>
-                  <div className="flex text-green-500 font-bold text-xl">
-                    50
-                  </div>
-                </div>
+                )}
               </div>
-            </div>
-            <div className="flex flex-1 flex-col justify-center items-center  mr-4 ml-4 ">
-              <div
-                style={{ boxShadow: " 0 1px 4px #564CD4" }}
-                className="flex flex-row w-[95px] h-[95px] rounded-full justify-center items-center shadow-inner bg-[#D9D5FF]"
-              >
-                <div className="flex ">
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 17 17"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M5.66602 1.61914H14.5708M5.66602 5.44189H14.5708M11.9736 15.381L5.66602 9.26464H7.89221C12.8395 9.26464 12.8395 1.61914 7.89221 1.61914"
-                      stroke="#585858"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div
-                  style={{ fontWeight: 700 }}
-                  className="text-2xl text-[#5B2B17] font-bold ml-1"
-                >
-                  10/-
-                </div>
-              </div>
-              <div className="flex flex-col mt-4">
-                <div className="flex text-[#887FEC] font-bold text-xl border-b-2 border-[#887FEC]">
-                  10
-                </div>
-                <div className="flex text-green-500 font-bold text-xl">50</div>
-              </div>
-            </div>
-            <div className="flex flex-1 flex-col justify-center items-center  mr-4 ml-4 ">
-              <div
-                style={{ boxShadow: " 0 1px 4px #4CD451" }}
-                className="flex flex-row w-[95px] h-[95px] rounded-full justify-center items-center shadow-inner bg-[#C5FFCB]"
-              >
-                <div className="flex ">
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 17 17"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M5.66602 1.61914H14.5708M5.66602 5.44189H14.5708M11.9736 15.381L5.66602 9.26464H7.89221C12.8395 9.26464 12.8395 1.61914 7.89221 1.61914"
-                      stroke="#585858"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div
-                  style={{ fontWeight: 700 }}
-                  className="text-2xl text-[#5B2B17] font-bold ml-1"
-                >
-                  15/-
-                </div>
-              </div>
-              <div className="flex flex-col mt-4">
-                <div className="flex text-[#887FEC] font-bold text-xl border-b-2 border-[#887FEC]">
-                  10
-                </div>
-                <div className="flex text-green-500 font-bold text-xl">50</div>
-              </div>
-            </div>
-            <div className="flex flex-1 flex-col justify-center items-center  mr-4 ml-4 ">
-              <div
-                style={{ boxShadow: " 0 1px 4px #E58B39" }}
-                className="flex flex-row w-[95px] h-[95px] rounded-full justify-center items-center shadow-inner bg-[#FFD7B2]"
-              >
-                <div className="flex ">
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 17 17"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M5.66602 1.61914H14.5708M5.66602 5.44189H14.5708M11.9736 15.381L5.66602 9.26464H7.89221C12.8395 9.26464 12.8395 1.61914 7.89221 1.61914"
-                      stroke="#585858"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div
-                  style={{ fontWeight: 700 }}
-                  className="text-2xl text-[#5B2B17] font-bold ml-1"
-                >
-                  20/-
-                </div>
-              </div>
-              <div className="flex flex-col mt-4">
-                <div className="flex text-[#887FEC] font-bold text-xl border-b-2 border-[#887FEC]">
-                  10
-                </div>
-                <div className="flex text-green-500 font-bold text-xl">50</div>
-              </div>
-            </div>
-            <div className="flex flex-1 flex-col justify-center items-center  mr-4 ml-4 ">
-              <div
-                style={{ boxShadow: " 0 1px 4px #ADA943" }}
-                className="flex flex-row w-[95px] h-[95px] rounded-full justify-center items-center shadow-inner bg-[#FCF29B]"
-              >
-                <div className="flex ">
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 17 17"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M5.66602 1.61914H14.5708M5.66602 5.44189H14.5708M11.9736 15.381L5.66602 9.26464H7.89221C12.8395 9.26464 12.8395 1.61914 7.89221 1.61914"
-                      stroke="#585858"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div
-                  style={{ fontWeight: 700 }}
-                  className="text-2xl text-[#5B2B17] font-bold ml-1"
-                >
-                  25/-
-                </div>
-              </div>
-              <div className="flex flex-col mt-4">
-                <div className="flex text-[#887FEC] font-bold text-xl border-b-2 border-[#887FEC]">
-                  10
-                </div>
-                <div className="flex text-green-500 font-bold text-xl">50</div>
-              </div>
-            </div>
-            <div className="flex flex-1 flex-col justify-center items-center  mr-4 ml-4 ">
-              <div
-                style={{ boxShadow: " 0 1px 4px #C14CD4" }}
-                className="flex flex-row w-[95px] h-[95px] rounded-full justify-center items-center shadow-inner bg-[#F2CDFF]"
-              >
-                <div className="flex ">
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 17 17"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M5.66602 1.61914H14.5708M5.66602 5.44189H14.5708M11.9736 15.381L5.66602 9.26464H7.89221C12.8395 9.26464 12.8395 1.61914 7.89221 1.61914"
-                      stroke="#585858"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div
-                  style={{ fontWeight: 700 }}
-                  className=" text-2xl text-[#5B2B17] font-bold ml-1"
-                >
-                  30/-
-                </div>
-              </div>
-              <div className="flex flex-col mt-4">
-                <div className="flex text-[#887FEC] font-bold text-xl border-b-2 border-[#887FEC]">
-                  10
-                </div>
-                <div className="flex text-green-500 font-bold text-xl">50</div>
-              </div>
-            </div>
+            ))}
           </div>
         </DialogContent>
         <DialogActions>

@@ -15,8 +15,10 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import Cookies from "js-cookie";
 
 export default function Report_Generation() {
+  const token = Cookies.get("accesstoken");
   const initialValues = {
     Conductor_Information: "",
     Date: "",
@@ -61,6 +63,11 @@ export default function Report_Generation() {
           {
             currentDate: values?.Date,
             conductor_id: values?.Conductor_Information,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         set_loading(false);
@@ -90,7 +97,11 @@ export default function Report_Generation() {
   useEffect(() => {
     // Fetch conductor information
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllConductorsList`) // Replace with your actual API endpoint
+      .get(`${process.env.REACT_APP_BASE_URL}/getAllConductorsList`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }) // Replace with your actual API endpoint
       .then((response) => setConductorOptions(response.data?.data?.data))
       .catch((error) => console.error("Error fetching conductor data:", error));
   }, []);

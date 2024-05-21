@@ -8,19 +8,28 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Formik, Form, Field } from "formik";
 import Scheduled_Table from "../../Tables/Scheduled_Table";
+import Cookies from "js-cookie";
 
 export default function ChaneScheduling_main() {
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
   console.log(location);
+  const token = Cookies.get("accesstoken");
 
   const [allScheduled, setAllScheduled] = useState([]);
   console.log(allScheduled);
 
   useEffect(() => {
     const response = axios
-      .get(`${process.env.REACT_APP_BASE_URL}/schedule/getAll?limit=10&page=1`)
+      .get(
+        `${process.env.REACT_APP_BASE_URL}/schedule/getAll?limit=10&page=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((response) => {
         console.log(response);
         setAllScheduled(response.data?.data?.data);
@@ -398,7 +407,7 @@ export default function ChaneScheduling_main() {
             </div>
           </div>
           <div className="flex flex-1 m-4 p-4 bg-white rounded-lg shadow-lg">
-            <Scheduled_Table data={allScheduled} />
+            <Scheduled_Table/>
           </div>
         </div>
       </div>

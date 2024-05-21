@@ -3,11 +3,13 @@ import RMC_logo from "../assets/Recipt_RMC_LOGO.png";
 import bus from "../assets/bus 1_recipt.png";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function Recipt() {
   const location = useLocation();
   const receiptData = location.state;
   const [data, set_data] = useState();
+  const token = Cookies.get("accesstoken");
 
   useEffect(() => {
     const postData = {
@@ -22,8 +24,12 @@ export default function Recipt() {
     };
 
     axios
-      .post("http://192.168.100.71:6001/api/ptms/v1/receipt/create", postData)
-      .post(`${process.env.REACT_APP_BASE_URL}/receipt/create`, postData)
+      //.post("http://192.168.100.71:6001/api/ptms/v1/receipt/create", postData)
+      .post(`${process.env.REACT_APP_BASE_URL}/receipt/create`, postData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         console.log(res.data);
         set_data(res.data.data);

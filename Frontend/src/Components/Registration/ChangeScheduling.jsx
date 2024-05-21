@@ -25,6 +25,7 @@ const initialValues = {
   In_Time: "",
   Out_Time: "",
 };
+import Cookies from "js-cookie";
 
 const validationSchema = Yup.object({
   Bus_information: Yup.string().required("Bus information is required"),
@@ -36,6 +37,8 @@ const validationSchema = Yup.object({
   Out_Time: Yup.string().required("Out Time is required"),
 });
 export default function ChangeScheduling() {
+  const token = Cookies.get("accesstoken");
+
   const [openDialog, setOpenDialog] = React.useState(false); // State to control success dialog
   const [openConfirmationDialog, setOpenConfirmationDialog] =
     React.useState(false); // State to control confirmation dialog
@@ -75,6 +78,11 @@ export default function ChangeScheduling() {
           from_time: Form_values?.In_Time,
           to_time: Form_values?.Out_Time,
           is_scheduled: "Scheduled",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       set_loading(false);
@@ -108,6 +116,11 @@ export default function ChangeScheduling() {
           to_time: Form_values?.Out_Time,
           id: scheID,
           is_scheduled: "Scheduled",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       set_openError(false);
@@ -126,7 +139,11 @@ export default function ChangeScheduling() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=100&page=1`) // Replace with your actual API endpoint
+      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=100&page=1`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }) // Replace with your actual API endpoint
       .then((response) => {
         setBusOptions(response.data.data.data);
       })
@@ -135,7 +152,12 @@ export default function ChangeScheduling() {
     // Fetch conductor information
     axios
       .get(
-        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=100&page=1`
+        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=100&page=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       ) // Replace with your actual API endpoint
       .then((response) => setConductorOptions(response.data.data.data))
       .catch((error) => console.error("Error fetching conductor data:", error));
