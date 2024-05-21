@@ -38,7 +38,7 @@ const Login = () => {
     try {
       //activateWorkingAnimation();
       const res = await axios({
-        url: `http://192.168.100.71:8000/api/login`,
+        url: `${process.env.REACT_APP_AUTH_URL}/login`,
         method: "POST",
         data: {
           email: values.user_id,

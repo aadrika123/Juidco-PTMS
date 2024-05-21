@@ -39,7 +39,7 @@ function App() {
 
   if (access_token) {
     return (
-      <Router>
+      <Router basename="/ptms">
         <Routes>
           <Route path="/" element={<RegisterMain />} />
           <Route path="/main" element={<Main />} />
@@ -89,7 +89,7 @@ function App() {
     );
   } else {
     return (
-      <Router>
+      <Router basename="/ptms">
         <Routes>
           <Route path="/" element={<Login_main />} />
         </Routes>
