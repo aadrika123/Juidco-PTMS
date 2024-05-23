@@ -9,5 +9,5 @@ const foreign_wrapper = async () => {
   await prisma.$queryRaw`GRANT USAGE ON FOREIGN SERVER master_fdw TO postgres`;
   await prisma.$queryRaw`IMPORT FOREIGN SCHEMA public LIMIT TO (users, wf_roles, wf_roleusermaps, ulb_masters) FROM SERVER master_fdw INTO public`;
 };
-
+ 
 export default foreign_wrapper;

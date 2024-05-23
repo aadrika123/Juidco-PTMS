@@ -121,4 +121,5 @@ export default class OnBoardingConductorServices {
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
+
 }

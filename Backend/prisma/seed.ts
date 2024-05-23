@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import foreign_wrapper from "./seeder/foreignWrapper";
+import foreign_wrapper from "./seeder/foreignWrapper.seed";
 const prisma = new PrismaClient();
 
 async function main() {
