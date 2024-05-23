@@ -49,7 +49,7 @@ class ReceiptDao {
 
   // ======================== GET RECEIPTS =========================================//
   get = async (req: Request) => {
-    const { from_date, to_date } = req.body;
+    const { from_date, to_date, bus_no } = req.body;
     const page: number = Number(req.query.page);
     const limit: number = Number(req.query.limit);
     const search: string = String(req.query.search);
@@ -106,6 +106,20 @@ class ReceiptDao {
       };
     }
 
+
+    if (bus_no !== "" && typeof bus_no === "string" && bus_no !== "undefined") {
+      query.where = {
+        OR: [
+          {
+            bus: {
+              register_no: { equals: bus_no, mode: "insensitive" },
+            },
+          },
+        ],
+      };
+    }
+
+
     if (
       from_date !== "" &&
       from_date !== undefined &&
@@ -132,6 +146,15 @@ class ReceiptDao {
     ]);
     return generateRes({ data, count, page, limit });
   };
+
+  passenger_status = async() => {
+    const date = new Date().toISOString().split("T")[0];
+    const data = await prisma.$queryRawUnsafe(`
+        SELECT COUNT(id)::INT FROM receipts where date = '${date}';
+    `);
+
+    return generateRes(data);
+  }
 }
 
 export default ReceiptDao;

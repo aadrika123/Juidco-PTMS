@@ -23,6 +23,11 @@ class ReceiptRoute {
       .post(responseTime, (req: Request, res: Response) =>
         receiptServices.get(req, res, "0102")
       );
+    app
+      .route(`${baseUrl}/passenger/day-wise`)
+      .get(responseTime, (req: Request, res: Response) =>
+        receiptServices.passenger_status(req, res, "0102")
+      );
   }
 }
 export default ReceiptRoute;

@@ -27,10 +27,11 @@ export default class BusReportRoute {
       .post((req: Request, res: Response) =>
         reportGeneration.getTotalAmount(req, res, "0502")
       );
-    // app
-    //   .route(`${baseUrl}/report/bus-monthwise`)
-    //   .post((req: Request, res: Response) =>
-    //     busGenerateReportServices.getMonthlyCollection(req, res, "051G")
-    //   );
+
+    app
+      .route(`${baseUrl}/report/real-time`)
+      .get((req: Request, res: Response) =>
+        reportGeneration.getRealTimeCollection(req, res, "0502")
+      );
   }
 }

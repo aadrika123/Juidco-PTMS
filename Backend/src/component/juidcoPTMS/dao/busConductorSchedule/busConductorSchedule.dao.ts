@@ -205,7 +205,6 @@ class BusConductorScheduleDao {
 
   deleteScheduleBusConductor = async (req: Request) => {
     const id = Number(req.body.id);
-
     const data = await prisma.scheduler.delete({
       where: {
         id: id,
@@ -214,5 +213,32 @@ class BusConductorScheduleDao {
 
     return generateRes(data);
   };
+
+  todaySchedulesBuses = async (req: Request) => {
+    const curr_date = String(req.body.curr_date);
+    const data = await prisma.$queryRawUnsafe(`
+      SELECT 
+        COUNT(DISTINCT sche.bus_id)::INT AS scheduled_buses,
+        COUNT(DISTINCT bm.register_no)::INT - COUNT(DISTINCT sche.bus_id)::INT AS absent_buses
+      FROM bus_master AS bm
+      LEFT JOIN scheduler AS sche ON bm.register_no = sche.bus_id AND sche.date = '${curr_date}';
+    `);
+     
+    return generateRes(data);
+  };
+
+  getBusScheduleConductor = async (req:Request) => {
+     const {conductor_id, date, from_time, to_time} = req.body;
+     
+    const query:string = `
+	    select conductor_id, bus_id, created_at, updated_at, from_time, to_time from scheduler
+    	where conductor_id = '${conductor_id}' AND date = '${date}' and from_time <= '${from_time}' and '${to_time}' <= to_time;
+    `;
+    
+    const data = await prisma.$queryRawUnsafe<any[]>(query);
+    console.log(data);
+    return generateRes(data);
+
+  }
 }
 export default BusConductorScheduleDao;

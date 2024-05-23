@@ -219,4 +219,49 @@ export default class BusConductorScheduleServices {
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
+  todaySchedulesBuses = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.busConductorSchedule.todaySchedulesBuses(req);
+      if (!data) {
+        return CommonRes.NOT_FOUND("Schedule Not Found", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS(
+        "Successfully found Schedule",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
+  getBusScheduleConductor = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "POST",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.busConductorSchedule.getBusScheduleConductor(req);
+
+      return CommonRes.SUCCESS(
+        "Successfully found Schedule",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+ 
 }

@@ -23,5 +23,11 @@ export default class OnBoardingConductorRoute {
       .get((req: Request, res: Response) =>
         onBoardingConductorServices.getAllConductorList(req, res, "021G")
       );
+
+    app
+      .route(`${baseUrl}/getConductorStatus`)
+      .get((req: Request, res: Response) =>
+        onBoardingConductorServices.getConductorStatus(req, res, "021G")
+      );
   }
 }

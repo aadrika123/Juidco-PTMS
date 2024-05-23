@@ -114,6 +114,25 @@ class ConductorOnBoarding {
     ]);
     return generateRes({ data, count, page, limit });
   };
+
+  getConductorStatus = async() => {
+      const date = new Date().toISOString().split("T")[0];
+      const qr_total_conductor:string = 'SELECT COUNT(id)::INT FROM conductor_master;';
+      const qr_conductor_status:string = `
+       SELECT 
+	    COUNT(DISTINCT sche.conductor_id)::INT AS scheduled_conductor,
+	    COUNT(DISTINCT cm.cunique_id)::INT - COUNT(DISTINCT sche.conductor_id)::INT AS absent_conductor
+	        FROM conductor_master AS cm
+	    LEFT JOIN scheduler AS sche ON cm.cunique_id = sche.conductor_id  
+      `;
+
+      const [total_conductor, conductor_status] = await prisma.$transaction([
+          prisma.$queryRawUnsafe(`${qr_total_conductor}`),
+          prisma.$queryRawUnsafe(`${qr_conductor_status}AND sche.date = '${date}'`),
+    ])
+
+      return generateRes({total_conductor, conductor_status});
+  }
 }
 
 export default ConductorOnBoarding;

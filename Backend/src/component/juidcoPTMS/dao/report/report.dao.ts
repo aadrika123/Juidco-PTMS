@@ -108,7 +108,7 @@ class ReportDao {
   };
 
   getTotalAmount = async (req: Request) => {
-    const { bus_id, conductor_id, from_date, to_date } = req.body;
+    const { bus_id, conductor_id, from_date, to_date, curr_date } = req.body;
     let query: string = "";
     function query_fn(extend_query: string): string {
       return `
@@ -149,10 +149,32 @@ class ReportDao {
     }
     //   ------------------------- FILTER BY CONDUCTOR-----------------------------//
 
+    //   ------------------------- FILTER BY CURRENT_DATE TOTAL COLLECTION-----------------------------//
+    if (curr_date) {
+      query = query_fn(`where date = '${curr_date}'`);
+    }
+    //   ------------------------- FILTER BY CURRENT_DATE TOTAL COLLECTION-----------------------------//
     const data = await prisma.$queryRawUnsafe(`${query}`);
 
     return generateRes(data);
   };
+
+
+
+    //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
+    
+    getRealTimeCollection = async () => {
+        const date = new Date().toISOString().split("T")[0];
+        const qr_real_time = `
+           	SELECT SUM (amount)::INT, extract (HOUR from created_at) as "from" , extract (HOUR from created_at)+1 as "to"  FROM receipts 
+        	where date = '${date}'
+        	group by (extract (HOUR from created_at))  
+        `;
+        const data = await prisma.$queryRawUnsafe(qr_real_time);
+        return generateRes(data);
+    }
+
+    //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
 }
 
 export default ReportDao;
