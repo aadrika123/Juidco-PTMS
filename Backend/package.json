@@ -12,7 +12,7 @@
     "test": "jest",
     "build": "npx tsc",
     "lint": "eslint src/",
-    "start": "tsc && node build/src/server.js",
+    "start": "tsc && node build/server.js",
     "dev": "nodemon src/server.ts",
     "migrate": "rm -rf ./prisma/migrations && npx prisma migrate dev --name init",
     "migrate_win": "npx prisma migrate dev --name init",

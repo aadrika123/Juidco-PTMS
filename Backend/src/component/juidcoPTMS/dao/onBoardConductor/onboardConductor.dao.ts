@@ -38,10 +38,19 @@ class ConductorOnBoarding {
       where: { adhar_no },
     });
 
+    const isExistingConductorEmail = await prisma.conductor_master.findUnique({
+      where: { email_id: emailId },
+    });
+
     if (isExistingConductor) {
       return generateRes({
         error_type: "VALIDATION",
         validation_error: "Already Exist",
+      });
+    } else if (isExistingConductorEmail) {
+      return generateRes({
+        error_type: "VALIDATION",
+        validation_error: "Email Already Exist",
       });
     }
 
@@ -115,10 +124,11 @@ class ConductorOnBoarding {
     return generateRes({ data, count, page, limit });
   };
 
-  getConductorStatus = async() => {
-      const date = new Date().toISOString().split("T")[0];
-      const qr_total_conductor:string = 'SELECT COUNT(id)::INT FROM conductor_master;';
-      const qr_conductor_status:string = `
+  getConductorStatus = async () => {
+    const date = new Date().toISOString().split("T")[0];
+    const qr_total_conductor: string =
+      "SELECT COUNT(id)::INT FROM conductor_master;";
+    const qr_conductor_status: string = `
        SELECT 
 	    COUNT(DISTINCT sche.conductor_id)::INT AS scheduled_conductor,
 	    COUNT(DISTINCT cm.cunique_id)::INT - COUNT(DISTINCT sche.conductor_id)::INT AS absent_conductor
@@ -126,13 +136,13 @@ class ConductorOnBoarding {
 	    LEFT JOIN scheduler AS sche ON cm.cunique_id = sche.conductor_id  
       `;
 
-      const [total_conductor, conductor_status] = await prisma.$transaction([
-          prisma.$queryRawUnsafe(`${qr_total_conductor}`),
-          prisma.$queryRawUnsafe(`${qr_conductor_status}AND sche.date = '${date}'`),
-    ])
+    const [total_conductor, conductor_status] = await prisma.$transaction([
+      prisma.$queryRawUnsafe(`${qr_total_conductor}`),
+      prisma.$queryRawUnsafe(`${qr_conductor_status}AND sche.date = '${date}'`),
+    ]);
 
-      return generateRes({total_conductor, conductor_status});
-  }
+    return generateRes({ total_conductor, conductor_status });
+  };
 }
 
 export default ConductorOnBoarding;

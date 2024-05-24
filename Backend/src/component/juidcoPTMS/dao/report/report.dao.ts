@@ -30,8 +30,8 @@ class ReportDao {
       query = query_fn(query_extend, conductor);
 
       amounts = await prisma.$queryRawUnsafe(`
-        select conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts 
-        group by conductor_id, amount, date
+        select bus_id, conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts 
+        group by bus_id, conductor_id, amount, date
       `);
     }
 
@@ -52,8 +52,8 @@ class ReportDao {
       query = query_fn(query_extend, conductor);
 
       amounts = await prisma.$queryRawUnsafe(`
-        select conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts 
-        group by conductor_id, amount, date
+        select bus_id, conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts 
+        group by conductor_id, amount, date, bus_id
         having date = '${from_date}'`);
     }
 
@@ -159,22 +159,20 @@ class ReportDao {
     return generateRes(data);
   };
 
+  //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
 
-
-    //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
-    
-    getRealTimeCollection = async () => {
-        const date = new Date().toISOString().split("T")[0];
-        const qr_real_time = `
+  getRealTimeCollection = async () => {
+    const date = new Date().toISOString().split("T")[0];
+    const qr_real_time = `
            	SELECT SUM (amount)::INT, extract (HOUR from created_at) as "from" , extract (HOUR from created_at)+1 as "to"  FROM receipts 
         	where date = '${date}'
         	group by (extract (HOUR from created_at))  
         `;
-        const data = await prisma.$queryRawUnsafe(qr_real_time);
-        return generateRes(data);
-    }
+    const data = await prisma.$queryRawUnsafe(qr_real_time);
+    return generateRes(data);
+  };
 
-    //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
+  //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
 }
 
 export default ReportDao;

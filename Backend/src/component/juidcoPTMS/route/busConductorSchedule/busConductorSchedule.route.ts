@@ -50,7 +50,7 @@ export default class BusConductorScheduleRoute {
 
     app
       .route(`${baseUrl}/schedule/delete`)
-      .get((req: Request, res: Response) =>
+      .post((req: Request, res: Response) =>
         busConductorScheduleServices.deleteScheduleBusConductor(
           req,
           res,
