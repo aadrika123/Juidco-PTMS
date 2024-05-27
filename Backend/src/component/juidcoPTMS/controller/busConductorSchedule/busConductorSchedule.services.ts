@@ -104,7 +104,7 @@ export default class BusConductorScheduleServices {
           false,
           "Already Exist",
           data,
-          403,
+          200,
           resObj.action,
           resObj.apiId,
           resObj.version,
