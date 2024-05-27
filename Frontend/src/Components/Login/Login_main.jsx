@@ -1,67 +1,55 @@
-/***
- * Author: Jaideep
- * Status: Closed
- * Description: Designed to manage login form design.
- */
-
 import React from "react";
 import Lottie from "lottie-react";
 import Login from "./Login";
 import img from "./loginImage.json";
-import lock from "./lock.json";
+//import lock from "./lock.json";
 const Login_main = () => {
   return (
     <>
       <div className="h-screen border-2 border-red-200 flex flex-col justify-between bg-gray-100 darks:bg-gray-900 border-b darks:bg-opacity-40">
         <header className="border-b border-gray-200  bg-white darks:bg-white-600 darks:border-gray-800 text-black">
           <div className="container mx-auto xl:max-w-6xl py-2">
-            {/* Navbar */}
             <nav
               className="flex flex-row flex-nowrap items-center justify-between mt-0 py-2 px-6"
               id="desktop-menu"
             >
-              {/* logo */}
               <a className="flex items-center py-2 ltr:mr-4 rtl:ml-4 text-xl">
                 <div className="flex flex-col">
                   <div>
                     <span className="font-bold text-xl uppercase">
-                      {/* {data?.brand_tag}  */} Public Transport Management
-                      System
+                      Public Transport Management System
                     </span>
                     <span className="text-lg opacity-0">s</span>
-                    <span className="hidden text-gray-700 darks:text-gray-200">
-                      {/* {data?.brand_tag == "AMC" ? "AMC" : "JUIDCO"} */}
-                    </span>
+                    <span className="hidden text-gray-700 darks:text-gray-200"></span>
                   </div>
                 </div>
               </a>
-              {/* menu , curantaly: Unavailable */}
             </nav>
           </div>
         </header>
 
         <main>
-          <div className=" md:py-12 bg-gray-100 darks:bg-gray-900 darks:bg-opacity-40">
+          <div className=" md:py-4 bg-gray-100 darks:bg-gray-900 darks:bg-opacity-40">
             <div className="container mx-auto px-4 xl:max-w-6xl">
-              <div className="flex flex-wrap -mx-4 flex-row ">
-                <div className="flex-shrink max-w-full px-4 w-full lg:w-1/2">
+              <div className="flex flex-wrap mx-4 flex-row ">
+                <div className="flex flex-1">
                   <Login />
                 </div>
-                <div className="flex-shrink max-w-full px-4 w-full lg:w-1/2">
-                  <div className="text-center  lg:mt-0">
-                    <div className="relative">
+                <div className="flex flex-col md:flex-row max-w-full px-4 w-full lg:w-1/2">
+                  <div className="text-center  lg:mt-5">
+                    <div className="flex flex-1">
                       <Lottie
                         animationData={img}
                         loop={true}
-                        className="absolute"
+                        className="flex "
                       />
-                      <div className="absolute  ">
+                      {/*  <div className="absolute  ">
                         <Lottie
                           animationData={lock}
                           loop={true}
                           className="mt-60 w-full"
                         />
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>

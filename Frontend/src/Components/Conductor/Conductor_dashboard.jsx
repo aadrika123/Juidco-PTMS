@@ -1,11 +1,85 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import background_image from "../../assets/background_image.png";
 import RMC_logo from "../../assets/RMC_LOGO.png";
 import bus from "../../assets/bus 1.png";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/slice/slice";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 export default function Conductor_dashboard() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const user_Details = Cookies.get("user_details");
+  const token = Cookies.get("accesstoken");
+  const [busData, set_busData] = useState(null);
+  console.log(busData);
+
+  /* const userDetailsObj = user_Details ? JSON.parse(user_Details) : null;
+  console.log(userDetailsObj);
+   */
+
+  const userName = localStorage.getItem("userName");
+
+  function handle_logout() {
+    const confirm = window.confirm("Are you sure want to logout?");
+    if (confirm) {
+      dispatch(logout());
+      window.location.replace("/ptms");
+    }
+  }
+
+  useEffect(() => {
+    if (userName === null) {
+      return;
+    } else {
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
+      const formattedTime = currentDate
+        .toTimeString()
+        .split(" ")[0]
+        .replace(/:/g, "")
+        .slice(0, 4); // Format time as HHMM
+
+      console.log(
+        "Format Date >>> ",
+        formattedDate,
+        "Format Time >>>> ",
+        formattedTime
+      );
+
+      try {
+        axios
+          .post(
+            `${process.env.REACT_APP_BASE_URL}/getScheduledConductor`,
+            {
+              conductor_id: userName,
+              date: formattedDate,
+              from_time: formattedTime,
+              to_time: formattedTime,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+          .then((e) => {
+            console.log("Scheduled Conductor", e);
+            localStorage.setItem("BusID", e.data?.data?.data[0].bus_id);
+            set_busData(e.data?.data?.data[0]);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, []);
+  console.log("bus data >>> ", busData?.bus_id);
 
   return (
     <div className="flex items-center justify-between h-screen w-screen">
@@ -27,8 +101,8 @@ export default function Conductor_dashboard() {
             />
           </svg>
         </div>
-        <div className="flex h-[250px] md:h-[100px] pb-8  justify-center items-center md:justify-start rounded-b-[30px] border-b-[3px] border-l-0 border-r-0 shadow-md border-t-0">
-          <div className="flex flex-1 flex-col md:flex-row  justify-start  items-center">
+        <div className="flex h-[300px] md:h-[100px] pb-8  justify-center items-center md:justify-start rounded-b-[30px] border-b-[3px] border-l-0 border-r-0 shadow-md border-t-0">
+          <div className="flex flex-1 flex-col md:flex-row  justify-between  items-center">
             <div className="flex  flex-col md:flex-row justify-between items-center">
               <div className="flex flex-col md:flex-row">
                 <div className="flex  justify-center items-center">
@@ -60,6 +134,23 @@ export default function Conductor_dashboard() {
                 </div>
               </div>
             </div>
+            <div
+              onClick={handle_logout}
+              className="flex cursor-pointer h-10 w-10 m-5 rounded-xl shadow-md justify-center items-center bg-[#5457D6] ml-4"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 17 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2.59143 12.5274H3.75852C3.83821 12.5274 3.91291 12.5622 3.96272 12.6237C4.07893 12.7648 4.20344 12.9009 4.33459 13.0304C4.871 13.5673 5.50638 13.9952 6.20559 14.2905C6.92999 14.5964 7.70858 14.7534 8.49494 14.752C9.29016 14.752 10.0605 14.5959 10.7843 14.2905C11.4835 13.9952 12.1189 13.5673 12.6553 13.0304C13.1927 12.4953 13.6211 11.861 13.917 11.1627C14.2241 10.4389 14.3785 9.67024 14.3785 8.87503C14.3785 8.07981 14.2225 7.31116 13.917 6.58733C13.6215 5.8884 13.1965 5.2592 12.6553 4.71965C12.1141 4.1801 11.4849 3.7551 10.7843 3.4596C10.0605 3.15413 9.29016 2.99807 8.49494 2.99807C7.69973 2.99807 6.92942 3.15247 6.20559 3.4596C5.505 3.7551 4.8758 4.1801 4.33459 4.71965C4.20344 4.85081 4.08059 4.98694 3.96272 5.12639C3.91291 5.18782 3.83654 5.22268 3.75852 5.22268H2.59143C2.48684 5.22268 2.42209 5.10647 2.4802 5.01848C3.75354 3.03958 5.98147 1.72971 8.51321 1.73635C12.4909 1.74631 15.6801 4.97532 15.6403 8.94807C15.6004 12.8577 12.4162 16.0137 8.49494 16.0137C5.96984 16.0137 3.75188 14.7055 2.4802 12.7316C2.42375 12.6436 2.48684 12.5274 2.59143 12.5274ZM1.11555 8.77044L3.47131 6.91106C3.5593 6.84133 3.68713 6.90442 3.68713 7.01565V8.27737H8.90002C8.97307 8.27737 9.03283 8.33713 9.03283 8.41018V9.33987C9.03283 9.41292 8.97307 9.47268 8.90002 9.47268H3.68713V10.7344C3.68713 10.8456 3.55764 10.9087 3.47131 10.839L1.11555 8.97962C1.09967 8.96719 1.08684 8.95132 1.07801 8.9332C1.06918 8.91508 1.06459 8.89518 1.06459 8.87503C1.06459 8.85487 1.06918 8.83497 1.07801 8.81685C1.08684 8.79873 1.09967 8.78286 1.11555 8.77044Z"
+                  fill="white"
+                />
+              </svg>
+            </div>
           </div>
         </div>
 
@@ -67,11 +158,32 @@ export default function Conductor_dashboard() {
           <div className="flex flex-col w-full h-fit justify-center ">
             <div className="flex flex-1 justify-center items-center">
               <div className="flex w-[70%] flex-col justify-center items-center">
+                <div className="flex flex-1 justify-center items-center mt-2 mb-2 flex-row">
+                  <div className="flex text-base md:text-sm lg:text-base xl:text-lg mr-4 font-bold">
+                    Conductor ID:
+                  </div>
+                  <div className="flex text-md md:text-xs lg:text-lg xl:text-xl">
+                    {userName}
+                  </div>
+                </div>
+                <div className="flex justify-center items-center mt-2 mb-2 flex-row">
+                  <div className="flex text-base md:text-sm lg:text-base xl:text-lg mr-4 font-bold">
+                    Scheduled Bus ID:
+                  </div>
+                  <div className="flex text-md md:text-xs lg:text-lg xl:text-xl">
+                    {busData?.bus_id}
+                  </div>
+                </div>
                 <button
+                  disabled={busData == undefined ? true : false}
                   onClick={() => {
                     navigate("/ticket_check");
                   }}
-                  className="flex m-4 flex-row w-[90%] text-2xl border-2 text-black hover:text-white font-md border-[#4338CA] hover:bg-[#4338CA] p-2 rounded-md justify-center items-center hover:fill-white"
+                  className={`flex m-4 flex-row w-[90%] text-lg md:text-xl lg:text-2xl xl:text-3xl border-2 ${
+                    busData == undefined
+                      ? "bg-slate-200 text-white"
+                      : "border-[#4338CA] hover:bg-[#4338CA] hover:text-white text-black"
+                  } font-md p-2 rounded-md justify-center items-center`}
                 >
                   Ticket Booking
                   <svg
@@ -100,7 +212,7 @@ export default function Conductor_dashboard() {
                   onClick={() => {
                     navigate("/conductor_Report");
                   }}
-                  className="flex m-4 flex-row w-[90%] text-2xl border-2 text-black hover:text-white font-md border-[#4338CA] hover:bg-[#4338CA] p-2 rounded-md justify-center items-center hover:fill-white"
+                  className="flex m-4 flex-row w-[90%] text-lg md:text-xl lg:text-2xl xl:text-3xl  border-2 text-black hover:text-white font-md border-[#4338CA] hover:bg-[#4338CA] p-2 rounded-md justify-center items-center hover:fill-white"
                 >
                   Report Generation
                   <svg

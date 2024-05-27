@@ -1,102 +1,82 @@
 import React, { useEffect, useState } from "react";
-import Main from "./Components/Main";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Recipt from "./Components/Recipt";
-import BusRegistration from "./Components/Registration/BusRegistration";
-import ConductorRegistration from "./Components/Registration/ConductorRegistration";
-import RegisterMain from "./Components/Registration/RegisterMain";
-import ChangeScheduling from "./Components/Registration/ChangeScheduling";
-import Report_Generation from "./Components/Registration/Report_Generation";
-import Conductor_dashboard from "./Components/Conductor/Conductor_dashboard";
-import Ticket_check from "./Components/Conductor/Ticket_check";
-import Conductor_Report_Generation from "./Components/Conductor/Conductor_Report_Generation";
-import Bus_Report_Generation from "./Components/Registration/Bus_Report_Generation";
-import Conductor_report_page from "./Components/Registration/Report/Conductor_report_page";
-import Bus_report_page from "./Components/Registration/Report/Bus_report_page";
-import Bus_Onboarding from "./Components/Registration/Onboarding/Bus_Onboarding";
-import Conductor_Onboarding from "./Components/Registration/Onboarding/Conductor_Onboarding";
-import ChaneScheduling_main from "./Components/Registration/ChangeScheduling/ChaneScheduling_main";
-import ReportGeneration_main from "./Components/Registration/ReportGeneration/ReportGeneration_main";
-import Login_main from "./Components/Login/Login_main";
+import { BrowserRouter as Router } from "react-router-dom";
 import Cookies from "js-cookie";
+import AppRoutes from "./Routes/AppRoutes";
+import img from "./assets/loader.json";
+import Lottie from "lottie-react";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+} from "@mui/material";
 
 function App() {
   const [access_token, set_access_token] = useState("");
   const [userType, set_userType] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const token = Cookies.get("accesstoken");
-    if (token) {
-      const userDetails = sessionStorage.getItem("user_details");
-      const type = JSON.parse(userDetails).user_type;
-      console.log(type, "type");
-      set_userType(type);
+    //const token = Cookies.get("accesstoken");
+    const token = localStorage.getItem("token");
+    if (token && token !== "undefined") {
+      const userDetails = Cookies.get("user_details");
+      const userType = localStorage.getItem("userType");
+      if (userType) {
+        set_userType(userType);
+      }
+      set_access_token(token);
+    } else if (token && token == "undefined") {
+      setOpen(true);
+      localStorage.clear();
+      //Cookies.remove("accesstoken");
+      //Cookies.remove("user_details");
     }
-    console.log(token);
-    set_access_token(token);
 
-    console.log("User ", userType);
+    setLoading(false);
   }, []);
 
-  if (access_token) {
-    return (
-      <Router basename="/ptms">
-        <Routes>
-          <Route path="/" element={<RegisterMain />} />
-          <Route path="/main" element={<Main />} />
-          <Route path="/recipt" element={<Recipt />} />
+  const handleClose = () => {
+    setOpen(false);
+    window.location.href = "/ptms"; // Assuming there's a login route
+  };
 
-          <Route path="/Bus-onboarding" element={<Bus_Onboarding />} />
-          <Route
-            path="/Conductor-onboarding"
-            element={<Conductor_Onboarding />}
-          />
-
-          <Route path="/registerBus" element={<BusRegistration />} />
-          <Route
-            path="/ConductorRegistration"
-            element={<ConductorRegistration />}
-          />
-          <Route
-            path="/ChangeScheduling-Main"
-            element={<ChaneScheduling_main />}
-          />
-          <Route path="/chagneScheduling" element={<ChangeScheduling />} />
-          <Route path="/reportGeneration" element={<Report_Generation />} />
-          <Route
-            path="/BusreportGeneration"
-            element={<Bus_Report_Generation />}
-          />
-          <Route
-            path="/conductor_dashboard"
-            element={<Conductor_dashboard />}
-          />
-          <Route path="/ticket_check" element={<Ticket_check />} />
-          <Route
-            path="/conductor_Report"
-            element={<Conductor_Report_Generation />}
-          />
-          <Route
-            path="/Conductor_report_page"
-            element={<Conductor_report_page />}
-          />
-          <Route path="/Bus_report_page" element={<Bus_report_page />} />
-          <Route
-            path="/ReportGeneration-main"
-            element={<ReportGeneration_main />}
-          />
-        </Routes>
-      </Router>
-    );
-  } else {
+  if (loading) {
     return (
-      <Router basename="/ptms">
-        <Routes>
-          <Route path="/" element={<Login_main />} />
-        </Routes>
-      </Router>
+      <div className="flex flex-1 justify-center items-center h-screen">
+        <Lottie animationData={img} loop={true} className="w-60 h-60" />
+      </div>
     );
   }
+
+  return (
+    <>
+      <Router basename="/ptms">
+        <AppRoutes access_token={access_token} userType={userType} />
+      </Router>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Session Expired"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Your session has expired. Please log in again.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 }
 
 export default App;

@@ -12,10 +12,18 @@ import bus_stop from "../../../assets/bus-stop.png";
 
 export default function Conductor_report_page() {
   const location = useLocation();
-  const receiptData = location.state;
   const navigate = useNavigate();
-  console.log("Report Page >>", receiptData);
-  const hasReports = receiptData?.report?.data?.length > 0;
+
+  
+
+  /*
+  useEffect(() => {
+    axios.post(`${process.env.REACT_APP_BASE_URL}/report/bus-daywise`, {
+      
+    });
+  })
+*/
+
   return (
     <div className="flex items-center justify-center h-screen w-screen">
       <div className="flex flex-1 flex-col bg-white h-screen ">

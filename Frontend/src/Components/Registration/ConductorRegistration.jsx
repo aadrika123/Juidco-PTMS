@@ -37,8 +37,13 @@ import Cookies from "js-cookie";
 const validationSchema = Yup.object({
   Name: Yup.string().required("Name is required"),
   Age: Yup.string()
-    .matches(/^[0-9]+$/, "Must be only digits")
-    .required("Age is required"),
+    .required("Age is required")
+    .transform((value) => (value ? Number(value) : 0)) // Transform string to number
+    .test(
+      "is-older-than-18",
+      "Age must be more than 18",
+      (value) => value > 18
+    ),
   Blood_Group: Yup.string().required("Blood Group is required"),
   Adhar_NO: Yup.string()
     .required("Adhar Number is required")
@@ -218,7 +223,7 @@ export default function ConductorRegistration() {
                     {" "}
                     <div className="flex flex-1 flex-col mt-4">
                       <label className="mb-2 ml-4" htmlFor="Adhar_NO">
-                        Adhar Number
+                        Aadhaar Number
                       </label>
                       <Field
                         type="number"
@@ -307,7 +312,7 @@ export default function ConductorRegistration() {
                         Age
                       </label>
                       <Field
-                        type="Number"
+                        type="text"
                         id="Age"
                         name="Age"
                         className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
@@ -453,7 +458,7 @@ export default function ConductorRegistration() {
                       )}
                       {uploadedFiles.Adhar_card && (
                         <div className="text-green-500 ml-4 mt-2">
-                          Adhar Card Uploaded
+                          Aadhaar Card Uploaded
                         </div>
                       )}
                     </div>

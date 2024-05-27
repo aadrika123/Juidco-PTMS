@@ -79,14 +79,28 @@ export default function Main() {
   const handle_Click = async (Amount, color, border_color) => {
     let result = confirm("Are you sure?");
     if (result) {
+      const busId = localStorage.getItem("BusID");
+      const conductorID = localStorage.getItem("userName");
+
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
+      const formattedTime = currentDate
+        .toTimeString()
+        .split(" ")[0]
+        .replace(/:/g, ":")
+        .slice(0, 4); // Format time as HHMM
+      const uniqueReceiptNo = `${formattedDate}-${formattedTime}-${Math.floor(
+        Math.random() * 10000
+      )}`;
+
       const postData = {
         data: {
           amount: Amount,
-          bus_id: "1BNC",
-          conductor_id: "PTM06292529",
-          date: "2024-05-16",
-          time: "04:00",
-          receipt_no: "15815487",
+          bus_id: busId,
+          conductor_id: conductorID,
+          date: formattedDate,
+          time: formattedTime,
+          receipt_no: uniqueReceiptNo,
         },
       };
       try {

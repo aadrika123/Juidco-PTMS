@@ -17,7 +17,10 @@ const authSlice = createSlice({
     },
     logout: (state) => {
       state.user = null;
-      Cookies.remove("loginData");
+      /* Cookies.remove("loginData");
+      Cookies.remove("accesstoken");
+      Cookies.remove("user_details"); */
+      localStorage.clear();
     },
   },
 });

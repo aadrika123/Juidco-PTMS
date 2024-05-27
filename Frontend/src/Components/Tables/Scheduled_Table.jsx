@@ -10,10 +10,12 @@ import {
   Avatar,
   TextField,
   TablePagination,
+  Dialog,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import axios from "axios";
-
 import Button from "@mui/material/Button";
 import Cookies from "js-cookie";
 
@@ -27,7 +29,7 @@ const formatDate = (dateString) => {
 };
 
 const formatTime = (time) => {
-  const timeString = time.toString().padStart(4, "0"); // Ensure the timeString is always 4 characters long
+  const timeString = time.toString().padStart(4, "0");
   const hours = timeString.slice(0, 2);
   const minutes = timeString.slice(2, 4);
   return `${hours}:${minutes}`;
@@ -35,6 +37,9 @@ const formatTime = (time) => {
 
 const ScheduledTable = () => {
   const token = Cookies.get("accesstoken");
+  const [openDialog, setOpenDialog] = useState(false); // State to control dialog
+  const [deleteDialog, setDeleteDialog] = useState(false); // State to control delete confirmation dialog
+  const [deleteItemId, setDeleteItemId] = useState(null); // State to track the item to be deleted
 
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -42,25 +47,17 @@ const ScheduledTable = () => {
   const [allScheduled, setAllScheduled] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
 
-  console.log("Allscheduled ---> ",allScheduled);
-
   useEffect(() => {
     fetchScheduledData();
   }, [page, rowsPerPage]);
 
   const fetchScheduledData = async () => {
     try {
-      const response = await axios
+      await axios
         .get(
-          `${process.env.REACT_APP_BASE_URL}/schedule/getAll?limit=${
-            page + 1
-          }&page=${rowsPerPage}`,
-          /*{
-          params: {
-            limit: rowsPerPage,
-            page: page + 1, // Backend pagination is 1-based
-          },
-        },*/
+          `${
+            process.env.REACT_APP_BASE_URL
+          }/schedule/getAll?limit=${rowsPerPage}&page=${page + 1}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -68,9 +65,8 @@ const ScheduledTable = () => {
           }
         )
         .then((response) => {
-          console.log(response.data.data);
           setAllScheduled(response.data?.data?.data);
-          setTotalRecords(response.data?.data?.total);
+          setTotalRecords(response.data?.data?.count);
         });
     } catch (error) {
       console.error("Failed to fetch scheduled data:", error);
@@ -88,6 +84,26 @@ const ScheduledTable = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/schedule/delete`,
+        {
+          id: deleteItemId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setDeleteDialog(false);
+      fetchScheduledData();
+    } catch (error) {
+      console.error("Failed to delete scheduled data:", error);
+    }
   };
 
   const filteredData = allScheduled?.filter((row) => {
@@ -205,33 +221,13 @@ const ScheduledTable = () => {
                 <TableCell>{formatTime(row.from_time)}</TableCell>
                 <TableCell>{formatTime(row.to_time)}</TableCell>
                 <TableCell>
-                  {/* Actions can be added here */}
-                  <div className="flex flex-1 flex-row">
-                    <div className="flex">
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M3.82353 4.76465H2.88235C2.38312 4.76465 1.90434 4.96297 1.55133 5.31598C1.19832 5.66899 1 6.14777 1 6.647V15.1176C1 15.6168 1.19832 16.0956 1.55133 16.4486C1.90434 16.8016 2.38312 16.9999 2.88235 16.9999H11.3529C11.8522 16.9999 12.331 16.8016 12.684 16.4486C13.037 16.0956 13.2353 15.6168 13.2353 15.1176V14.1764"
-                          stroke="#333333"
-                          stroke-width="1.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M12.2953 2.88245L15.1188 5.70598M16.4223 4.37422C16.793 4.00354 17.0013 3.50079 17.0013 2.97657C17.0013 2.45235 16.793 1.9496 16.4223 1.57892C16.0517 1.20825 15.5489 1 15.0247 1C14.5005 1 13.9977 1.20825 13.627 1.57892L5.70703 9.47069V12.2942H8.53056L16.4223 4.37422Z"
-                          stroke="#333333"
-                          stroke-width="1.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <div className="flex ml-2 ">
+                  <div className="flex flex-row items-center">
+                    <Button
+                      onClick={() => {
+                        setDeleteItemId(row.id);
+                        setDeleteDialog(true);
+                      }}
+                    >
                       <svg
                         width="22"
                         height="22"
@@ -244,7 +240,7 @@ const ScheduledTable = () => {
                           fill="#333333"
                         />
                       </svg>
-                    </div>
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -261,6 +257,38 @@ const ScheduledTable = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
+
+      <Dialog
+        open={deleteDialog}
+        onClose={() => setDeleteDialog(false)}
+        aria-labelledby="delete-confirmation-dialog"
+      >
+        <DialogContent>
+          <div className="flex flex-1 flex-row justify-center items-center">
+            Are you sure you want to delete this scheduling?
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialog(false)}>Cancel</Button>
+          <Button onClick={handleDelete} color="primary">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openDialog}
+        fullWidth={true}
+        maxWidth={"lg"}
+        onClose={() => setOpenDialog(false)}
+      >
+        <DialogContent>
+          <div className="flex flex-1 flex-row justify-center items-center"></div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
