@@ -101,7 +101,7 @@ export default class BusConductorScheduleServices {
       );
       if (data.error_type === "VALIDATION") {
         return sendResponse(
-          true,
+          false,
           "Already Exist",
           data,
           403,
