@@ -2,7 +2,7 @@
 const nextConfig = {
   basePath: "/ptms",
   env: {
-    backend: "https://aadrikainfomedia.com/auth",
+    backend: "https://jharkhandegovernance.com/auth",
   },
 };
 
