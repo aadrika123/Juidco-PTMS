@@ -19,6 +19,7 @@ class BusConductorScheduleDao {
     select * from scheduler where
     not ((${setFromTime} <= from_time and ${setToTime} <= from_time)
     or  (${setFromTime} >= to_time and ${setToTime} >= to_time)) 
+    and bus_id = '${bus_no}' or conductor_id = '${conductor_id}'
     `);
 
       if (isExistingSchedule) {
