@@ -99,11 +99,14 @@ export default class BusConductorScheduleServices {
       const data = await this.busConductorSchedule.createScheduleBusConductor(
         req
       );
+
+      console.log(data.error_type, "data");
       if (data.error_type === "VALIDATION") {
+        console.log(data);
         return sendResponse(
+          true,
           false,
-          "Already Exist",
-          data,
+          { data: data },
           200,
           resObj.action,
           resObj.apiId,
@@ -243,7 +246,11 @@ export default class BusConductorScheduleServices {
     }
   };
 
-  getBusScheduleConductor = async (req: Request, res: Response, apiId: string) => {
+  getBusScheduleConductor = async (
+    req: Request,
+    res: Response,
+    apiId: string
+  ) => {
     const resObj: resObj = {
       apiId,
       action: "POST",
@@ -263,5 +270,4 @@ export default class BusConductorScheduleServices {
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
- 
 }
