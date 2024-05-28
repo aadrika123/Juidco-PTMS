@@ -34,7 +34,7 @@ export default class BusConductorScheduleRoute {
 
     app
       .route(`${baseUrl}/schedule/update-schedule`)
-      .put((req: Request, res: Response) =>
+      .post((req: Request, res: Response) =>
         busConductorScheduleServices.updateScheduleBusConductor(
           req,
           res,

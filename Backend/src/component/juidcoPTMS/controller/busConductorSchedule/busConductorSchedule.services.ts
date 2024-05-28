@@ -162,12 +162,13 @@ export default class BusConductorScheduleServices {
   ) => {
     const resObj: resObj = {
       apiId,
-      action: "GET",
+      action: "POST",
       version: "1.0",
     };
 
     try {
       //validation error
+      console.log(true);
       const isValidated = await ScheduleBusConductorValidationSchema.validate(
         req.body
       );
