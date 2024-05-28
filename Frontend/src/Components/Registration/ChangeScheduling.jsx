@@ -123,7 +123,7 @@ export default function ChangeScheduling() {
 
   const Update_Schedule = async (id) => {
     try {
-      const response = await axios.put(
+      const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/schedule/update-schedule`,
         {
           bus_no: Form_values?.Bus_information,
