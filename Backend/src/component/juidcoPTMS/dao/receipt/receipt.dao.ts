@@ -129,6 +129,7 @@ class ReceiptDao {
             conductor: {
               cunique_id: { equals: conductor_id, mode: "insensitive" },
             },
+            date: new Date(from_date),
           },
         ],
       };
