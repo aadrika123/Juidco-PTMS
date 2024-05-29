@@ -54,8 +54,8 @@ class ReceiptDao {
     const limit: number = Number(req.query.limit);
     const search: string = String(req.query.search);
 
-    console.log(search, new Date(from_date), to_date, "datee");
-
+    const d1 = new Date(from_date);
+    const d2 = new Date(to_date);
     const query: Prisma.receiptsFindManyArgs = {
       skip: (page - 1) * limit,
       take: limit,
@@ -106,7 +106,7 @@ class ReceiptDao {
       };
     }
 
-    if (bus_no !== "" && typeof bus_no === "string" && bus_no !== "undefined") {
+    if (bus_no) {
       query.where = {
         OR: [
           {
@@ -118,33 +118,32 @@ class ReceiptDao {
       };
     }
 
-    if (
-      conductor_id !== "" &&
-      typeof conductor_id === "string" &&
-      conductor_id !== "undefined"
-    ) {
+    if (from_date && to_date && conductor_id) {
       query.where = {
-        OR: [
+        AND: [
           {
             conductor: {
               cunique_id: { equals: conductor_id, mode: "insensitive" },
             },
-            date: new Date(from_date),
+          },
+          {
+            date: {
+              gte: d1,
+              lte: d2,
+            },
           },
         ],
       };
     }
 
-    if (
-      from_date !== "" &&
-      from_date !== undefined &&
-      to_date !== "" &&
-      to_date !== undefined
-    ) {
-      const d1 = new Date(from_date);
-      const d2 = new Date(to_date);
+    if (from_date && to_date && bus_no) {
       query.where = {
-        OR: [
+        AND: [
+          {
+            bus: {
+              register_no: { equals: bus_no, mode: "insensitive" },
+            },
+          },
           {
             date: {
               gte: d1,
@@ -157,8 +156,9 @@ class ReceiptDao {
 
     const [data, count] = await prisma.$transaction([
       prisma.receipts.findMany(query),
-      prisma.receipts.count(),
+      prisma.receipts.count({ where: query.where }),
     ]);
+
     return generateRes({ data, count, page, limit });
   };
 
