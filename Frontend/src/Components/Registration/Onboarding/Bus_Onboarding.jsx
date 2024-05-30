@@ -208,6 +208,7 @@ export default function Bus_Onboarding() {
                             htmlFor="registration_No"
                           >
                             Registration Number
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -241,6 +242,7 @@ export default function Bus_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="VIN_Number">
                             {`VIN (chassis)  Number`}
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -280,6 +282,7 @@ export default function Bus_Onboarding() {
                             htmlFor="Pollution_selectedFile"
                           >
                             Pollution Certificate
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="file"
@@ -338,6 +341,7 @@ export default function Bus_Onboarding() {
                             htmlFor="Tax_selectedFile"
                           >
                             Tax Copy
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="file"
@@ -395,6 +399,7 @@ export default function Bus_Onboarding() {
                           htmlFor="Registration_selectedFile"
                         >
                           Registration Certificate
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="file"

@@ -84,11 +84,11 @@ const AppRoutes = ({ access_token, userType }) => {
             }
           />
           <Route
-            path="/ReportBus_recipt/:id"
+            path="/ReportBus_recipt/:id/:Selected_Date/:End_Date"
             element={<PrivateRoute element={ReportBus_recipt} />}
           />
           <Route
-            path="/ReportConductor_recipt/:Cid"
+            path="/ReportConductor_recipt/:Cid/:Selected_Date/:End_Date"
             element={<PrivateRoute element={ReportConductor_Bus} />}
           />
           <Route

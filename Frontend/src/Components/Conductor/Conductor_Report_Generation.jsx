@@ -38,6 +38,8 @@ export default function Conductor_Report_Generation() {
   const [total_amount, set_total_amount] = useState([]);
   const [conductor_id, set_conductor_id] = useState("");
   const [bus_id, set_bus_id] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   console.log("Total Amount Array >>> ", total_amount);
   console.log("report state >>> ", report);
@@ -54,6 +56,8 @@ export default function Conductor_Report_Generation() {
 
   const onSubmit = async (values) => {
     set_filterValues(values);
+    setFromDate(values.fromDate);
+    setToDate(values.toDate);
     set_report_type(values.reportType);
     if (values.reportType === "conductor") {
       set_conductor_id(values.id);
@@ -637,13 +641,15 @@ export default function Conductor_Report_Generation() {
             {report_type === "" ? (
               <></>
             ) : report_type === "conductor" ? (
-              <Link to={`/ReportConductor_recipt/${conductor_id}`}>
+              <Link
+                to={`/ReportConductor_recipt/${conductor_id}/${fromDate}/${toDate}`}
+              >
                 <div className="flex justify-end items-center mb-4 mr-4 font-bold">
                   {`See All Recipts `}
                 </div>
               </Link>
             ) : (
-              <Link to={`/ReportBus_recipt/${bus_id}`}>
+              <Link to={`/ReportBus_recipt/${bus_id}/${fromDate}/${toDate}`}>
                 <div className="flex justify-end items-center mb-4 mr-4 font-bold">
                   {`See All Recipts `}
                 </div>

@@ -39,7 +39,8 @@ const Login = () => {
         data: {
           email: values.user_id,
           password: values.password,
-          type: deviceType,
+          type: window.ReactNativeWebView ? "mobile" : null,
+          // type: "mobile"
         },
       });
 
@@ -52,7 +53,7 @@ const Login = () => {
         localStorage.setItem("userType", userDetails.user_type);
         localStorage.setItem("userName", userDetails.user_name);
         localStorage.setItem("device", deviceType);
-        localStorage.setItem("ulbId", userDetails.ulb_id);
+        // localStorage.setItem("ulbId", userDetails.ulb_id);
         localStorage.setItem("userUlbName", userDetails.ulbName);
         localStorage.setItem("roles", userDetails.role[0]);
         localStorage.setItem("isLoggedIn", true);

@@ -55,6 +55,9 @@ export default function Main() {
       "\n \n" +
       "Receipt: " +
       data?.receipt_no +
+      "\n \n" +
+      "Conductor ID: " +
+      data?.conductor_id +
       "\n" +
       "\n \n" +
       "*******************************";

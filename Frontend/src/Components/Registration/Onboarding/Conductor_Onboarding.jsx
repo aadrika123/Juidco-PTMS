@@ -274,6 +274,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Aadhaar_NO">
                             Aadhaar Number
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -301,6 +302,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Name">
                             Name
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -344,6 +346,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="last_Name">
                             Last Name
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -368,6 +371,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Age">
                             Age
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -395,6 +399,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Blood_Group">
                             Blood Group
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             as="select"
@@ -441,6 +446,7 @@ export default function Conductor_Onboarding() {
                             htmlFor="Fitness_Certificate_selectedFile"
                           >
                             Fitness Certificate
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="file"
@@ -498,6 +504,7 @@ export default function Conductor_Onboarding() {
                             htmlFor="Aadhaar_card_selectedFile"
                           >
                             Aadhaar card
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="file"
@@ -554,6 +561,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Contact_Number">
                             Contact Number
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"

@@ -16,7 +16,8 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
 export default function ReportConductor_Bus() {
-  const { Cid } = useParams();
+  const { Cid, Selected_Date, End_Date } = useParams();
+
   const token = Cookies.get("accesstoken");
   const navigate = useNavigate();
 
@@ -31,6 +32,8 @@ export default function ReportConductor_Bus() {
         `${process.env.REACT_APP_BASE_URL}/receipt/get`,
         {
           conductor_id: Cid,
+          from_date: Selected_Date,
+          to_date: End_Date
         },
         {
           headers: {
