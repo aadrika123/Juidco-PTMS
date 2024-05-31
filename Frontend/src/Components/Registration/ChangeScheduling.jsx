@@ -79,7 +79,6 @@ export default function ChangeScheduling() {
   }
 
   const timeOptions = generateTimeOptions(15);
-  console.log(timeOptions);
 
   const handleConfirmation = async () => {
     set_loading(true);
@@ -101,16 +100,33 @@ export default function ChangeScheduling() {
           },
         }
       );
-      set_loading(false);
-      console.log(response);
-      set_success(response.data?.data);
+      if (response.data?.message === false) {
+        set_loading(false);
+        console.log(response);
+
+        console.log("Error");
+        set_Error(response.data?.message);
+        set_openError(true);
+        if (scheID === null) {
+          sessionStorage.setItem("id", response?.data?.data?.data?.id);
+           console.log("ID >>>>> ", response?.data?.data?.data?.id);
+           setScheID(response?.data?.data?.data?.id);
+        }
+      } else {
+        set_loading(false);
+        console.log(response);
+        set_success(response.data?.data);
+
+        setOpenDialog(true);
+      }
       sessionStorage.clear("id");
       setScheID(null);
-      setOpenDialog(true);
     } catch (error) {
       set_loading(false);
       if (scheID === null) {
-        sessionStorage.setItem("id", error.response?.data?.data?.id);
+        sessionStorage.setItem("id", response?.data?.data?.id);
+        console.log("ID >>>>> ", response?.data);
+        setScheID(response?.data?.data?.data?.id);
       }
 
       set_Error(error.response.data);

@@ -101,10 +101,10 @@ export default function ReportConductor_Bus() {
         <div className="flex text-xl font-normal  mr-4">Generate Report</div>
       </div>
       <Typography variant="h4" gutterBottom>
-        Report Bus Receipt
+        Report
       </Typography>
       <Typography variant="h6" gutterBottom>
-        Receipt ID: {Cid}
+        ID: {Cid}
       </Typography>
       <TableContainer component={Paper}>
         <Table stickyHeader>

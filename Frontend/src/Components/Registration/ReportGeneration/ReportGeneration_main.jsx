@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import busstop from "../../../assets/bus-stop.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -199,7 +199,7 @@ export default function ReportGeneration_main() {
   const [dialog_busUid, set_dialog_busUid] = useState("");
   const [Dialogdate, set_dateDialog] = useState("");
   const [DialogAmount, set_DialogAmount] = useState("");
-  
+
   const handle_dialog_busUid = (id, date, amount) => {
     set_dialog_busUid(id);
     set_dateDialog(date);
@@ -267,152 +267,161 @@ export default function ReportGeneration_main() {
                   validationSchema={validationSchema}
                   onSubmit={onSubmit}
                 >
-                  {({ values, setFieldValue }) => (
-                    <Form className="flex  flex-1 flex-row space-x-4">
-                      <div className="flex flex-1  flex-col">
-                        <RadioGroup
-                          row
-                          className="flex "
-                          aria-label="reportType"
-                          name="reportType"
-                          value={values.reportType}
-                          onChange={(e) =>
-                            setFieldValue("reportType", e.target.value)
-                          }
-                        >
-                          <FormControlLabel
+                  {({ values, setFieldValue }) => {
+                    // useEffect to reload the page when id changes
+                    useEffect(() => {
+                      if (values.id) {
+                        window.location.reload();
+                      }
+                    }, [values.reportType]);
+
+                    return (
+                      <Form className="flex  flex-1 flex-row space-x-4">
+                        <div className="flex flex-1  flex-col">
+                          <RadioGroup
+                            row
                             className="flex "
-                            value="conductor"
-                            control={<Radio />}
-                            label="Conductor Wise Report"
-                          />
-                          <FormControlLabel
-                            className="flex"
-                            value="bus"
-                            control={<Radio />}
-                            label="Bus Wise Report"
-                          />
-                        </RadioGroup>
-                        <div className="flex md:flex-row flex-col flex-1">
-                          {values.reportType && (
-                            <>
-                              <div className="flex flex-1 flex-col ml-4 mr-4">
-                                <label htmlFor="fromDate">
-                                  {values.reportType === "conductor"
-                                    ? "Conductor ID"
-                                    : "Bus ID"}
-                                </label>
+                            aria-label="reportType"
+                            name="reportType"
+                            value={values.reportType}
+                            onChange={(e) =>
+                              setFieldValue("reportType", e.target.value)
+                            }
+                          >
+                            <FormControlLabel
+                              className="flex "
+                              value="conductor"
+                              control={<Radio />}
+                              label="Conductor Wise Report"
+                            />
+                            <FormControlLabel
+                              className="flex"
+                              value="bus"
+                              control={<Radio />}
+                              label="Bus Wise Report"
+                            />
+                          </RadioGroup>
+                          <div className="flex md:flex-row flex-col flex-1">
+                            {values.reportType && (
+                              <>
+                                <div className="flex flex-1 flex-col ml-4 mr-4">
+                                  <label htmlFor="fromDate">
+                                    {values.reportType === "conductor"
+                                      ? "Conductor ID"
+                                      : "Bus ID"}
+                                  </label>
 
-                                <Field
-                                  type="text"
-                                  className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
-                                  style={{ boxShadow: "0 1px 4px #fff" }}
-                                  onFocus={(e) =>
-                                    (e.target.style.boxShadow =
-                                      "0 1px 4px #000")
-                                  }
-                                  onBlur={(e) =>
-                                    (e.target.style.boxShadow = "none")
-                                  }
-                                  
-                                  name="id"
-                                />
-                                <ErrorMessage
-                                  name="id"
-                                  component="div"
-                                  className="text-red-500 ml-4"
-                                />
-                              </div>
-
-                              <div className="flex flex-1 flex-col md:ml-20 ml-5 mr-4 ">
-                                <label htmlFor="fromDate">From Date </label>
-                                <Field
-                                  as="input"
-                                  type="date"
-                                  placeholder="Select Date"
-                                  id="fromDate"
-                                  name="fromDate"
-                                  className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
-                                  style={{ boxShadow: "0 1px 4px #fff" }}
-                                  onFocus={(e) =>
-                                    (e.target.style.boxShadow =
-                                      "0 1px 4px #000")
-                                  }
-                                  onBlur={(e) =>
-                                    (e.target.style.boxShadow = "none")
-                                  }
-                                />
-
-                                <ErrorMessage
-                                  name="fromDate"
-                                  component="div"
-                                  className="text-red-500 ml-4"
-                                />
-                              </div>
-                              <div className="flex flex-1 flex-col ml-4 mr-4 ">
-                                <label htmlFor="toDate">To Date </label>
-                                <Field
-                                  as="input"
-                                  type="date"
-                                  placeholder="Select Date"
-                                  id="toDate"
-                                  name="toDate"
-                                  className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
-                                  style={{ boxShadow: "0 1px 4px #fff" }}
-                                  onFocus={(e) =>
-                                    (e.target.style.boxShadow =
-                                      "0 1px 4px #000")
-                                  }
-                                  onBlur={(e) =>
-                                    (e.target.style.boxShadow = "none")
-                                  }
-                                />
-
-                                <ErrorMessage
-                                  name="toDate"
-                                  component="div"
-                                  className="text-red-500 ml-4"
-                                />
-                              </div>
-
-                              <button
-                                type="submit"
-                                className="bg-[#6366F1] h-10 text-white mt-8 px-4 py-2 rounded-md"
-                              >
-                                <div className="flex flex-1 flex-row justify-center items-center">
-                                  <div className="flex">
-                                    {" "}
-                                    <svg
-                                      width="20"
-                                      height="24"
-                                      viewBox="0 0 20 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M12.4996 19.4344C12.533 19.7136 12.4496 20.0114 12.258 20.2068C12.1809 20.2931 12.0893 20.3615 11.9885 20.4082C11.8877 20.4549 11.7796 20.479 11.6705 20.479C11.5613 20.479 11.4532 20.4549 11.3524 20.4082C11.2516 20.3615 11.16 20.2931 11.083 20.2068L7.74129 16.475C7.6504 16.3758 7.58129 16.2545 7.53937 16.1205C7.49745 15.9865 7.48384 15.8435 7.49962 15.7026V10.9379L3.50795 5.23319C3.37263 5.03918 3.31157 4.79324 3.33811 4.54912C3.36466 4.30499 3.47665 4.08252 3.64962 3.93032C3.80795 3.80004 3.98295 3.72559 4.16629 3.72559H15.833C16.0163 3.72559 16.1913 3.80004 16.3496 3.93032C16.5226 4.08252 16.6346 4.30499 16.6611 4.54912C16.6877 4.79324 16.6266 5.03918 16.4913 5.23319L12.4996 10.9379V19.4344ZM5.86629 5.58682L9.16629 10.2957V15.4328L10.833 17.294V10.2864L14.133 5.58682H5.86629Z"
-                                        fill="white"
-                                      />
-                                    </svg>
-                                  </div>
-                                  <div className="flex flex-1 text-white text-md">
-                                    Search Result
-                                  </div>
+                                  <Field
+                                    type="text"
+                                    className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
+                                    style={{ boxShadow: "0 1px 4px #fff" }}
+                                    onFocus={(e) =>
+                                      (e.target.style.boxShadow =
+                                        "0 1px 4px #000")
+                                    }
+                                    onBlur={(e) =>
+                                      (e.target.style.boxShadow = "none")
+                                    }
+                                    name="id"
+                                  />
+                                  <ErrorMessage
+                                    name="id"
+                                    component="div"
+                                    className="text-red-500 ml-4"
+                                  />
                                 </div>
-                              </button>
-                            </>
-                          )}
+
+                                <div className="flex flex-1 flex-col md:ml-20 ml-5 mr-4 ">
+                                  <label htmlFor="fromDate">From Date </label>
+                                  <Field
+                                    as="input"
+                                    type="date"
+                                    placeholder="Select Date"
+                                    id="fromDate"
+                                    name="fromDate"
+                                    className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
+                                    style={{ boxShadow: "0 1px 4px #fff" }}
+                                    onFocus={(e) =>
+                                      (e.target.style.boxShadow =
+                                        "0 1px 4px #000")
+                                    }
+                                    onBlur={(e) =>
+                                      (e.target.style.boxShadow = "none")
+                                    }
+                                  />
+
+                                  <ErrorMessage
+                                    name="fromDate"
+                                    component="div"
+                                    className="text-red-500 ml-4"
+                                  />
+                                </div>
+                                <div className="flex flex-1 flex-col ml-4 mr-4 ">
+                                  <label htmlFor="toDate">To Date </label>
+                                  <Field
+                                    as="input"
+                                    type="date"
+                                    placeholder="Select Date"
+                                    id="toDate"
+                                    name="toDate"
+                                    className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
+                                    style={{ boxShadow: "0 1px 4px #fff" }}
+                                    onFocus={(e) =>
+                                      (e.target.style.boxShadow =
+                                        "0 1px 4px #000")
+                                    }
+                                    onBlur={(e) =>
+                                      (e.target.style.boxShadow = "none")
+                                    }
+                                  />
+
+                                  <ErrorMessage
+                                    name="toDate"
+                                    component="div"
+                                    className="text-red-500 ml-4"
+                                  />
+                                </div>
+
+                                <button
+                                  type="submit"
+                                  className="bg-[#6366F1] h-10 text-white mt-8 px-4 py-2 rounded-md"
+                                >
+                                  <div className="flex flex-1 flex-row justify-center items-center">
+                                    <div className="flex">
+                                      {" "}
+                                      <svg
+                                        width="20"
+                                        height="24"
+                                        viewBox="0 0 20 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M12.4996 19.4344C12.533 19.7136 12.4496 20.0114 12.258 20.2068C12.1809 20.2931 12.0893 20.3615 11.9885 20.4082C11.8877 20.4549 11.7796 20.479 11.6705 20.479C11.5613 20.479 11.4532 20.4549 11.3524 20.4082C11.2516 20.3615 11.16 20.2931 11.083 20.2068L7.74129 16.475C7.6504 16.3758 7.58129 16.2545 7.53937 16.1205C7.49745 15.9865 7.48384 15.8435 7.49962 15.7026V10.9379L3.50795 5.23319C3.37263 5.03918 3.31157 4.79324 3.33811 4.54912C3.36466 4.30499 3.47665 4.08252 3.64962 3.93032C3.80795 3.80004 3.98295 3.72559 4.16629 3.72559H15.833C16.0163 3.72559 16.1913 3.80004 16.3496 3.93032C16.5226 4.08252 16.6346 4.30499 16.6611 4.54912C16.6877 4.79324 16.6266 5.03918 16.4913 5.23319L12.4996 10.9379V19.4344ZM5.86629 5.58682L9.16629 10.2957V15.4328L10.833 17.294V10.2864L14.133 5.58682H5.86629Z"
+                                          fill="white"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <div className="flex flex-1 text-white text-md">
+                                      Search Result
+                                    </div>
+                                  </div>
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </Form>
-                  )}
+                      </Form>
+                    );
+                  }}
                 </Formik>
               </div>
             </div>
           </div>
           <div className="flex flex-1 flex-col md:flex-row   ml-4 mr-4 mt-4 ">
             <div className="flex flex-1 m-4  bg-white shadow-lg p-8 rounded-lg ">
-              {conductor_details?.data ? (
+              {conductor_details?.data &&
+              conductor_details.data[0]?.first_name ? (
                 <div className="flex flex-1 flex-col ">
                   <div className="flex mt-5  flex-row">
                     <div className="flex font-bold">Name:</div>
@@ -459,7 +468,7 @@ export default function ReportGeneration_main() {
                 <></>
               )}
 
-              {bus_details?.data ? (
+              {bus_details?.data && bus_details?.data[0]?.id ? (
                 <div className="flex flex-1 flex-col ">
                   <div className="flex mt-5 flex-row">
                     <div className="flex font-bold">Id:</div>
@@ -487,14 +496,29 @@ export default function ReportGeneration_main() {
                 <div className="flex flex-1 flex-row ">
                   <div className="flex flex-1">
                     <div className="flex flex-col flex-1">
-                      <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
-                        {/* {total_collection.data[0].total_bus_collection}/- */}
+                      {/* <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
                         {total_collection?.data &&
                           total_collection.data[0].total_bus_collection}
                         /-
-                      </div>
+                      </div> */}
+                      {total_collection?.data &&
+                      total_collection.data[0].total_bus_collection ? (
+                        <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+                          {/* {total_collection.data[0].total_bus_collection}/- */}
+                          {total_collection?.data &&
+                            total_collection.data[0].total_bus_collection}
+                          /-
+                        </div>
+                      ) : (
+                        <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+                          No data Found
+                        </div>
+                      )}
                       <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
-                        Total Amount of the Bus Collection
+                        {total_collection?.data &&
+                        total_collection.data[0].total_bus_collection
+                          ? " Total Amount of the Bus Collection"
+                          : ""}
                       </div>
                     </div>
                   </div>
@@ -512,14 +536,30 @@ export default function ReportGeneration_main() {
                 <div className="flex flex-1 flex-row ">
                   <div className="flex flex-1">
                     <div className="flex flex-col flex-1">
-                      <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
-                        {/* {total_collection.data[0].total_bus_collection}/- */}
+                      {/* <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
                         {bus_total_collection?.data &&
                           bus_total_collection.data[0].total_bus_collection}
                         /-
-                      </div>
+                      </div> */}
+                      {bus_total_collection?.data &&
+                      bus_total_collection.data[0].total_bus_collection ? (
+                        <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+                          {/* {total_collection.data[0].total_bus_collection}/- */}
+                          {bus_total_collection?.data &&
+                            bus_total_collection.data[0].total_bus_collection}
+                          /-
+                        </div>
+                      ) : (
+                        <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+                          No data Found
+                        </div>
+                      )}
+
                       <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
-                        Total Amount of the Bus Collection
+                        {bus_total_collection?.data &&
+                        bus_total_collection.data[0].total_bus_collection
+                          ? " Total Amount of the Bus Collection"
+                          : ""}
                       </div>
                     </div>
                   </div>

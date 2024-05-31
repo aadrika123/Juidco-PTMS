@@ -32,8 +32,8 @@ function App() {
     } else if (token && token == "undefined") {
       setOpen(true);
       localStorage.clear();
-      //Cookies.remove("accesstoken");
-      //Cookies.remove("user_details");
+      Cookies.remove("accesstoken");
+      Cookies.remove("user_details");
     }
 
     setLoading(false);
@@ -41,6 +41,7 @@ function App() {
 
   const handleClose = () => {
     setOpen(false);
+    localStorage.clear();
     window.location.href = "/ptms"; // Assuming there's a login route
   };
 

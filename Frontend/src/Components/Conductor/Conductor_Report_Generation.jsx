@@ -405,7 +405,8 @@ export default function Conductor_Report_Generation() {
           </div>
           <div className="flex flex-1 flex-col md:flex-row   ml-4 mr-4 mt-4 ">
             <div className="flex flex-1 m-4  bg-white shadow-lg p-8 rounded-lg ">
-              {conductor_details?.data ? (
+              {conductor_details?.data &&
+              conductor_details.data[0]?.first_name ? (
                 <div className="flex flex-1 flex-col ">
                   <div className="flex mt-5  flex-row">
                     <div className="flex font-bold">Name:</div>
@@ -480,12 +481,24 @@ export default function Conductor_Report_Generation() {
                 <div className="flex flex-1 flex-row ">
                   <div className="flex flex-1">
                     <div className="flex flex-col flex-1">
-                      <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
-                        {/* {total_collection.data[0].total_bus_collection}/- */}
+                      {/* <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
                         {total_collection?.data &&
                           total_collection.data[0].total_bus_collection}
                         /-
-                      </div>
+                      </div> */}
+                      {total_collection?.data &&
+                      total_collection.data[0].total_bus_collection ? (
+                        <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+                          {/* {total_collection.data[0].total_bus_collection}/- */}
+                          {total_collection?.data &&
+                            total_collection.data[0].total_bus_collection}
+                          /-
+                        </div>
+                      ) : (
+                        <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+                          No data Found
+                        </div>
+                      )}
                       <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
                         Total Amount of the Bus Collection
                       </div>
