@@ -143,6 +143,19 @@ class ConductorOnBoarding {
 
     return generateRes({ total_conductor, conductor_status });
   };
+
+  // !----------------------------- CHECK EMPLOYEE ID EXIST OR NOT ------------------------------//
+  validate_aadhar = async (req: Request) => {
+    const adhar_no = req.body.adhar_no;
+
+    const exist = await prisma.$queryRaw`
+        SELECT EXISTS (SELECT 1 FROM conductor_master WHERE adhar_no = ${adhar_no});
+      `;
+
+    console.log(exist);
+
+    return generateRes(exist);
+  };
 }
 
 export default ConductorOnBoarding;

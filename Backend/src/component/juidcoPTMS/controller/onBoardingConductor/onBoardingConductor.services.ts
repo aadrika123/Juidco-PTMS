@@ -96,7 +96,6 @@ export default class OnBoardingConductorServices {
     }
   };
 
-
   getConductorStatus = async (req: Request, res: Response, apiId: string) => {
     const resObj: resObj = {
       apiId,
@@ -122,4 +121,23 @@ export default class OnBoardingConductorServices {
     }
   };
 
+  validate_aadhar = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.constructorOnboarding.validate_aadhar(req);
+
+      if (!data) {
+        return CommonRes.NOT_FOUND("Aadhar Not Found", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS("Aadhar Found Successfully!", data, resObj, res);
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
 }

@@ -29,5 +29,11 @@ export default class OnBoardingConductorRoute {
       .get((req: Request, res: Response) =>
         onBoardingConductorServices.getConductorStatus(req, res, "021G")
       );
+
+    app
+      .route(`${baseUrl}/validate-aadhar`)
+      .post((req: Request, res: Response) =>
+        onBoardingConductorServices.validate_aadhar(req, res, "021G")
+      );
   }
 }

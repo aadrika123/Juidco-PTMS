@@ -188,7 +188,7 @@ class BusConductorScheduleDao {
     }
     const [data, count] = await prisma.$transaction([
       prisma.scheduler.findMany(query),
-      prisma.scheduler.count(),
+      prisma.scheduler.count({where: query.where}),
     ]);
     return generateRes({ data, count, page, limit });
   };
