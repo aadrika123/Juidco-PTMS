@@ -28,7 +28,7 @@ model bus_master {
 model conductor_master {
   id               Int    @id @default(autoincrement())
   first_name       String
-  middle_name      String
+  middle_name      String?
   last_name        String
   age              String
   blood_grp        String

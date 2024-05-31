@@ -64,6 +64,8 @@ class BusConductorScheduleDao {
     const bus_no: string = String(req.query.bus_no);
     const conductor_id: string = String(req.query.conductor_id);
     const conductor_name: string = String(req.query.conductor_name);
+    const from_date: string = String(req.query.from_date);
+    const to_date: string = String(req.query.to_date);
 
     const query: Prisma.schedulerFindManyArgs = {
       skip: (page - 1) * limit,
@@ -121,6 +123,32 @@ class BusConductorScheduleDao {
           {
             bus: {
               register_no: { equals: bus_no, mode: "insensitive" },
+            },
+          },
+        ],
+      };
+    }
+
+    if (
+      bus_no !== "" &&
+      typeof bus_no === "string" &&
+      bus_no !== "undefined" &&
+      from_date !== "" &&
+      typeof from_date === "string" &&
+      from_date !== "undefined" &&
+      to_date !== "" &&
+      typeof to_date === "string" &&
+      to_date !== "undefined"
+    ) {
+      query.where = {
+        OR: [
+          {
+            bus: {
+              register_no: { equals: bus_no, mode: "insensitive" },
+            },
+            date: {
+              gte: new Date(from_date),
+              lte: new Date(to_date),
             },
           },
         ],
