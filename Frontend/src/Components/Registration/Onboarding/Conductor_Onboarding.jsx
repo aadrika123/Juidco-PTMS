@@ -147,7 +147,7 @@ export default function Conductor_Onboarding() {
         `${process.env.REACT_APP_BASE_URL}/onBoardingConductor`,
         {
           firstName: values.Name,
-          middleName: values?.Middle_Name,
+          middleName: values?.Middle_Name || "null",
           lastName: values?.last_Name,
           bloodGrp: values.Blood_Group,
           mobileNo: values.Contact_Number,
@@ -349,7 +349,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Middle_Name">
                             Middle Name
-                            <span className="text-red-500">*</span>
+                            {/* <span className="text-red-500">*</span> */}
                           </label>
                           <Field
                             type="text"

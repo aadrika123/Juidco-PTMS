@@ -322,7 +322,9 @@ export default function Conductor_Report_Generation() {
                         {conductor_details.data[0].first_name}
                       </div>
                       <div className="flex ml-2">
-                        {conductor_details.data[0].middle_name}
+                        {conductor_details.data[0].middle_name == "null"
+                          ? ""
+                          : conductor_details.data[0].middle_name}
                       </div>
                       <div className="flex ml-2">
                         {conductor_details.data[0].last_name}

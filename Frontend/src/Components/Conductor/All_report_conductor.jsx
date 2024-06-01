@@ -28,11 +28,11 @@ export default function All_report_conductor() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
   function formatTime(timeStr) {
-    if (timeStr.length === 6) {
+    if (timeStr.length === 4) {
       const hours = timeStr.substring(0, 2);
       const minutes = timeStr.substring(2, 4);
-      const seconds = timeStr.substring(4, 6);
-      return `${hours}:${minutes}:${seconds}`;
+      //const seconds = timeStr.substring(4, 6);
+      return `${hours}:${minutes}`;
     }
     return timeStr; // Return the original string if it doesn't match the expected length
   }

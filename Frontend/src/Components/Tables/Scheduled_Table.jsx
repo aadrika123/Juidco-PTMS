@@ -384,7 +384,11 @@ const ScheduledTable = () => {
                     <div className="flex items-center">
                       <Avatar>{row.conductor.first_name.charAt(0)}</Avatar>
                       <div className="ml-4">
-                        <div>{`${row.conductor.first_name} ${row.conductor.middle_name} ${row.conductor.last_name}`}</div>
+                        <div>{`${row.conductor.first_name} ${
+                          row.conductor.middle_name == "null"
+                            ? ""
+                            : row.conductor.middle_name
+                        } ${row.conductor.last_name}`}</div>
                         <div className="text-gray-500 text-sm">
                           {row.conductor.email_id}
                         </div>

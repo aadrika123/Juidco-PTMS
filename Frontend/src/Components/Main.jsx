@@ -80,7 +80,7 @@ export default function Main() {
   };
 
   const handle_Click = async (Amount, color, border_color) => {
-    let result = confirm("Are you sure?");
+    let result = confirm("Are you sure want to Print the recipt ?");
     if (result) {
       const busId = localStorage.getItem("BusID");
       const conductorID = localStorage.getItem("userName");
