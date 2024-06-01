@@ -16,7 +16,7 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
 export default function ReportBusReceipt() {
-  const { id } = useParams();
+  const { id, Selected_Date, End_Date } = useParams();
   const token = Cookies.get("accesstoken");
   const navigate = useNavigate();
 
@@ -25,12 +25,23 @@ export default function ReportBusReceipt() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
 
+  function formatTime(timeStr) {
+    if (timeStr.length === 4) {
+      const hours = timeStr.substring(0, 2);
+      const minutes = timeStr.substring(2, 4);
+      //const seconds = timeStr.substring(4, 6);
+      return `${hours}:${minutes}`;
+    }
+    return timeStr; // Return the original string if it doesn't match the expected length
+  }
   useEffect(() => {
     axios
       .post(
         `${process.env.REACT_APP_BASE_URL}/receipt/get`,
         {
           bus_no: id,
+          from_date: Selected_Date,
+          to_date: End_Date,
         },
         {
           headers: {
@@ -101,10 +112,10 @@ export default function ReportBusReceipt() {
         <div className="flex text-xl font-normal  mr-4">Generate Report</div>
       </div>
       <Typography variant="h4" gutterBottom>
-        Report
+        Report Bus Receipt
       </Typography>
       <Typography variant="h6" gutterBottom>
-        ID : {id}
+        Receipt ID: {id}
       </Typography>
       <TableContainer component={Paper}>
         <Table stickyHeader>
@@ -137,7 +148,7 @@ export default function ReportBusReceipt() {
                   {row.amount}
                 </TableCell>
                 <TableCell>{new Date(row.date).toLocaleDateString()}</TableCell>
-                <TableCell>{row.time}</TableCell>
+                <TableCell>{formatTime(row.time)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

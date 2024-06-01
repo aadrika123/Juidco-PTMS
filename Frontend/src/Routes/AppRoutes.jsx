@@ -26,6 +26,7 @@ import Dashboard_data from "../Components/Dashboard/Dashboard_data";
 import ProtectedApproute from "./ProtectedApproute";
 import ReportBus_recipt from "../Components/Registration/ReportGeneration/ReportBus_recipt";
 import ReportConductor_Bus from "../Components/Registration/ReportGeneration/ReportConductor_Bus";
+import All_report_conductor from "../Components/Conductor/All_report_conductor";
 
 const AppRoutes = ({ access_token, userType }) => {
   console.log("AppRoutes with token >>> ", access_token, userType);
@@ -84,11 +85,11 @@ const AppRoutes = ({ access_token, userType }) => {
             }
           />
           <Route
-            path="/ReportBus_recipt/:id"
+            path="/ReportBus_recipt/:id/:Selected_Date/:End_Date"
             element={<PrivateRoute element={ReportBus_recipt} />}
           />
           <Route
-            path="/ReportConductor_recipt/:Cid"
+            path="/ReportConductor_recipt/:Cid/:Selected_Date/:End_Date"
             element={<PrivateRoute element={ReportConductor_Bus} />}
           />
           <Route
@@ -111,8 +112,8 @@ const AppRoutes = ({ access_token, userType }) => {
             element={<ProtectedApproute element={Main} />}
           />
           <Route
-            path="/ReportConductor_recipt/:Cid"
-            element={<ReportConductor_Bus />}
+            path="/ReportConductor_recipt"
+            element={<All_report_conductor />}
           />
           <Route
             path="/conductor_Report"

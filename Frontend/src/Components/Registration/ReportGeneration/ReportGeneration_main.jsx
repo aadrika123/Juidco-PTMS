@@ -17,12 +17,9 @@ export default function ReportGeneration_main() {
     fromDate: "",
     toDate: "",
   };
-
   const validationSchema = Yup.object({
     reportType: Yup.string().required("Report type is required"),
     id: Yup.string().required("ID is required"),
-    fromDate: Yup.string(),
-    toDate: Yup.string(),
   });
 
   const [report, set_report] = useState({});
@@ -38,11 +35,12 @@ export default function ReportGeneration_main() {
   const [total_amount, set_total_amount] = useState([]);
   const [conductor_id, set_conductor_id] = useState("");
   const [bus_id, set_bus_id] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   console.log("Total Amount Array >>> ", total_amount);
   console.log("report state >>> ", report);
   console.log("Total state >>", total_collection);
-  console.log(conductor_details);
 
   /* const handle_logOut = () => {
     console.log("Log out");
@@ -54,6 +52,8 @@ export default function ReportGeneration_main() {
 
   const onSubmit = async (values) => {
     set_filterValues(values);
+    setFromDate(values.fromDate);
+    setToDate(values.toDate ? values.toDate : values.fromDate);
     set_report_type(values.reportType);
     if (values.reportType === "conductor") {
       set_conductor_id(values.id);
@@ -269,11 +269,11 @@ export default function ReportGeneration_main() {
                 >
                   {({ values, setFieldValue }) => {
                     // useEffect to reload the page when id changes
-                    useEffect(() => {
+                    /*  useEffect(() => {
                       if (values.id) {
                         window.location.reload();
                       }
-                    }, [values.reportType]);
+                    }, [values.id]); */
 
                     return (
                       <Form className="flex  flex-1 flex-row space-x-4">
@@ -468,7 +468,7 @@ export default function ReportGeneration_main() {
                 <></>
               )}
 
-              {bus_details?.data && bus_details?.data[0]?.id ? (
+              {bus_details?.data && bus_details.data[0]?.register_no ? (
                 <div className="flex flex-1 flex-col ">
                   <div className="flex mt-5 flex-row">
                     <div className="flex font-bold">Id:</div>
@@ -496,29 +496,14 @@ export default function ReportGeneration_main() {
                 <div className="flex flex-1 flex-row ">
                   <div className="flex flex-1">
                     <div className="flex flex-col flex-1">
-                      {/* <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+                      <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+                        {/* {total_collection.data[0].total_bus_collection}/- */}
                         {total_collection?.data &&
                           total_collection.data[0].total_bus_collection}
                         /-
-                      </div> */}
-                      {total_collection?.data &&
-                      total_collection.data[0].total_bus_collection ? (
-                        <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
-                          {/* {total_collection.data[0].total_bus_collection}/- */}
-                          {total_collection?.data &&
-                            total_collection.data[0].total_bus_collection}
-                          /-
-                        </div>
-                      ) : (
-                        <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
-                          No data Found
-                        </div>
-                      )}
+                      </div>
                       <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
-                        {total_collection?.data &&
-                        total_collection.data[0].total_bus_collection
-                          ? " Total Amount of the Bus Collection"
-                          : ""}
+                        Total Amount of the Bus Collection
                       </div>
                     </div>
                   </div>
@@ -536,30 +521,14 @@ export default function ReportGeneration_main() {
                 <div className="flex flex-1 flex-row ">
                   <div className="flex flex-1">
                     <div className="flex flex-col flex-1">
-                      {/* <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+                      <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+                        {/* {total_collection.data[0].total_bus_collection}/- */}
                         {bus_total_collection?.data &&
                           bus_total_collection.data[0].total_bus_collection}
                         /-
-                      </div> */}
-                      {bus_total_collection?.data &&
-                      bus_total_collection.data[0].total_bus_collection ? (
-                        <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
-                          {/* {total_collection.data[0].total_bus_collection}/- */}
-                          {bus_total_collection?.data &&
-                            bus_total_collection.data[0].total_bus_collection}
-                          /-
-                        </div>
-                      ) : (
-                        <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
-                          No data Found
-                        </div>
-                      )}
-
+                      </div>
                       <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
-                        {bus_total_collection?.data &&
-                        bus_total_collection.data[0].total_bus_collection
-                          ? " Total Amount of the Bus Collection"
-                          : ""}
+                        Total Amount of the Bus Collection
                       </div>
                     </div>
                   </div>
@@ -684,13 +653,15 @@ export default function ReportGeneration_main() {
             {report_type === "" ? (
               <></>
             ) : report_type === "conductor" ? (
-              <Link to={`/ReportConductor_recipt/${conductor_id}`}>
+              <Link
+                to={`/ReportConductor_recipt/${conductor_id}/${fromDate}/${toDate}`}
+              >
                 <div className="flex justify-end items-center mb-4 mr-4 font-bold">
                   {`See All Recipts `}
                 </div>
               </Link>
             ) : (
-              <Link to={`/ReportBus_recipt/${bus_id}`}>
+              <Link to={`/ReportBus_recipt/${bus_id}/${fromDate}/${toDate}`}>
                 <div className="flex justify-end items-center mb-4 mr-4 font-bold">
                   {`See All Recipts `}
                 </div>

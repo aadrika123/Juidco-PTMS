@@ -27,10 +27,12 @@ const initialValues = {
 
 const validationSchema = Yup.object({
   registration_No: Yup.string()
-    .max(10, "Adhar Number must be exactly 10 digits")
+    .max(10, "Registration Number must be exactly 10 digits")
+    .min(10, "Registration Number must be exactly 10 digits")
     .required("Registration Number is required"),
   VIN_Number: Yup.string()
     .max(17, "VIN Number must be exactly 17 digits")
+    .min(17, "VIN Number must be exactly 17 digits")
     .required("VIN Number is required"),
   Pollution_selectedFile: Yup.mixed()
     .required("Pollution Certificate File is required")
@@ -130,13 +132,32 @@ export default function Bus_Onboarding() {
           },
         }
       );
-      set_loading(false);
-      set_success(response.data?.data);
-      setOpenDialog(true);
+
+      console.log("Response >>>>>> ", response);
+
+      const responseData = response?.data;
+
+      if (typeof responseData === "string") {
+        if (responseData.includes("Client error")) {
+          console.log("Client error occurred");
+          set_loading(false);
+          set_error(responseData);
+          set_opeen_error_dialog(true);
+        } else {
+          set_loading(false);
+          set_success(responseData);
+          setOpenDialog(true);
+        }
+      } else {
+        // Handle other types of response data here if needed
+        set_loading(false);
+        set_success(responseData?.data || responseData);
+        setOpenDialog(true);
+      }
     } catch (error) {
       console.error("Error making POST request:", error);
       set_loading(false);
-      set_error(error.response.data);
+      set_error(error.response?.data || "An error occurred");
       set_opeen_error_dialog(true);
     }
   };
@@ -208,6 +229,7 @@ export default function Bus_Onboarding() {
                             htmlFor="registration_No"
                           >
                             Registration Number
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -240,7 +262,8 @@ export default function Bus_Onboarding() {
                         </div>
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="VIN_Number">
-                            {`VIN (chassis)  Number`}
+                            {`VIN / Chassis  Number`}
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -280,6 +303,7 @@ export default function Bus_Onboarding() {
                             htmlFor="Pollution_selectedFile"
                           >
                             Pollution Certificate
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="file"
@@ -338,6 +362,7 @@ export default function Bus_Onboarding() {
                             htmlFor="Tax_selectedFile"
                           >
                             Tax Copy
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="file"
@@ -395,6 +420,7 @@ export default function Bus_Onboarding() {
                           htmlFor="Registration_selectedFile"
                         >
                           Registration Certificate
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="file"
@@ -561,9 +587,7 @@ export default function Bus_Onboarding() {
               <h2>Something went wrong</h2>
             </div>
             <div className="flex mt-5 flex-row justify-around">
-              <div className="flex w-fit ml-2 text-[#4A4545]">
-                {error?.message}
-              </div>
+              <div className="flex w-fit ml-2 text-[#4A4545]">{error}</div>
             </div>
           </div>
         </DialogContent>

@@ -60,11 +60,12 @@ export default function ChangeScheduling() {
     setOpenConfirmationDialog(true);
     setSubmitting(false);
   };
-  console.log(scheID);
   useEffect(() => {
     const id = sessionStorage.getItem("id");
     setScheID(id);
   }, [Error]);
+
+  console.log(scheID, "<======== ID")
 
   function generateTimeOptions(intervalMinutes) {
     const timeOptions = [];
@@ -82,7 +83,7 @@ export default function ChangeScheduling() {
 
   const handleConfirmation = async () => {
     set_loading(true);
-    console.log(Form_values);
+
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/schedule/create-new-schedule`,
@@ -100,45 +101,29 @@ export default function ChangeScheduling() {
           },
         }
       );
-      if (response.data?.message === false) {
-        set_loading(false);
-        console.log(response);
 
-        console.log("Error");
-        set_Error(response.data?.message);
-        set_openError(true);
-        if (scheID === null) {
+      if (response.data.message === false) {
+        if (scheID === null || scheID === "undefined") {
           sessionStorage.setItem("id", response?.data?.data?.data?.id);
-           console.log("ID >>>>> ", response?.data?.data?.data?.id);
-           setScheID(response?.data?.data?.data?.id);
         }
+        set_Error(response.data?.data?.data);
+        set_openError(true);
       } else {
-        set_loading(false);
-        console.log(response);
-        set_success(response.data?.data);
-
         setOpenDialog(true);
+        set_success(response.data?.data);
+        sessionStorage.clear("id");
+        setScheID(null);
       }
-      sessionStorage.clear("id");
-      setScheID(null);
+      set_loading(false);
     } catch (error) {
       set_loading(false);
-      if (scheID === null) {
-        sessionStorage.setItem("id", response?.data?.data?.id);
-        console.log("ID >>>>> ", response?.data);
-        setScheID(response?.data?.data?.data?.id);
-      }
-
-      set_Error(error.response.data);
-      set_openError(true);
     }
     setOpenConfirmationDialog(false);
   };
 
   const Update_Schedule = async (id) => {
-    console.log("Updated Schedule button clicked");
     try {
-      const response = await axios.put(
+      const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/schedule/update-schedule`,
         {
           bus_no: Form_values?.Bus_information,
@@ -485,7 +470,9 @@ export default function ChangeScheduling() {
               <h2>Something went wrong</h2>
             </div>
             <div className="flex mt-5 flex-row justify-around">
-              <div className="flex ml-2 text-[#4A4545]">{Error?.message}</div>
+              <div className="flex ml-2 text-[#4A4545]">
+                {Error?.validation_error}
+              </div>
             </div>
           </div>
         </DialogContent>

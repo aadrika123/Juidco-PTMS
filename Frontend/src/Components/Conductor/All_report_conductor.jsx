@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import {
   Table,
@@ -15,9 +15,11 @@ import {
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
-export default function ReportConductor_Bus() {
+export default function All_report_conductor() {
   const { Cid, Selected_Date, End_Date } = useParams();
-
+  const location = useLocation();
+  const receiptData = location.state;
+  console.log("Data from navigation >>> ", receiptData);
   const token = Cookies.get("accesstoken");
   const navigate = useNavigate();
 
@@ -26,11 +28,11 @@ export default function ReportConductor_Bus() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
   function formatTime(timeStr) {
-    if (timeStr.length === 4) {
+    if (timeStr.length === 6) {
       const hours = timeStr.substring(0, 2);
       const minutes = timeStr.substring(2, 4);
-      //const seconds = timeStr.substring(4, 6);
-      return `${hours}:${minutes}`;
+      const seconds = timeStr.substring(4, 6);
+      return `${hours}:${minutes}:${seconds}`;
     }
     return timeStr; // Return the original string if it doesn't match the expected length
   }
@@ -40,9 +42,9 @@ export default function ReportConductor_Bus() {
       .post(
         `${process.env.REACT_APP_BASE_URL}/receipt/get`,
         {
-          conductor_id: Cid,
-          from_date: Selected_Date,
-          to_date: End_Date,
+          conductor_id: receiptData.conductor_uid,
+          from_date: receiptData.from_date,
+          to_date: receiptData.to_date,
         },
         {
           headers: {
@@ -113,10 +115,10 @@ export default function ReportConductor_Bus() {
         <div className="flex text-xl font-normal  mr-4">Generate Report</div>
       </div>
       <Typography variant="h4" gutterBottom>
-        Report Bus Receipt
+        Conductor Receipt
       </Typography>
       <Typography variant="h6" gutterBottom>
-        Receipt ID: {Cid}
+        Conductor ID: {receiptData.conductor_uid}
       </Typography>
       <TableContainer component={Paper}>
         <Table stickyHeader>

@@ -55,6 +55,9 @@ export default function Main() {
       "\n \n" +
       "Receipt: " +
       data?.receipt_no +
+      "\n \n" +
+      "Conductor ID: " +
+      data?.conductor_id +
       "\n" +
       "\n \n" +
       "*******************************";
@@ -84,11 +87,15 @@ export default function Main() {
 
       const currentDate = new Date();
       const formattedDate = currentDate.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
-      const formattedTime = currentDate
+      /*  const formattedTime = currentDate
         .toTimeString()
         .split(" ")[0]
         .replace(/:/g, ":")
-        .slice(0, 4); // Format time as HHMM
+        .slice(0, 4); // Format time as HHMM */
+      const hours = String(currentDate.getHours()).padStart(2, "0"); // Get hours with leading zero if needed
+      const minutes = String(currentDate.getMinutes()).padStart(2, "0"); // Get minutes with leading zero if needed
+      //const seconds = String(currentDate.getSeconds()).padStart(2, "0"); // Get seconds with leading zero if needed
+      const formattedTime = `${hours}:${minutes}`;
       const uniqueReceiptNo = `${formattedDate}-${formattedTime}-${Math.floor(
         Math.random() * 10000
       )}`;

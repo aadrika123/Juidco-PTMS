@@ -41,8 +41,13 @@ const initialValues = {
 const validationSchema = Yup.object({
   Aadhaar_NO: Yup.string()
     .required("Aadhaar Number is required")
+    .max(12, "Aadhaar Number must be exactly 12 digits")
+    .min(12, "Aadhaar Number must be exactly 12 digits")
     .matches(/^[0-9]{12}$/, "Aadhaar Number must be 12 digits"),
-  Name: Yup.string().required("Name is required"),
+  Name: Yup.string()
+    //.max(3, "Minimum 3 characters")
+    .min(3, "Minimum 3 characters")
+    .required("Name is required"),
   Age: Yup.string()
     // .required("Age is required")
     .test(
@@ -53,7 +58,11 @@ const validationSchema = Yup.object({
         return age >= 18 && age < 60; // Check if age is greater than or equal to 18
       }
     ),
-  last_Name: Yup.string().required("Last Name is required"),
+  Middle_Name: Yup.string().min(3, "Minimum 3 characters"),
+  last_Name: Yup.string()
+    //.max(3, "Minimum 3 characters")
+    .min(3, "Minimum 3 characters")
+    .required("Last Name is required"),
   Blood_Group: Yup.string().required("Blood Group is required"),
   Fitness_Certificate_selectedFile: Yup.mixed()
     .required("Fitness Certificate File is required")
@@ -71,9 +80,13 @@ const validationSchema = Yup.object({
     ),
   Contact_Number: Yup.string()
     .required("Contact Number is required")
+    .max(10, "Contact Number must be exactly 10 digits")
+    .min(10, "Contact Number must be exactly 10 digits")
     .matches(/^[0-9]{10}$/, "Must be 10 digits"),
   Emergency_Contact_Number: Yup.string()
     .matches(/^[0-9]{10}$/, "Must be 10 digits")
+    .max(10, "Contact Number must be exactly 10 digits")
+    .min(10, "Contact Number must be exactly 10 digits")
     .notRequired(),
 });
 
@@ -158,7 +171,8 @@ export default function Conductor_Onboarding() {
         console.log("Api status >>>", response?.status);
         setOpenDialog(true);
 
-        set_success(response.data?.data);
+        set_success(response?.data?.data?.cunique_id);
+        console.log("Success Data", success);
       } else {
         set_loading(false);
         console.log(response);
@@ -169,7 +183,7 @@ export default function Conductor_Onboarding() {
     } catch (error) {
       console.error("Error making POST request:", error);
       set_loading(false);
-      set_error(error.response.data);
+      set_error(error?.response?.data?.message);
       set_opeen_error_dialog(true);
     }
   };
@@ -274,6 +288,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Aadhaar_NO">
                             Aadhaar Number
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -300,7 +315,8 @@ export default function Conductor_Onboarding() {
                         </div>
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Name">
-                            Name
+                            First Name
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -309,6 +325,16 @@ export default function Conductor_Onboarding() {
                             className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
                             style={{ boxShadow: "0 1px 4px #fff" }}
                             maxLength={30}
+                            onKeyPress={(e) => {
+                              if (
+                                !(
+                                  (e.key >= "a" && e.key <= "z") ||
+                                  (e.key >= "A" && e.key <= "Z")
+                                )
+                              ) {
+                                e.preventDefault();
+                              }
+                            }}
                             onFocus={(e) =>
                               (e.target.style.boxShadow = "0 1px 4px #000")
                             }
@@ -323,6 +349,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Middle_Name">
                             Middle Name
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -330,6 +357,16 @@ export default function Conductor_Onboarding() {
                             className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
                             style={{ boxShadow: "0 1px 4px #fff" }}
                             maxLength={30}
+                            onKeyPress={(e) => {
+                              if (
+                                !(
+                                  (e.key >= "a" && e.key <= "z") ||
+                                  (e.key >= "A" && e.key <= "Z")
+                                )
+                              ) {
+                                e.preventDefault();
+                              }
+                            }}
                             onFocus={(e) =>
                               (e.target.style.boxShadow = "0 1px 4px #000")
                             }
@@ -344,6 +381,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="last_Name">
                             Last Name
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -368,6 +406,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Age">
                             Age
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -395,6 +434,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Blood_Group">
                             Blood Group
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             as="select"
@@ -419,15 +459,6 @@ export default function Conductor_Onboarding() {
                             <option value={"AB-"}>AB-</option>
                             <option value={"O+"}>O+</option>
                             <option value={"O-"}>O-</option>
-
-                            {/* { id: 1, name: "A+" },
-                    { id: 2, name: "A-" },
-                    { id: 3, name: "B+" },
-                    { id: 4, name: "B-" },
-                    { id: 5, name: "AB+" },
-                    { id: 6, name: "AB-" },
-                    { id: 7, name: "O+" },
-                    { id: 8, name: "O-" }, */}
                           </Field>
                           <ErrorMessage
                             name="Blood_Group"
@@ -441,6 +472,7 @@ export default function Conductor_Onboarding() {
                             htmlFor="Fitness_Certificate_selectedFile"
                           >
                             Fitness Certificate
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="file"
@@ -498,6 +530,7 @@ export default function Conductor_Onboarding() {
                             htmlFor="Aadhaar_card_selectedFile"
                           >
                             Aadhaar card
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="file"
@@ -554,6 +587,7 @@ export default function Conductor_Onboarding() {
                         <div className="flex flex-1 flex-col mt-4">
                           <label className="mb-2 ml-4" htmlFor="Contact_Number">
                             Contact Number
+                            <span className="text-red-500">*</span>
                           </label>
                           <Field
                             type="text"
@@ -707,9 +741,7 @@ export default function Conductor_Onboarding() {
               <div className="flex text-black font-semibold">
                 Conductor ID :
               </div>
-              <div className="flex ml-2 text-[#4A4545]">
-                {success?.cunique_id}
-              </div>
+              <div className="flex ml-2 text-[#4A4545]">{success}</div>
             </div>
           </div>
         </DialogContent>
