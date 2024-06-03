@@ -73,13 +73,12 @@ export default class OnBoardingBusServices {
       // ---------------------------- VALIDATION --------------------------------------------//
 
       const data = await this.busOnboarding.onBoardingNewBus(req);
-
+      console.log(data, "data");
       if (data.error_type === "VALIDATION") {
-        return CommonRes.VALIDATION_ERROR(
-          "Vehicle Already Registered",
-          resObj,
-          res
-        );
+        return res.json({
+          status: "Error",
+          message: "Vehicle Already Exist",
+        });
       }
 
       return CommonRes.SUCCESS("Successfully added the bus", data, resObj, res);
