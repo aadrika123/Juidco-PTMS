@@ -31,7 +31,13 @@ export default class BusReportRoute {
     app
       .route(`${baseUrl}/report/real-time`)
       .get((req: Request, res: Response) =>
-        reportGeneration.getRealTimeCollection(req, res, "0502")
+        reportGeneration.getRealTimeCollection(req, res, "0503")
+      );
+
+    app
+      .route(`${baseUrl}/report/all`)
+      .post((req: Request, res: Response) =>
+        reportGeneration.generateAllReports(req, res, "0504")
       );
   }
 }

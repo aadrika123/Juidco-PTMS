@@ -173,6 +173,40 @@ class ReportDao {
   };
 
   //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
+
+
+  generateAllReports = async (req: Request) => {
+    const { from_date, to_date } = req.body;
+
+    const qr_func = (condition?: string) => {
+      return `
+       SELECT
+          COUNT(receipt_no)::INT AS receipt_count,
+        SUM(amount)::INT AS total_amount, receipts.conductor_id, date, pa.register_no as bus_no
+        FROM receipts
+        JOIN bus_master as pa on pa.register_no = receipts.bus_id
+        ${
+          condition || ''
+        }
+        GROUP BY date, receipts.conductor_id, pa.register_no
+        ORDER BY date;
+      `;
+    };
+
+    let qr_1 = qr_func();
+
+    if (from_date && to_date) {
+      qr_1 = qr_func(`
+        where date between '${from_date}' and '${to_date}'
+      `);
+    }
+    const [data] = await prisma.$transaction([
+      prisma.$queryRawUnsafe(qr_1)
+    ]);
+
+    
+    return generateRes(data);
+  };
 }
 
 export default ReportDao;
