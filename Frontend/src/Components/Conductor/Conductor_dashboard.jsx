@@ -21,13 +21,13 @@ export default function Conductor_dashboard() {
   console.log(userDetailsObj);
    */
 
-  const userName = localStorage.getItem("userName");
+  const userName = localStorage.getItem("conductorId");
 
   function handle_logout() {
     const confirm = window.confirm("Are you sure want to logout?");
     if (confirm) {
       dispatch(logout());
-      window.location.replace("/ptms");
+      window.location.replace("/mobile");
     }
   }
 

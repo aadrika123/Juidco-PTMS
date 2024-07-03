@@ -73,7 +73,7 @@ const Header = ({ heading, set_hide, hide }) => {
                 />
               </svg>
             </div>
-            <div className="flex h-10 w-10 justify-center items-center  rounded-xl shadow-md bg-[#5457D6] ml-4">
+            {/* <div className="flex h-10 w-10 justify-center items-center  rounded-xl shadow-md bg-[#5457D6] ml-4">
               <svg
                 width="24"
                 height="24"
@@ -86,7 +86,7 @@ const Header = ({ heading, set_hide, hide }) => {
                   fill="white"
                 />
               </svg>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

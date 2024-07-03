@@ -79,24 +79,31 @@ const handle_Image_upload = async (
   setUploading
 ) => {
   const formData = new FormData();
+  const MAX_SIZE = 2 * 1024 * 1024;
   formData.append("img", file);
-
-  try {
-    setUploading(true);
-    const response = await axios.post(
-      `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
-  } catch (error) {
-    console.error("Error uploading image:", error);
-  } finally {
-    setUploading(false);
+  console.log("File Size", file.size);
+  if (file.size > MAX_SIZE) {
+    console.error("Error: File size exceeds 2MB.");
+    alert("Error: File size exceeds 2MB.");
+    return;
+  } else {
+    try {
+      setUploading((prev) => ({ ...prev, [type]: true }));
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setUploading((prev) => ({ ...prev, [type]: false }));
+    }
   }
 };
 

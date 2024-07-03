@@ -23,6 +23,9 @@ import Cookies from "js-cookie";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import busstop from "../../assets/bus-stop.png";
 
+import autoTable from "jspdf-autotable";
+import { jsPDF } from "jspdf";
+
 const formatDate = (dateString) => {
   const options = {
     year: "numeric",
@@ -78,7 +81,7 @@ const ScheduledTable = () => {
         },
       }) // Replace with your actual API endpoint
       .then((response) => {
-        set_busoptions(response.data.data.data);
+        set_busoptions(response?.data?.data?.data);
       })
       .catch((error) => console.error("Error fetching bus data:", error));
 
@@ -158,6 +161,41 @@ const ScheduledTable = () => {
     );
   });
 
+  const handleDownload = () => {
+    const doc = new jsPDF();
+
+    const columns = [
+      { header: "ID" },
+      { header: "Bus No." },
+      { header: "Conductor Id" },
+      { header: "Conductor Name" },
+      { header: "Mobile No." },
+      { header: "Date" },
+      { header: "From Time" },
+      { header: "To Time" },
+    ];
+
+    const data = [];
+    const table = document.getElementById("data-table");
+    console.log(table);
+    const rows = table?.querySelectorAll("tbody tr") || [];
+    rows.forEach((row) => {
+      const rowData = [];
+      row.querySelectorAll("td").forEach((cell) => {
+        const cellData = cell?.textContent?.trim() || "";
+        rowData.push(cellData);
+      });
+      data.push(rowData);
+    });
+
+    autoTable(doc, {
+      head: [columns.map((column) => column.header)],
+      body: data,
+    });
+
+    doc.save("Scheduling.pdf");
+  };
+
   return (
     <div className="flex relative flex-1 flex-col">
       <div className="flex p-4 mt-5 ml-4 mr-4 rounded-md justify-start items-start shadow-md h-fit bg-white">
@@ -205,7 +243,7 @@ const ScheduledTable = () => {
                     }}
                   >
                     <option value="" label="Select bus number" />
-                    {busoptions.map((bus) => (
+                    {busoptions?.map((bus) => (
                       <option
                         key={bus.id}
                         value={bus.register_no}
@@ -231,6 +269,14 @@ const ScheduledTable = () => {
                       onFocus={(e) =>
                         (e.target.style.boxShadow = "0 1px 4px #000")
                       }
+                      onKeyPress={(e) => {
+                        if (
+                          (e.key >= "0" || e.key >= "A") &&
+                          (e.key <= "9" || e.key <= "Z")
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
                       onBlur={(e) => (e.target.style.boxShadow = "none")}
                     />
                     <ErrorMessage
@@ -253,6 +299,14 @@ const ScheduledTable = () => {
                       onFocus={(e) =>
                         (e.target.style.boxShadow = "0 1px 4px #000")
                       }
+                      onKeyPress={(e) => {
+                        if (
+                          (e.key >= "0" || e.key >= "A") &&
+                          (e.key <= "9" || e.key <= "Z")
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
                       onBlur={(e) => (e.target.style.boxShadow = "none")}
                     />
                     <ErrorMessage
@@ -294,7 +348,7 @@ const ScheduledTable = () => {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-row justify-center items-center">
+      <div className="flex flex-1 flex-row justify-end items-end">
         <div style={{ flex: 2 }} className="flex justify-center items-center">
           <div style={{ flex: 2 }} className="flex mr-4">
             <TextField
@@ -307,7 +361,11 @@ const ScheduledTable = () => {
             />
           </div>
           <div className="flex flex-1 mr-4">
-            <Button variant="contained" sx={{ width: "100%" }} disabled>
+            <Button
+              variant="contained"
+              sx={{ width: "100%" }}
+              onClick={handleDownload}
+            >
               <div className="flex flex-1 justify-center items-center flex-row">
                 <div className="flex ">
                   <svg
@@ -349,7 +407,7 @@ const ScheduledTable = () => {
 
       <TableContainer component={Paper} className="shadow-lg rounded-lg">
         {filteredData?.length > 0 ? (
-          <Table stickyHeader>
+          <Table id="data-table" stickyHeader>
             <TableHead>
               <TableRow className="bg-blue-600">
                 <TableCell className="text-white font-bold">ID</TableCell>
@@ -432,7 +490,7 @@ const ScheduledTable = () => {
           </div>
         )}
         <TablePagination
-          rowsPerPageOptions={[2, 5, 10, 15]}
+          rowsPerPageOptions={[10]}
           component="div"
           count={totalRecords}
           rowsPerPage={rowsPerPage}

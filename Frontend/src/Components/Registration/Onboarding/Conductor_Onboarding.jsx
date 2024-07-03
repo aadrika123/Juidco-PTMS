@@ -88,6 +88,9 @@ const validationSchema = Yup.object({
     .max(10, "Contact Number must be exactly 10 digits")
     .min(10, "Contact Number must be exactly 10 digits")
     .notRequired(),
+  EmailId: Yup.string()
+    .email("Email is invalid")
+    .required("Email is required and Must be Unique"),
 });
 
 const handle_Image_upload = async (
@@ -97,24 +100,31 @@ const handle_Image_upload = async (
   setUploading
 ) => {
   const formData = new FormData();
+  const MAX_SIZE = 2 * 1024 * 1024;
   formData.append("img", file);
-
-  try {
-    setUploading((prev) => ({ ...prev, [type]: true }));
-    const response = await axios.post(
-      `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
-  } catch (error) {
-    console.error("Error uploading image:", error);
-  } finally {
-    setUploading((prev) => ({ ...prev, [type]: false }));
+  console.log("File Size", file.size);
+  if (file.size > MAX_SIZE) {
+    console.error("Error: File size exceeds 2MB.");
+    alert("Error: File size exceeds 2MB.");
+    return;
+  } else {
+    try {
+      setUploading((prev) => ({ ...prev, [type]: true }));
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setUploading((prev) => ({ ...prev, [type]: false }));
+    }
   }
 };
 
@@ -139,7 +149,7 @@ export default function Conductor_Onboarding() {
 
   console.log("Uploaded Files >>> ", uploadedFiles);
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values, reset) => {
     console.log(values);
     set_loading(true);
     try {
@@ -170,7 +180,6 @@ export default function Conductor_Onboarding() {
         console.log(response);
         console.log("Api status >>>", response?.status);
         setOpenDialog(true);
-
         set_success(response?.data?.data?.cunique_id);
         console.log("Success Data", success);
       } else {
@@ -183,9 +192,19 @@ export default function Conductor_Onboarding() {
     } catch (error) {
       console.error("Error making POST request:", error);
       set_loading(false);
-      set_error(error?.response?.data?.message);
+      const errorMessage = error?.response?.data?.message;
+      set_error(errorMessage);
+      console.log(errorMessage);
+
+      if (
+        typeof errorMessage === "string" &&
+        errorMessage.includes("Conductor Already Registered")
+      ) {
+        console.log("Conductor Already Registered");
+      }
       set_opeen_error_dialog(true);
     }
+    reset.resetForm();
   };
 
   const validateDob = (e) => {
@@ -254,26 +273,6 @@ export default function Conductor_Onboarding() {
                   Add New Conductor
                 </div>
               </div>
-              {/* <div className="flex flex-col mr-20 mt-4 h-36 w-36 bg-white border-2 rounded-xl justify-center items-center border-blue-300 cursor-pointer">
-                <svg
-                  width="42"
-                  height="42"
-                  viewBox="0 0 32 32"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M9.0016 21.9997C0.00159883 22.9997 1.0016 11.9997 9.0016 12.9997C6.0016 1.99967 23.0016 1.99967 22.0016 9.99967C32.0016 6.99967 32.0016 22.9997 23.0016 21.9997M11.0016 17.9997L16.0016 13.9997M16.0016 13.9997L21.0016 17.9997M16.0016 13.9997V28.9997"
-                    stroke="#699BF7"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-                <div className="flex mt-2 text-blue-300 font-bold ">
-                  Upload Profile
-                </div>
-              </div> */}
             </div>
             <div className="flex flex-1 justify-center items-center">
               <div className="flex flex-col w-full  justify-center ">
@@ -499,9 +498,14 @@ export default function Conductor_Onboarding() {
                           />
                           {values.Fitness_Certificate_selectedFile && (
                             <div className="flex flex-1 justify-end mr-8 ml-8 mt-2">
+                              {uploadedFiles.Fitness_Certificate && (
+                                <div className="text-green-500 ml-4 mt-2">
+                                  Fitness Certificate Uploaded
+                                </div>
+                              )}
                               <button
                                 type="button"
-                                className="flex justify-end items-end ml-4 px-4 w-fit py-2 bg-[#4245D9] text-white rounded"
+                                className="flex flex- justify-end items-end ml-4 px-4  w-fit h-[40px] py-2 bg-[#4245D9] text-white rounded"
                                 onClick={() =>
                                   handle_Image_upload(
                                     values.Fitness_Certificate_selectedFile,
@@ -516,11 +520,6 @@ export default function Conductor_Onboarding() {
                                   ? "Uploading..."
                                   : "Upload"}
                               </button>
-                            </div>
-                          )}
-                          {uploadedFiles.Fitness_Certificate && (
-                            <div className="text-green-500 ml-4 mt-2">
-                              Fitness Certificate Uploaded
                             </div>
                           )}
                         </div>
@@ -557,9 +556,14 @@ export default function Conductor_Onboarding() {
                           />
                           {values.Aadhaar_card_selectedFile && (
                             <div className="flex flex-1 justify-end mr-8 ml-8 mt-2">
+                              {uploadedFiles.Aadhaar_card && (
+                                <div className="text-green-500 ml-4 mt-2 ">
+                                  Aadhaar Card Uploaded
+                                </div>
+                              )}
                               <button
                                 type="button"
-                                className="flex justify-end items-end ml-4 px-4 w-fit py-2 bg-[#4245D9] text-white rounded"
+                                className="flex justify-end items-end ml-4 px-4 w-fit h-[40px] py-2 bg-[#4245D9] text-white rounded"
                                 onClick={() =>
                                   handle_Image_upload(
                                     values.Aadhaar_card_selectedFile,
@@ -574,11 +578,6 @@ export default function Conductor_Onboarding() {
                                   ? "Uploading..."
                                   : "Upload"}
                               </button>
-                            </div>
-                          )}
-                          {uploadedFiles.Aadhaar_card && (
-                            <div className="text-green-500 ml-4 mt-2">
-                              Aadhaar Card Uploaded
                             </div>
                           )}
                         </div>
@@ -648,6 +647,7 @@ export default function Conductor_Onboarding() {
                       <div className="flex flex-col mt-4">
                         <label className="mb-2 ml-4" htmlFor="EmailId">
                           Email Id
+                          <span className="text-red-500">*</span>
                         </label>
                         <Field
                           type="email"
@@ -753,7 +753,7 @@ export default function Conductor_Onboarding() {
       <Dialog
         open={opeen_error_dialog}
         fullWidth={true}
-        maxWidth={"md"}
+        maxWidth={"xs"}
         onClose={() => set_opeen_error_dialog(false)}
       >
         <DialogContent className="bg-red-100">
@@ -781,7 +781,7 @@ export default function Conductor_Onboarding() {
             </div>
             <div className="flex mt-5 flex-row justify-around">
               <div className="flex w-fit h-fit ml-2 text-[#4A4545]">
-                {error}
+                {"Something Went Wrong Please Fill the Form Properly."}
               </div>
             </div>
           </div>

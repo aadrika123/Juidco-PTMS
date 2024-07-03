@@ -48,7 +48,7 @@ export default function Conductor_Report_Generation() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  const userName = localStorage.getItem("userName");
+  const userName = localStorage.getItem("conductorId");
 
   console.log("Total Amount Array >>> ", total_amount);
   console.log("report state >>> ", report);
@@ -469,62 +469,66 @@ export default function Conductor_Report_Generation() {
         onClose={() => setOpenDialog(false)}
       >
         <DialogContent>
-          <div className="flex flex-1 flex-row justify-center items-center">
-            <div className="flex flex-1 flex-col mr-4 ml-4">
+          <div className="flex  flex-row justify-start items-start">
+            <div className="flex flex-col mr-4 ml-4">
               <img src={busstop} width={50} height={50} />
               <div className="flex mt-2 text-[#6D63E8]">Bus: {1}</div>
               <div className="flex flex-1 flex-row ">
-                <div className="felx  text-md font-bold">Total :</div>
+                <div className="felx  text-md font-bold">
+                  Total Collection :
+                </div>
                 <div className="flex text-green-400 ml-2 font-bold">
                   {DialogAmount}
                 </div>
               </div>
             </div>
-            {total_amount.map((amounts) => (
-              <div className="flex flex-1 mr-4 ml-4 ">
-                {amounts.bus_id == dialog_busUid &&
-                  formatDate(amounts.date) == Dialogdate && (
-                    <div className="flex flex-1 flex-col justify-center items-center  mr-4 ml-4 ">
-                      <div
-                        style={{ boxShadow: " 0 1px 4px #FF8B8B" }}
-                        className="flex flex-row w-[95px] h-[95px] rounded-full justify-center items-center shadow-inner bg-[#FFE7E7]"
-                      >
-                        <div className="flex ">
-                          <svg
-                            width="17"
-                            height="17"
-                            viewBox="0 0 17 17"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M5.66602 1.61914H14.5708M5.66602 5.44189H14.5708M11.9736 15.381L5.66602 9.26464H7.89221C12.8395 9.26464 12.8395 1.61914 7.89221 1.61914"
-                              stroke="#585858"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </div>
+            <div className="flex flex-1 overflow-auto">
+              {total_amount.map((amounts) => (
+                <div className="flex justify-center items-center flex-1 mr-4 ml-4 ">
+                  {amounts.bus_id == dialog_busUid &&
+                    formatDate(amounts.date) == Dialogdate && (
+                      <div className="flex flex-1 flex-col justify-center items-center  mr-4 ml-4 ">
                         <div
-                          style={{ fontWeight: 700 }}
-                          className="text-2xl text-[#5B2B17] font-bold ml-1"
+                          style={{ boxShadow: " 0 1px 4px #FF8B8B" }}
+                          className="flex flex-row w-[95px] h-[95px] rounded-full justify-center items-center shadow-inner bg-[#FFE7E7]"
                         >
-                          {amounts?.amount}
+                          <div className="flex ">
+                            <svg
+                              width="17"
+                              height="17"
+                              viewBox="0 0 17 17"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M5.66602 1.61914H14.5708M5.66602 5.44189H14.5708M11.9736 15.381L5.66602 9.26464H7.89221C12.8395 9.26464 12.8395 1.61914 7.89221 1.61914"
+                                stroke="#585858"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <div
+                            style={{ fontWeight: 700 }}
+                            className="flex justify-center items-center text-2xl text-[#5B2B17] font-bold ml-1"
+                          >
+                            {amounts?.amount}
+                          </div>
+                        </div>
+                        <div className="flex flex-col mt-4">
+                          <div className="flex text-[#887FEC] font-bold text-xl border-b-2 border-[#887FEC]">
+                            {amounts?.count}
+                          </div>
+                          <div className="flex text-green-500 font-bold text-xl">
+                            {amounts?.sum}
+                          </div>
                         </div>
                       </div>
-                      <div className="flex flex-col mt-4">
-                        <div className="flex text-[#887FEC] font-bold text-xl border-b-2 border-[#887FEC]">
-                          {amounts?.count}
-                        </div>
-                        <div className="flex text-green-500 font-bold text-xl">
-                          {amounts?.sum}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-              </div>
-            ))}
+                    )}
+                </div>
+              ))}
+            </div>
           </div>
         </DialogContent>
         <DialogActions>

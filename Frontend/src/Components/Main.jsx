@@ -80,10 +80,12 @@ export default function Main() {
   };
 
   const handle_Click = async (Amount, color, border_color) => {
-    let result = confirm("Are you sure want to Print the recipt ?");
+    let result = confirm(
+      `Are you sure, That You want to take a print of Amount ${Amount} ? `
+    );
     if (result) {
       const busId = localStorage.getItem("BusID");
-      const conductorID = localStorage.getItem("userName");
+      const conductorID = localStorage.getItem("conductorId");
 
       const currentDate = new Date();
       const formattedDate = currentDate.toISOString().split("T")[0]; // Format date as YYYY-MM-DD

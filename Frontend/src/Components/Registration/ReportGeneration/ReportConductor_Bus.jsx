@@ -116,7 +116,7 @@ export default function ReportConductor_Bus() {
         Report Bus Receipt
       </Typography>
       <Typography variant="h6" gutterBottom>
-        Receipt ID: {Cid}
+        Conductor ID: {Cid}
       </Typography>
       <TableContainer component={Paper}>
         <Table stickyHeader>

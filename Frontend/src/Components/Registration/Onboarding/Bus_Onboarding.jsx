@@ -64,24 +64,31 @@ const handle_Image_upload = async (
   setUploading
 ) => {
   const formData = new FormData();
+  const MAX_SIZE = 2 * 1024 * 1024;
   formData.append("img", file);
-
-  try {
-    setUploading((prev) => ({ ...prev, [type]: true }));
-    const response = await axios.post(
-      `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
-  } catch (error) {
-    console.error("Error uploading image:", error);
-  } finally {
-    setUploading((prev) => ({ ...prev, [type]: false }));
+  console.log("File Size", file.size);
+  if (file.size > MAX_SIZE) {
+    console.error("Error: File size exceeds 2MB.");
+    alert("Error: File size exceeds 2MB.");
+    return;
+  } else {
+    try {
+      setUploading((prev) => ({ ...prev, [type]: true }));
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setUploading((prev) => ({ ...prev, [type]: false }));
+    }
   }
 };
 
@@ -135,25 +142,36 @@ export default function Bus_Onboarding() {
 
       console.log("Response >>>>>> ", response);
 
-      const responseData = response?.data;
+      //
+      if (response?.data?.status == "Error") {
+        console.log("Error Occured");
+        console.log("Client error occurred");
+        const responseData = response?.data?.message;
+        set_loading(false);
+        set_error(responseData);
+        set_opeen_error_dialog(true);
+      } else {
+        const responseData = response?.data?.data;
+        set_loading(false);
+        set_success(responseData);
+        setOpenDialog(true);
+      }
 
-      if (typeof responseData === "string") {
+      /* if (typeof responseData === "string") {
         if (responseData.includes("Client error")) {
           console.log("Client error occurred");
           set_loading(false);
           set_error(responseData);
           set_opeen_error_dialog(true);
         } else {
-          set_loading(false);
-          set_success(responseData);
-          setOpenDialog(true);
+         
         }
       } else {
         // Handle other types of response data here if needed
         set_loading(false);
         set_success(responseData?.data || responseData);
         setOpenDialog(true);
-      }
+      } */
     } catch (error) {
       console.error("Error making POST request:", error);
       set_loading(false);
@@ -330,9 +348,14 @@ export default function Bus_Onboarding() {
                           />
                           {values.Pollution_selectedFile && (
                             <div className="flex flex-1 justify-end mr-8 ml-8 mt-2">
+                              {uploadedFiles.Pollution && (
+                                <div className="text-green-500 ml-4 mt-2">
+                                  Pollution Certificate Uploaded
+                                </div>
+                              )}
                               <button
                                 type="button"
-                                className="flex justify-end items-end  ml-4 px-4 w-fit py-2 bg-[#4245D9] text-white rounded"
+                                className="flex justify-end items-end  ml-4 px-4 w-fit h-[40px] py-2 bg-[#4245D9] text-white rounded"
                                 onClick={() =>
                                   handle_Image_upload(
                                     values.Pollution_selectedFile,
@@ -347,11 +370,6 @@ export default function Bus_Onboarding() {
                                   ? "Uploading..."
                                   : "Upload"}
                               </button>
-                            </div>
-                          )}
-                          {uploadedFiles.Pollution && (
-                            <div className="text-green-500 ml-4 mt-2">
-                              Pollution Certificate Uploaded
                             </div>
                           )}
                         </div>
@@ -389,9 +407,14 @@ export default function Bus_Onboarding() {
                           />
                           {values.Tax_selectedFile && (
                             <div className="flex  justify-end mr-8 ml-8 mt-2">
+                              {uploadedFiles.Tax && (
+                                <div className="text-green-500 ml-4 mt-2">
+                                  Tax Certificate Uploaded
+                                </div>
+                              )}
                               <button
                                 type="button"
-                                className="flex justify-center items-center  ml-4 px-4 w-fit py-2 bg-[#4245D9] text-white rounded"
+                                className="flex justify-center items-center  ml-4 px-4 w-fit h-[40px] py-2 bg-[#4245D9] text-white rounded"
                                 onClick={() =>
                                   handle_Image_upload(
                                     values.Tax_selectedFile,
@@ -404,11 +427,6 @@ export default function Bus_Onboarding() {
                               >
                                 {uploading.Tax ? "Uploading..." : "Upload"}
                               </button>
-                            </div>
-                          )}
-                          {uploadedFiles.Tax && (
-                            <div className="text-green-500 ml-4 mt-2">
-                              Tax Certificate Uploaded
                             </div>
                           )}
                         </div>
@@ -447,9 +465,14 @@ export default function Bus_Onboarding() {
                         />
                         {values.Registration_selectedFile && (
                           <div className="flex flex-1 justify-end mr-8 ml-8 mt-2">
+                            {uploadedFiles.Registration && (
+                              <div className="text-green-500 ml-4 mt-2">
+                                Registration Certificate Uploaded
+                              </div>
+                            )}
                             <button
                               type="button"
-                              className="flex justify-end items-end  ml-4 px-4 w-fit py-2 bg-[#4245D9] text-white rounded"
+                              className="flex justify-end items-end  ml-4 px-4 w-fit h-[40px] py-2 bg-[#4245D9] text-white rounded"
                               onClick={() =>
                                 handle_Image_upload(
                                   values.Registration_selectedFile,
@@ -464,11 +487,6 @@ export default function Bus_Onboarding() {
                                 ? "Uploading..."
                                 : "Upload"}
                             </button>
-                          </div>
-                        )}
-                        {uploadedFiles.Registration && (
-                          <div className="text-green-500 ml-4 mt-2">
-                            Registration Certificate Uploaded
                           </div>
                         )}
                       </div>

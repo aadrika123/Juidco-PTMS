@@ -65,7 +65,7 @@ export default function ChangeScheduling() {
     setScheID(id);
   }, [Error]);
 
-  console.log(scheID, "<======== ID")
+  console.log(scheID, "<======== ID");
 
   function generateTimeOptions(intervalMinutes) {
     const timeOptions = [];
@@ -325,6 +325,7 @@ export default function ChangeScheduling() {
                               onFocus={(e) =>
                                 (e.target.style.boxShadow = "0 1px 4px #000")
                               }
+                              
                               onBlur={(e) =>
                                 (e.target.style.boxShadow = "none")
                               }
@@ -348,13 +349,16 @@ export default function ChangeScheduling() {
                     </div>
                     <div className="flex flex-1 flex-row mt-5">
                       <div className="flex flex-1 justify-center items-center ">
-                        <div className="flex w-20 h-10 md:w-[80%] border border-[#4245D9] rounded-md shadow-md justify-center items-center">
+                        <div
+                          onClick={() => navigate(-1)}
+                          className="flex w-20 h-10 md:w-[80%] border border-[#4245D9] rounded-md shadow-md justify-center items-center cursor-pointer"
+                        >
                           <h2 className="flex text-[#4245D9] font-semibold">
                             Cancel
                           </h2>
                         </div>
                       </div>
-                      <div className="flex flex-1 justify-center items-center ">
+                      {/* <div className="flex flex-1 justify-center items-center ">
                         <div className="flex flex-1 justify-center items-center ">
                           <div className="flex w-20 h-10 md:w-[80%] border border-[#4245D9] rounded-md shadow-md justify-center items-center">
                             <h2 className="flex text-[#4245D9] font-semibold">
@@ -362,7 +366,7 @@ export default function ChangeScheduling() {
                             </h2>
                           </div>
                         </div>
-                      </div>
+                      </div> */}
                       <div className="flex flex-1 justify-center items-center ">
                         <div className="flex flex-1 justify-center items-center ">
                           <button

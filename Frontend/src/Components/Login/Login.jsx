@@ -40,11 +40,12 @@ const Login = () => {
           email: values.user_id,
           password: values.password,
           type: window.ReactNativeWebView ? "mobile" : null,
-          //type: deviceType,
+          //type: "mobile",
         },
       });
 
       if (res) {
+        console.log(res);
         const { token, userDetails } = res.data.data;
         Cookies.set("accesstoken", token, { expires: 1 });
 
@@ -55,10 +56,11 @@ const Login = () => {
         localStorage.setItem("device", deviceType);
         // localStorage.setItem("ulbId", userDetails.ulb_id);
         localStorage.setItem("userUlbName", userDetails.ulbName);
-        localStorage.setItem("roles", userDetails.role[0]);
+        localStorage.setItem("roles", JSON.stringify(userDetails.role));
         localStorage.setItem("isLoggedIn", true);
         localStorage.setItem("userEmail", userDetails.email);
         localStorage.setItem("ulbIduserMobile", userDetails.mobile);
+        localStorage.setItem("conductorId", userDetails.user_name);
 
         /* Cookies.set("user_details", JSON.stringify(userDetails), {
           expires: 1,

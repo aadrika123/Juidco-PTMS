@@ -115,7 +115,7 @@ export default function ReportBusReceipt() {
         Report Bus Receipt
       </Typography>
       <Typography variant="h6" gutterBottom>
-        Receipt ID: {id}
+        Bus ID: {id}
       </Typography>
       <TableContainer component={Paper}>
         <Table stickyHeader>
