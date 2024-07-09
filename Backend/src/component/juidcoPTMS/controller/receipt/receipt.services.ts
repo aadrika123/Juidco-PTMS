@@ -92,7 +92,7 @@ class ReceiptServices {
     };
 
     try {
-      const data = await this.receiptDao.passenger_status();
+      const data = await this.receiptDao.passenger_status(req);
       if (!data) {
         return CommonRes.NOT_FOUND(
           resMessage(this.initMsg).NOT_FOUND,

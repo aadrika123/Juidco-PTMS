@@ -162,11 +162,26 @@ class ReceiptDao {
     return generateRes({ data, count, page, limit });
   };
 
-  passenger_status = async () => {
+  passenger_status = async (req: Request) => {
+    const { from_date, to_date } = req.body;
+
     const date = new Date().toISOString().split("T")[0];
-    const data = await prisma.$queryRawUnsafe(`
-        SELECT COUNT(id)::INT FROM receipts where date = '${date}';
-    `);
+
+    const qr_func = (condition?: string) => {
+      return `
+        SELECT COUNT(id)::INT,SUM (amount)::INT,COUNT(id)::INT as no_of_receips FROM receipts ${
+          condition ? condition : `where date = '${date}'`
+        } 
+      `;
+    };
+
+    let qr = qr_func();
+
+    if (from_date && to_date) {
+      qr = qr_func(`where date BETWEEN '${from_date}' AND '${to_date}'`);
+    }
+
+    const data = await prisma.$queryRawUnsafe(qr);
 
     return generateRes(data);
   };

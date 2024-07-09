@@ -164,7 +164,7 @@ class ReportDao {
   getRealTimeCollection = async () => {
     const date = new Date().toISOString().split("T")[0];
     const qr_real_time = `
-           	SELECT SUM (amount)::INT, extract (HOUR from created_at) as "from" , extract (HOUR from created_at)+1 as "to"  FROM receipts 
+           	SELECT SUM (amount)::INT, extract (HOUR from created_at) as "from" , extract (HOUR from created_at)+1 as "to", COUNT(id)::INT as receips FROM receipts 
         	where date = '${date}'
         	group by (extract (HOUR from created_at))  
         `;
