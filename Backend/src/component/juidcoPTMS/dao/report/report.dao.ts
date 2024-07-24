@@ -99,8 +99,6 @@ class ReportDao {
       prisma.$queryRawUnsafe<any[]>(`${query}`),
     ]);
 
-    console.log(data);
-
     const result = {
       data: [...data],
       amounts,
@@ -193,33 +191,80 @@ class ReportDao {
 
   //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
 
+  //   ------------------------- GET ALL REPORT COLLECITON ----------------------------//
   generateAllReports = async (req: Request) => {
     const { from_date, to_date } = req.body;
+    const limit: number = Number(req.query.limit);
+    const page: number = Number(req.query.page);
+
+    const offset = (page - 1) * limit;
 
     const qr_func = (condition?: string) => {
       return `
-       SELECT
-          COUNT(receipt_no)::INT AS receipt_count,
-        SUM(amount)::INT AS total_amount, receipts.conductor_id, date, pa.register_no as bus_no
-        FROM receipts
-        JOIN bus_master as pa on pa.register_no = receipts.bus_id
-        ${condition || ""}
-        GROUP BY date, receipts.conductor_id, pa.register_no
-        ORDER BY date;
+      SELECT
+      COUNT(receipt_no)::INT AS receipt_count,
+      SUM(amount)::INT AS total_amount, receipts.conductor_id, 
+        pa.register_no as bus_no, cm.first_name, cm.last_name, cm.age, cm.adhar_no, cm.mobile_no,
+	      pa.register_no, pa.vin_no
+      FROM receipts
+      JOIN bus_master as pa on pa.register_no = receipts.bus_id
+      JOIN conductor_master as cm on cm.cunique_id = receipts.conductor_id
+      ${condition || ""}
+      GROUP BY receipts.conductor_id, pa.register_no, cm.id, pa.id
+      LIMIT $1 OFFSET $2
+      `;
+    };
+
+    const qr_func_2 = (conductor_id?: string, condition?: string) => {
+      return `
+        select receipts.*from receipts
+        where receipts.conductor_id = '${conductor_id}' ${condition || ""};
       `;
     };
 
     let qr_1 = qr_func();
+    let qr_2 = qr_func_2();
 
     if (from_date && to_date) {
       qr_1 = qr_func(`
         where date between '${from_date}' and '${to_date}'
       `);
     }
-    const [data] = await prisma.$transaction([prisma.$queryRawUnsafe(qr_1)]);
 
-    return generateRes(data);
+    const [all_conductor] = await prisma.$transaction([
+      prisma.$queryRawUnsafe<any[]>(qr_1, limit, offset),
+    ]);
+
+    const all_conductor_data: any[] = [];
+    if (all_conductor !== null) {
+      const promises = all_conductor.map(async (item: any) => {
+        if (from_date && to_date) {
+          qr_2 = qr_func_2(
+            item?.conductor_id,
+            `AND date between '${from_date}' and '${to_date}'`
+          );
+        } else {
+          qr_2 = qr_func_2(item?.conductor_id);
+        }
+        const [data] = await prisma.$transaction([
+          prisma.$queryRawUnsafe(qr_2),
+        ]);
+        return {
+          conductor_id: item?.conductor_id,
+          data: { ...item, details: data },
+        };
+      });
+
+      const results = await Promise.all(promises);
+
+      results.forEach((result) => {
+        all_conductor_data.push(result);
+      });
+    }
+
+    return generateRes(all_conductor_data);
   };
+  //   ------------------------- GET ALL REPORT COLLECITON ----------------------------//
 
   demographicCount = async (req: Request) => {
     const { from_date, to_date } = req.body;
@@ -236,7 +281,6 @@ class ReportDao {
          ${
            condition || `where date between '${startOfWeek}' and '${endOfWeek}'`
          } group by date
-		
       `;
     };
 
