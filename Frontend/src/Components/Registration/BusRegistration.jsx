@@ -15,7 +15,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-
+import Cookies from "js-cookie";
 const FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 const initialValues = {
@@ -65,24 +65,31 @@ const handle_Image_upload = async (
   setUploading
 ) => {
   const formData = new FormData();
+  const MAX_SIZE = 2 * 1024 * 1024;
   formData.append("img", file);
-
-  try {
-    setUploading((prev) => ({ ...prev, [type]: true }));
-    const response = await axios.post(
-      `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
-  } catch (error) {
-    console.error("Error uploading image:", error);
-  } finally {
-    setUploading((prev) => ({ ...prev, [type]: false }));
+  console.log("File Size", file.size);
+  if (file.size > MAX_SIZE) {
+    console.error("Error: File size exceeds 2MB.");
+    alert("Error: File size exceeds 2MB.");
+    return;
+  } else {
+    try {
+      setUploading((prev) => ({ ...prev, [type]: true }));10
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setUploading((prev) => ({ ...prev, [type]: false }));
+    }
   }
 };
 
@@ -91,7 +98,7 @@ export default function BusRegistration() {
   const [openDialog, setOpenDialog] = React.useState(false); // State to control dialog
   const [opeen_error_dialog, set_opeen_error_dialog] = React.useState(false);
   const [uploadedFiles, setUploadedFiles] = React.useState({});
-
+  const token = Cookies.get("accesstoken");
   const [uploading, setUploading] = React.useState({
     Pollution: false,
     Tax: false,
@@ -115,6 +122,11 @@ export default function BusRegistration() {
           taxCopy_cert: uploadedFiles?.Tax,
           vin_no: values.VIN_Number,
           registration_cert: uploadedFiles?.Registration,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       set_loading(false);
@@ -216,10 +228,21 @@ export default function BusRegistration() {
                         name="registration_No"
                         className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
                         style={{ boxShadow: "0 1px 4px #fff" }}
+                        maxlength={10}
                         onFocus={(e) =>
                           (e.target.style.boxShadow = "0 1px 4px #000")
                         }
                         onBlur={(e) => (e.target.style.boxShadow = "none")}
+                        onKeyPress={(e) => {
+                          if (
+                            !(
+                              (e.key >= "0" || e.key >= "A") &&
+                              (e.key <= "9" || e.key <= "Z")
+                            )
+                          ) {
+                            e.preventDefault();
+                          }
+                        }}
                       />
                       <ErrorMessage
                         name="registration_No"
@@ -283,9 +306,14 @@ export default function BusRegistration() {
                       />
                       {values.Pollution_selectedFile && (
                         <div className="flex flex-1 justify-end mr-8 ml-8 mt-2">
+                          {uploadedFiles.Pollution && (
+                            <div className="text-green-500 ml-4 mt-2">
+                              Pollution Certificate Uploaded
+                            </div>
+                          )}
                           <button
                             type="button"
-                            className="flex justify-end items-end  ml-4 px-4 w-fit py-2 bg-[#4245D9] text-white rounded"
+                            className="flex justify-end items-end  ml-4 px-4 w-fit h-[40px] py-2 bg-[#4245D9] text-white rounded"
                             onClick={() =>
                               handle_Image_upload(
                                 values.Pollution_selectedFile,
@@ -298,11 +326,6 @@ export default function BusRegistration() {
                           >
                             {uploading.Pollution ? "Uploading..." : "Upload"}
                           </button>
-                        </div>
-                      )}
-                      {uploadedFiles.Pollution && (
-                        <div className="text-green-500 ml-4 mt-2">
-                          Pollution Certificate Uploaded
                         </div>
                       )}
                     </div>
@@ -333,9 +356,14 @@ export default function BusRegistration() {
                       />
                       {values.Tax_selectedFile && (
                         <div className="flex  justify-end mr-8 ml-8 mt-2">
+                          {uploadedFiles.Tax && (
+                            <div className="text-green-500 ml-4 mt-2">
+                              Tax Certificate Uploaded
+                            </div>
+                          )}
                           <button
                             type="button"
-                            className="flex justify-center items-center  ml-4 px-4 w-fit py-2 bg-[#4245D9] text-white rounded"
+                            className="flex justify-center items-center  ml-4 px-4 w-fit h-[40px] py-2 bg-[#4245D9] text-white rounded"
                             onClick={() =>
                               handle_Image_upload(
                                 values.Tax_selectedFile,
@@ -348,11 +376,6 @@ export default function BusRegistration() {
                           >
                             {uploading.Tax ? "Uploading..." : "Upload"}
                           </button>
-                        </div>
-                      )}
-                      {uploadedFiles.Tax && (
-                        <div className="text-green-500 ml-4 mt-2">
-                          Tax Certificate Uploaded
                         </div>
                       )}
                     </div>
@@ -390,9 +413,14 @@ export default function BusRegistration() {
                     />
                     {values.Registration_selectedFile && (
                       <div className="flex flex-1 justify-end mr-8 ml-8 mt-2">
+                        {uploadedFiles.Registration && (
+                          <div className="text-green-500 ml-4 mt-2">
+                            Registration Certificate Uploaded
+                          </div>
+                        )}
                         <button
                           type="button"
-                          className="flex justify-end items-end  ml-4 px-4 w-fit py-2 bg-[#4245D9] text-white rounded"
+                          className="flex justify-end items-end  ml-4 px-4 w-fit h-[40px] py-2 bg-[#4245D9] text-white rounded"
                           onClick={() =>
                             handle_Image_upload(
                               values.Registration_selectedFile,
@@ -405,11 +433,6 @@ export default function BusRegistration() {
                         >
                           {uploading.Registration ? "Uploading..." : "Upload"}
                         </button>
-                      </div>
-                    )}
-                    {uploadedFiles.Registration && (
-                      <div className="text-green-500 ml-4 mt-2">
-                        Registration Certificate Uploaded
                       </div>
                     )}
                   </div>

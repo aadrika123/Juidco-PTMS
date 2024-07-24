@@ -12,9 +12,18 @@ import bus_stop from "../../../assets/bus-stop.png";
 
 export default function Conductor_report_page() {
   const location = useLocation();
-  const receiptData = location.state;
   const navigate = useNavigate();
-  console.log("Report Page >>", receiptData);
+
+  
+
+  /*
+  useEffect(() => {
+    axios.post(`${process.env.REACT_APP_BASE_URL}/report/bus-daywise`, {
+      
+    });
+  })
+*/
+
   return (
     <div className="flex items-center justify-center h-screen w-screen">
       <div className="flex flex-1 flex-col bg-white h-screen ">
@@ -85,9 +94,9 @@ export default function Conductor_report_page() {
         </div>
         <div className="relative w-full flex-col overflow-y-auto">
           <div className="flex flex-1 flex-wrap mt-5 w-full h-fit justify-center items-center ">
-            {receiptData?.report?.data?.map((receipt) => (
+            {receiptData?.report?.map((receipt) => (
               <div
-                key={receipt.id}
+                key={receipt.bus_id}
                 className="h-fit w-[200px] rounded-2xl border-4 border-blue-400 bg-white flex flex-col justify-start items-center m-4 p-4"
               >
                 <img
@@ -96,16 +105,17 @@ export default function Conductor_report_page() {
                   alt="Bus Stop"
                 />
                 <div className="mt-4 text-center">
-                  <p className="font-semibold">
+                  <p>Bus No : {receipt.bus_id}</p>
+                  {/* <p className="font-semibold">
                     Receipt No: {receipt.receipt_no}
-                  </p>
-                  <p>Amount: Rs. {receipt.amount}</p>
-                  <div className="flex flex-row gap-8">
+                  </p> */}
+                  <p>Amount: Rs. {receipt.total_amount}</p>
+                  {/* <div className="flex flex-row gap-8">
                     <div className="flex ">{receipt.time}</div>
                     <div className="flex">
                       {new Date(receipt.date).toLocaleDateString()}
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             ))}

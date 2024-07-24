@@ -39,5 +39,11 @@ export default class BusReportRoute {
       .post((req: Request, res: Response) =>
         reportGeneration.generateAllReports(req, res, "0504")
       );
+
+    app
+      .route(`${baseUrl}/report/demographic`)
+      .post((req: Request, res: Response) =>
+        reportGeneration.demographicCount(req, res, "0505")
+      );
   }
 }

@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { PrismaClient } from "@prisma/client";
 import { generateRes } from "../../../../util/generateRes";
+import { getCurrentWeekRange } from "../../../../util/helper";
 
 const prisma = new PrismaClient();
 class ReportDao {
@@ -162,18 +163,35 @@ class ReportDao {
   //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
 
   getRealTimeCollection = async () => {
-    const date = new Date().toISOString().split("T")[0];
+    // const date = new Date().toISOString().split("T")[0];
+    // const qr_real_time = `
+    //       SELECT SUM (amount)::INT, extract (HOUR from created_at) as "from" , extract (HOUR from created_at)+1 as "to", COUNT(id)::INT as receipts FROM receipts
+    //     	where date = '${date}'
+    //     	group by (extract (HOUR from created_at))
+    //     `;
+
     const qr_real_time = `
-           	SELECT SUM (amount)::INT, extract (HOUR from created_at) as "from" , extract (HOUR from created_at)+1 as "to", COUNT(id)::INT as receips FROM receipts 
-        	where date = '${date}'
-        	group by (extract (HOUR from created_at))  
-        `;
+      SELECT
+          SUM(amount)::INT AS sum,
+          TO_CHAR(created_at, 'YYYY-MM-DD') AS day,
+          COUNT(id)::INT AS receipts
+      FROM
+          receipts
+      WHERE
+          created_at >= DATE_TRUNC('month', CURRENT_DATE)
+          AND created_at < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
+      GROUP BY
+          TO_CHAR(created_at, 'YYYY-MM-DD')
+      ORDER BY
+          day;
+
+    `;
+
     const data = await prisma.$queryRawUnsafe(qr_real_time);
     return generateRes(data);
   };
 
   //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
-
 
   generateAllReports = async (req: Request) => {
     const { from_date, to_date } = req.body;
@@ -185,9 +203,7 @@ class ReportDao {
         SUM(amount)::INT AS total_amount, receipts.conductor_id, date, pa.register_no as bus_no
         FROM receipts
         JOIN bus_master as pa on pa.register_no = receipts.bus_id
-        ${
-          condition || ''
-        }
+        ${condition || ""}
         GROUP BY date, receipts.conductor_id, pa.register_no
         ORDER BY date;
       `;
@@ -200,11 +216,39 @@ class ReportDao {
         where date between '${from_date}' and '${to_date}'
       `);
     }
-    const [data] = await prisma.$transaction([
-      prisma.$queryRawUnsafe(qr_1)
-    ]);
+    const [data] = await prisma.$transaction([prisma.$queryRawUnsafe(qr_1)]);
 
-    
+    return generateRes(data);
+  };
+
+  demographicCount = async (req: Request) => {
+    const { from_date, to_date } = req.body;
+
+    const { startOfWeek, endOfWeek } = getCurrentWeekRange();
+
+    const qr_func = (condition?: string) => {
+      return `
+        	SELECT
+            COUNT(id)::INT AS customer_count,
+            SUM(amount)::INT AS total_amount,
+            date
+          FROM receipts
+         ${
+           condition || `where date between '${startOfWeek}' and '${endOfWeek}'`
+         } group by date
+		
+      `;
+    };
+
+    let qr_1 = qr_func();
+    if (from_date && to_date) {
+      qr_1 = qr_func(`
+        where date between '${from_date}' and '${to_date}'
+      `);
+    }
+
+    const [data] = await prisma.$transaction([prisma.$queryRawUnsafe(qr_1)]);
+
     return generateRes(data);
   };
 }

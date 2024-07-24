@@ -19,7 +19,7 @@ export default function Ticket_check() {
 
   const getFormatTime = () => {
     const date = new Date();
-    const formattedTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    const formattedTime = `${date.getHours()}:${date.getMinutes()}`;
     return formattedTime;
   };
   const handle_Click = (Amount, color, border_color) => {

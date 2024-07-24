@@ -32,12 +32,18 @@ const initialValues = {
   Emergency_Contact_Number: "",
   EmailId: "",
 };
+import Cookies from "js-cookie";
 
 const validationSchema = Yup.object({
   Name: Yup.string().required("Name is required"),
   Age: Yup.string()
-    .matches(/^[0-9]+$/, "Must be only digits")
-    .required("Age is required"),
+    .required("Age is required")
+    .transform((value) => (value ? Number(value) : 0)) // Transform string to number
+    .test(
+      "is-older-than-18",
+      "Age must be more than 18",
+      (value) => value > 18
+    ),
   Blood_Group: Yup.string().required("Blood Group is required"),
   Adhar_NO: Yup.string()
     .required("Adhar Number is required")
@@ -73,24 +79,31 @@ const handle_Image_upload = async (
   setUploading
 ) => {
   const formData = new FormData();
+  const MAX_SIZE = 2 * 1024 * 1024;
   formData.append("img", file);
-
-  try {
-    setUploading(true);
-    const response = await axios.post(
-      `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
-  } catch (error) {
-    console.error("Error uploading image:", error);
-  } finally {
-    setUploading(false);
+  console.log("File Size", file.size);
+  if (file.size > MAX_SIZE) {
+    console.error("Error: File size exceeds 2MB.");
+    alert("Error: File size exceeds 2MB.");
+    return;
+  } else {
+    try {
+      setUploading((prev) => ({ ...prev, [type]: true }));
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUploadedFiles((prev) => ({ ...prev, [type]: response.data.data }));
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setUploading((prev) => ({ ...prev, [type]: false }));
+    }
   }
 };
 
@@ -108,6 +121,8 @@ export default function ConductorRegistration() {
   const onSubmit = async (values) => {
     console.log(values);
     set_loading(true);
+    const token = Cookies.get("accesstoken");
+
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/onBoardingConductor`,
@@ -123,6 +138,11 @@ export default function ConductorRegistration() {
           adhar_no: values.Adhar_NO.toString(),
           adhar_doc: uploadedFiles?.Adhar_card,
           fitness_doc: uploadedFiles?.Fitness_Certificate,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       set_loading(false);
@@ -210,7 +230,7 @@ export default function ConductorRegistration() {
                     {" "}
                     <div className="flex flex-1 flex-col mt-4">
                       <label className="mb-2 ml-4" htmlFor="Adhar_NO">
-                        Adhar Number
+                        Aadhaar Number
                       </label>
                       <Field
                         type="number"
@@ -299,7 +319,7 @@ export default function ConductorRegistration() {
                         Age
                       </label>
                       <Field
-                        type="Number"
+                        type="text"
                         id="Age"
                         name="Age"
                         className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
@@ -445,7 +465,7 @@ export default function ConductorRegistration() {
                       )}
                       {uploadedFiles.Adhar_card && (
                         <div className="text-green-500 ml-4 mt-2">
-                          Adhar Card Uploaded
+                          Aadhaar Card Uploaded
                         </div>
                       )}
                     </div>
@@ -613,7 +633,7 @@ export default function ConductorRegistration() {
                 Your Conductor ID :
               </div>
               <div className="flex ml-2 text-[#4A4545]">
-                {success?.cUniqueId}
+                {success?.cunique_id}
               </div>
             </div>
           </div>
