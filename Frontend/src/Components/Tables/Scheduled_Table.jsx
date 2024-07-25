@@ -179,7 +179,7 @@ const ScheduledTable = () => {
 
     const data = [];
     const table = document.getElementById("data-table");
-    console.log(table);
+
     const rows = table?.querySelectorAll("tbody tr") || [];
     rows.forEach((row) => {
       const rowData = [];

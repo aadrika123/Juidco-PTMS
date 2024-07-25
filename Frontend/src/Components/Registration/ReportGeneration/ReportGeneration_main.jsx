@@ -8,6 +8,7 @@ import { Button, FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { Dialog, DialogContent, DialogActions } from "@mui/material";
 import Cookies from "js-cookie";
 import { ReportCard, BusCard } from "../../Ui/ReportCard";
+import DownloadReport from "../../Ui/DownloadReport";
 export default function ReportGeneration_main() {
   const token = Cookies.get("accesstoken");
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ export default function ReportGeneration_main() {
   const [toDate, setToDate] = useState("");
 
   const [filterAllReport, set_filterAllReport] = useState([]);
+  const [downloadReportPopup, setDownloadReportPopup] = useState(false);
 
   function filterAllReportData() {
     set_filterAllReport(!filterAllReport);
@@ -575,12 +577,51 @@ export default function ReportGeneration_main() {
                       />
                     </svg>
                   </div>
-                  <div className="flex flex-1 text-white text-md">
+                  <div className="flex flex-1 text-white text-md whitespace-nowrap">
                     Search Result
                   </div>
                 </div>
               </button>
+              <button
+                type="button"
+                className="bg-[#6366F1] h-10 text-white px-4 rounded-md"
+                onClick={() => setDownloadReportPopup(true)}
+              >
+                <div className="flex flex-row gap-1 justify-center items-center">
+                  <div className="flex gap-5">
+                    {" "}
+                    <svg
+                      width="23"
+                      height="23"
+                      viewBox="0 0 23 23"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.4987 7.1875H6.70703C6.32578 7.1875 5.96015 7.33895 5.69057 7.60853C5.42098 7.87812 5.26953 8.24375 5.26953 8.625V16.2917C5.26953 16.6729 5.42098 17.0385 5.69057 17.3081C5.96015 17.5777 6.32578 17.7292 6.70703 17.7292H14.3737C14.7549 17.7292 15.1206 17.5777 15.3902 17.3081C15.6597 17.0385 15.8112 16.6729 15.8112 16.2917V11.5"
+                        stroke="#fff"
+                        stroke-linecap="round"
+                      />
+                      <path
+                        d="M11.9766 11.0208L18.0754 4.922M13.8932 4.3125H18.6849V9.10417"
+                        stroke="#fff"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <div className="flex flex-1 text-white text-md whitespace-nowrap">
+                    Export
+                  </div>
+                </div>
+              </button>
             </div>
+            {downloadReportPopup && (
+              <DownloadReport
+                reports={report_all}
+                closePopup={setDownloadReportPopup}
+              />
+            )}
             {report_type === "" ? (
               <div className="flex  justify-center items-center text-gray-500 font-bold">
                 <div className="flex flex-col gap-5">
