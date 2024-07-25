@@ -88,6 +88,18 @@ class ReceiptDao {
       },
     };
 
+    if (conductor_id) {
+      query.where = {
+        OR: [
+          {
+            conductor: {
+              cunique_id: { equals: conductor_id, mode: "insensitive" },
+            },
+          },
+        ],
+      };
+    }
+
     if (search !== "" && typeof search === "string" && search !== "undefined") {
       query.where = {
         OR: [

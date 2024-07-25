@@ -96,13 +96,13 @@ const AppRoutes = ({ access_token, userType }) => {
             element={<PrivateRoute element={ReportBus_recipt} />}
           />
           <Route
-            path="/ReportConductor_recipt/:Cid/:Selected_Date/:End_Date"
+            path="/ReportConductor_recipt/:Cid/:Selected_Date?/:End_Date?"
             element={<PrivateRoute element={ReportConductor_Bus} />}
           />
           <Route
             path="dashboard"
-            // element={<PrivateRoute element={Dashboard_data} />}
-            element={<Dashboard_data/>}
+            element={<PrivateRoute element={Dashboard_data} />}
+            // element={<Dashboard_data/>}
           />
           <Route path="/*" element={<No_access />} />
         </>
