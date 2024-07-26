@@ -72,6 +72,8 @@ const Login = () => {
           window.location.replace("/ptms/dashboard");
         } else if (userDetails.user_type === "TC") {
           window.location.replace("/ptms/conductor_dashboard");
+        } else if (userDetails.user_type === "TL") {
+          window.location.replace("/ptms/accountant_dashboard");
         } else {
           window.location.replace("/");
         }

@@ -62,7 +62,7 @@ const ReportCard = ({
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-10 bg-white p-8">
+        <div className="flex items-center gap-10 bg-white p-8 shadow-lg">
           <div className="flex flex-1 flex-col ">
             <div className="flex mt-5  flex-row">
               <div className="flex font-bold">Name:</div>
@@ -92,7 +92,7 @@ const ReportCard = ({
             </div>
           </div>
 
-          <div className="flex flex-1 justify-center items-center border  bg-white shadow-lg p-8 rounded-lg m-4 ">
+          <div className="flex flex-1 justify-center items-center border  bg-white border p-8 rounded-lg m-4 ">
             <div className="flex flex-1 flex-row ">
               <div className="flex flex-1">
                 <div className="flex flex-col flex-1">

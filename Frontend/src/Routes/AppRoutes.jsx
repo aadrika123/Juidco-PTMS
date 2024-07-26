@@ -28,6 +28,8 @@ import ReportBus_recipt from "../Components/Registration/ReportGeneration/Report
 import ReportConductor_Bus from "../Components/Registration/ReportGeneration/ReportConductor_Bus";
 import All_report_conductor from "../Components/Conductor/All_report_conductor";
 import Collection_Report from "../Components/Tables/Collection_Report";
+import AccountantDashboard from "../Components/Accountant/AccountantDashboard";
+import ConductorDetails from "../Components/Accountant/ConductorDetails";
 
 const AppRoutes = ({ access_token, userType }) => {
   console.log("AppRoutes with token >>> ", access_token, userType);
@@ -107,6 +109,7 @@ const AppRoutes = ({ access_token, userType }) => {
           <Route path="/*" element={<No_access />} />
         </>
       )}
+
       {access_token && userType === "TC" && (
         <>
           <Route
@@ -130,6 +133,15 @@ const AppRoutes = ({ access_token, userType }) => {
             }
           />
           <Route path="/*" element={<No_access />} />
+        </>
+      )}
+
+      {access_token && userType === "TL" && (
+        <>
+          <Route
+            path="/accountant_dashboard"
+            element={<ProtectedApproute element={ConductorDetails} />}
+          />
         </>
       )}
     </Routes>
