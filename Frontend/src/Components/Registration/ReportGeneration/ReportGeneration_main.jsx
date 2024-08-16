@@ -342,8 +342,8 @@ export default function ReportGeneration_main() {
                                     className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
                                     style={{ boxShadow: "0 1px 4px #fff" }}
                                     onFocus={(e) =>
-                                      (e.target.style.boxShadow =
-                                        "0 1px 4px #000")
+                                    (e.target.style.boxShadow =
+                                      "0 1px 4px #000")
                                     }
                                     onBlur={(e) =>
                                       (e.target.style.boxShadow = "none")
@@ -368,8 +368,8 @@ export default function ReportGeneration_main() {
                                     className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
                                     style={{ boxShadow: "0 1px 4px #fff" }}
                                     onFocus={(e) =>
-                                      (e.target.style.boxShadow =
-                                        "0 1px 4px #000")
+                                    (e.target.style.boxShadow =
+                                      "0 1px 4px #000")
                                     }
                                     onBlur={(e) =>
                                       (e.target.style.boxShadow = "none")
@@ -393,8 +393,8 @@ export default function ReportGeneration_main() {
                                     className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
                                     style={{ boxShadow: "0 1px 4px #fff" }}
                                     onFocus={(e) =>
-                                      (e.target.style.boxShadow =
-                                        "0 1px 4px #000")
+                                    (e.target.style.boxShadow =
+                                      "0 1px 4px #000")
                                     }
                                     onBlur={(e) =>
                                       (e.target.style.boxShadow = "none")
@@ -446,20 +446,19 @@ export default function ReportGeneration_main() {
           </div>
           <div className="flex flex-1 flex-col md:flex-row   ml-4 mr-4 mt-4 ">
             <div
-              className={`flex flex-1 m-4   ${
-                (conductor_details?.data &&
-                  conductor_details.data[0]?.first_name) ||
+              className={`flex flex-1 m-4   ${(conductor_details?.data &&
+                conductor_details.data[0]?.first_name) ||
                 (bus_details?.data && bus_details.data[0]?.register_no)
-                  ? "shadow-lg rounded-lg bg-white"
-                  : ""
-              } p-8 `}
+                ? "shadow-lg rounded-lg bg-white"
+                : ""
+                } p-8 `}
             >
               {conductor_details?.data &&
-              conductor_details.data[0]?.first_name ? (
+                conductor_details.data[0]?.first_name ? (
                 <ReportCard
                   card_type={"conductor"}
                   first_name={conductor_details.data[0].first_name}
-                  middle_name={conductor_details.data[0].middle_name}
+                  middle_name={conductor_details.data[0]?.middle_name}
                   last_name={conductor_details.data[0].last_name}
                   age={conductor_details.data[0].age}
                   conductor_id={conductor_details.data[0].cunique_id}
@@ -506,12 +505,11 @@ export default function ReportGeneration_main() {
 
             {bus_details?.data ? (
               <div
-                className={`flex flex-1 justify-center items-center  ${
-                  bus_total_collection?.data &&
+                className={`flex flex-1 justify-center items-center  ${bus_total_collection?.data &&
                   bus_total_collection.data[0].total_bus_collection
-                    ? "border bg-white shadow-lg rounded-lg"
-                    : ""
-                } p-8  m-4`}
+                  ? "border bg-white shadow-lg rounded-lg"
+                  : ""
+                  } p-8  m-4`}
               >
                 <div className="flex flex-1 flex-row ">
                   <div className="flex flex-1">
@@ -629,7 +627,7 @@ export default function ReportGeneration_main() {
                     <div className="flex" key={report?.conductor_id}>
                       <ReportCard
                         first_name={report?.data?.first_name}
-                        middle_name={report?.data.middle_name}
+                        middle_name={report?.data?.middle_name}
                         last_name={report?.data.last_name}
                         age={report?.data.age}
                         conductor_id={report?.data.conductor_id}
@@ -666,7 +664,7 @@ export default function ReportGeneration_main() {
             ) : report_type === "conductor" ? (
               <div className="flex flex-1 flex-wrap m-4">
                 {filterValues?.reportType === "conductor" &&
-                report?.result?.data.length !== 0 ? (
+                  report?.result?.data.length !== 0 ? (
                   report?.result?.data.map((bus) => (
                     <div className="flex flex-1 flex-col">
                       <div
@@ -716,7 +714,7 @@ export default function ReportGeneration_main() {
             ) : (
               <div className="flex flex-1 flex-wrap m-4">
                 {filterValues?.reportType === "bus" &&
-                bus_report?.result?.data.length !== 0 ? (
+                  bus_report?.result?.data.length !== 0 ? (
                   bus_report?.result?.data.map((bus) => (
                     <div className="flex flex-1 flex-col">
                       <div
