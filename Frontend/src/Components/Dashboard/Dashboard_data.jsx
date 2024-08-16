@@ -22,6 +22,7 @@ export default function Dashboard_data() {
   const categories = realTimeData?.map((item) => item.day);
   const seriesData = realTimeData?.map((item) => item.sum);
   const totalValue = seriesData?.reduce((acc, val) => acc + val, 0);
+  console.log('the nan data is..',realTimeData)
   const receiptTotalCount = realTimeData?.reduce(
     (acc, val) => acc + val.receipts,
     0
@@ -386,7 +387,7 @@ export default function Dashboard_data() {
                     className={`w-full md:w-full  mr-4  flex flex-col items-center justify-center relative`}
                   >
                     <span className="text-[#1dafc9] text-2xl font-bold">
-                      {receiptTotalCount}
+                      {passenger_details}
                     </span>
                     <h4 className="text-center text-xs whitespace-nowrap">
                       Total Customer Count
