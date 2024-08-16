@@ -457,13 +457,13 @@ export default function ReportGeneration_main() {
                 conductor_details.data[0]?.first_name ? (
                 <ReportCard
                   card_type={"conductor"}
-                  first_name={conductor_details.data[0].first_name}
+                  first_name={conductor_details.data[0]?.first_name}
                   middle_name={conductor_details.data[0]?.middle_name}
-                  last_name={conductor_details.data[0].last_name}
-                  age={conductor_details.data[0].age}
-                  conductor_id={conductor_details.data[0].cunique_id}
-                  mobile_no={conductor_details.data[0].mobile_no}
-                  aadhar_no={conductor_details.data[0].adhar_no}
+                  last_name={conductor_details.data[0]?.last_name}
+                  age={conductor_details.data[0]?.age}
+                  conductor_id={conductor_details.data[0]?.cunique_id}
+                  mobile_no={conductor_details.data[0]?.mobile_no}
+                  aadhar_no={conductor_details.data[0]?.adhar_no}
                 />
               ) : (
                 <></>
@@ -472,9 +472,9 @@ export default function ReportGeneration_main() {
               {bus_details?.data && bus_details.data[0]?.register_no ? (
                 <ReportCard
                   card_type={"bus"}
-                  bus_id={bus_details.data[0].id}
-                  register_no={bus_details.data[0].register_no}
-                  vin_no={bus_details.data[0].vin_no}
+                  bus_id={bus_details.data[0]?.id}
+                  register_no={bus_details.data[0]?.register_no}
+                  vin_no={bus_details.data[0]?.vin_no}
                 />
               ) : null}
             </div>
@@ -628,11 +628,11 @@ export default function ReportGeneration_main() {
                       <ReportCard
                         first_name={report?.data?.first_name}
                         middle_name={report?.data?.middle_name}
-                        last_name={report?.data.last_name}
-                        age={report?.data.age}
-                        conductor_id={report?.data.conductor_id}
-                        mobile_no={report?.data.mobile_no}
-                        aadhar_no={report?.data.adhar_no}
+                        last_name={report?.data?.last_name}
+                        age={report?.data?.age}
+                        conductor_id={report?.data?.conductor_id}
+                        mobile_no={report?.data?.mobile_no}
+                        aadhar_no={report?.data?.adhar_no}
                         total_bus_collection={report?.data?.total_amount}
                       />
 
