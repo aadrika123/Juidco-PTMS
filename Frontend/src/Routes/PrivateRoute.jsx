@@ -40,7 +40,7 @@ const PrivateRoute = ({ element: Component }) => {
             <Header
               hide={hide}
               set_hide={setHide}
-              heading={"Parking Management System"}
+              heading={"Public Transport Management System"}
             />
           </div>
 
