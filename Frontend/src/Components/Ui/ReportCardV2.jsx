@@ -39,34 +39,89 @@ const ReportCard = ({
     <>
       {details && <BusDialog open={open} setOpen={setOpen} data={details} />}
       {card_type == "conductor" ? (
-        <div className="flex flex-1 flex-col ">
-          <div className="flex mt-5  flex-row">
-            <div className="flex font-bold">Name:</div>
-            <div className="flex ml-4 flex-row">
-              <div className="flex">{first_name}</div>
-              <div className="flex ml-2">
-                {middle_name == "null" ? "" : middle_name}
+
+        <div className="flex items-center gap-10 bg-white p-4 shadow-sm rounded-md w-full">
+          <div className="flex flex-1 flex-col justify-between h-full ">
+            <p>Conductor Name : <span className="font-normal">{`${first_name} ${last_name}`}</span></p>
+            <p>Conductor ID : <span className="font-normal">{conductor_id}</span></p>
+            <p>Contact Number : <span className="font-normal">{mobile_no}</span></p>
+            <p>Aadhar Card / Pan Card : <span className="font-normal">{aadhar_no}</span></p>
+            <p>Age : <span className="font-normal">{age}</span></p>
+          </div>
+
+          <div className="flex flex-1 justify-end gap-8 items-center ">
+            {details?.slice(0, 2).map((item, index) => (
+              <div key={index} className="flex flex-1 flex-col ">
+                <h5 className="text-xl">{item?.bus_id}</h5>
+                <div>
+                  <p>Date : <span className="font-normal">{new Date(item?.date).toLocaleDateString()}</span></p>
+                  {/* <p>Status : <span className="font-normal">{'Scheduled'}</span></p> */}
+                </div>
+                <button
+                  disabled
+                  className="bg-[#6366F1] h-10 text-white mt-8 px-4 py-2 rounded-sm"
+                >
+                  <p>₹{item?.total_collection}</p>
+                </button>
               </div>
-              <div className="flex ml-2">{last_name}</div>
-            </div>
+            ))}
           </div>
-          <div className="flex mt-5 flex-row">
-            <div className="flex font-bold">Age:</div>
-            <div className="flex ml-4">{age}</div>
-          </div>
-          <div className="flex mt-5 flex-row  ">
-            <div className="flex font-bold">Conductor ID:</div>
-            <div className="flex ml-4">{conductor_id}</div>
-          </div>
-          <div className="flex mt-5 flex-row  ">
-            <div className="flex font-bold">Contact Number:</div>
-            <div className="flex ml-4">+91 {mobile_no}</div>
-          </div>
-          <div className="flex mt-5 flex-row  ">
-            <div className="flex font-bold">Adhar Card/Pan Number :</div>
-            <div className="flex ml-4">{aadhar_no}</div>
+
+          <div className="flex flex-col justify-between h-full items-end">
+            <Link
+              to={`/ReportConductor_recipt/${conductor_id}/${fromDate}/${toDate}`}
+              className="font-bold"
+            >
+              See All Recipts{" "}
+            </Link>
+            <Button
+              variant="contained"
+              sx={{
+                borderRadius: '50%',
+                aspectRatio: 1 / 1,
+                width: '40px',
+                height: '40px',
+                minWidth: '0',
+              }}
+              onClick={() => { setOpen(true) }}
+            >
+              <ArrowForwardIcon />
+            </Button>
           </div>
         </div>
+
+        // <div className="flex flex-1 flex-col ">
+        //   <div className="flex mt-5  flex-row">
+        //     <div className="flex font-bold">Name:</div>
+        //     <div className="flex ml-4 flex-row">
+        //       <div className="flex">{first_name}</div>
+        //       <div className="flex ml-2">
+        //         {middle_name == "null" ? "" : middle_name}
+        //       </div>
+        //       <div className="flex ml-2">{last_name}</div>
+        //     </div>
+        //   </div>
+        //   <div className="flex mt-5 flex-row">
+        //     <div className="flex font-bold">Age:</div>
+        //     <div className="flex ml-4">{age}</div>
+        //   </div>
+        //   <div className="flex mt-5 flex-row  ">
+        //     <div className="flex font-bold">Conductor ID:</div>
+        //     <div className="flex ml-4">{conductor_id}</div>
+        //   </div>
+        //   <div className="flex mt-5 flex-row  ">
+        //     <div className="flex font-bold">Contact Number:</div>
+        //     <div className="flex ml-4">+91 {mobile_no}</div>
+        //   </div>
+        //   <div className="flex mt-5 flex-row  ">
+        //     <div className="flex font-bold">Adhar Card/Pan Number :</div>
+        //     <div className="flex ml-4">{aadhar_no}</div>
+        //   </div>
+        // </div>
+
+
+
+
         // <div className="flex items-center gap-10 bg-white p-4 shadow-sm rounded-md w-full">
         //   <div className="flex flex-1 flex-col justify-between h-full ">
         //     <p>Conductor Name : <span className="font-normal">{`${first_name} ${last_name}`}</span></p>
@@ -311,7 +366,7 @@ const BusDialog = ({ open, setOpen, data }) => {
                     disabled
                     className="bg-[#6366F1] h-10 text-white mt-8 px-4 py-2 rounded-sm"
                   >
-                    <p>{item?.amount}</p>
+                    <p>₹{item?.total_collection}</p>
                   </button>
                 </div>
               </Grid>

@@ -22,7 +22,7 @@ export default function ReportGeneration_main() {
   };
   const validationSchema = Yup.object({
     reportType: Yup.string().required("Report type is required"),
-    id: Yup.string().required("ID is required"),
+    // id: Yup.string().required("ID is required"),
     fromDate: Yup.date().required("From Date is required"),
     toDate: Yup.date().required("To Date is required"),
   });
@@ -451,12 +451,7 @@ export default function ReportGeneration_main() {
           </div>
           <div className="flex flex-1 flex-col md:flex-row   ml-4 mr-4 mt-4 ">
             <div
-              className={`flex flex-1 m-4   ${(conductor_details?.data &&
-                conductor_details.data[0]?.first_name) ||
-                (bus_details?.data && bus_details.data[0]?.register_no)
-                ? "shadow-lg rounded-lg bg-white"
-                : ""
-                } p-8 `}
+              className={`flex flex-1 m-4  p-8 `}
             >
               {conductor_details?.data &&
                 conductor_details.data[0]?.first_name ? (
@@ -469,6 +464,9 @@ export default function ReportGeneration_main() {
                   conductor_id={conductor_details.data[0]?.cunique_id}
                   mobile_no={conductor_details.data[0]?.mobile_no}
                   aadhar_no={conductor_details.data[0]?.adhar_no}
+                  details={report?.result?.data}
+                  fromDate={fromDate}
+                  toDate={toDate}
                 />
               ) : (
                 <></>
@@ -484,26 +482,27 @@ export default function ReportGeneration_main() {
               ) : null}
             </div>
             {conductor_details?.data ? (
-              <div className="flex flex-1 justify-center items-center border  bg-white shadow-lg p-8 rounded-lg m-4 ">
-                <div className="flex flex-1 flex-row ">
-                  <div className="flex flex-1">
-                    <div className="flex flex-col flex-1">
-                      <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
-                        {/* {total_collection.data[0].total_bus_collection}/- */}
-                        {total_collection?.data &&
-                          total_collection.data[0].total_bus_collection}
-                        /-
-                      </div>
-                      <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
-                        Total Amount of the Bus Collection
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-1">
-                    <img src={busstop} className="flex ml-4 w-24 h-24" />
-                  </div>
-                </div>
-              </div>
+              // <div className="flex flex-1 justify-center items-center border  bg-white shadow-lg p-8 rounded-lg m-4 ">
+              //   <div className="flex flex-1 flex-row ">
+              //     <div className="flex flex-1">
+              //       <div className="flex flex-col flex-1">
+              //         <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+              //           {/* {total_collection.data[0].total_bus_collection}/- */}
+              //           {total_collection?.data &&
+              //             total_collection.data[0].total_bus_collection}
+              //           /-
+              //         </div>
+              //         <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
+              //           Total Amount of the Bus Collection
+              //         </div>
+              //       </div>
+              //     </div>
+              //     <div className="flex flex-1">
+              //       <img src={busstop} className="flex ml-4 w-24 h-24" />
+              //     </div>
+              //   </div>
+              // </div>
+              <></>
             ) : (
               <></>
             )}
@@ -683,55 +682,56 @@ export default function ReportGeneration_main() {
                 </div>
               </div>
             ) : report_type === "conductor" ? (
-              <div className="flex flex-1 flex-wrap m-4">
-                {filterValues?.reportType === "conductor" &&
-                  report?.result?.data.length !== 0 ? (
-                  report?.result?.data.map((bus) => (
-                    <div className="flex flex-1 flex-col">
-                      <div
-                        onClick={() => {
-                          handle_dialog_busUid(
-                            bus.bus_id,
-                            formatDate(bus.date),
-                            bus.total_collection
-                          );
-                        }}
-                        key={bus.bus_id}
-                        className="flex cursor-pointer flex-col h-[180px] w-[180px] m-4 rounded-md border-2 justify-center items-center border-blue-400 bg-white"
-                      >
-                        <div className="flex flex-1 flex-col justify-center items-center m-4">
-                          <img
-                            src={busstop}
-                            style={{ translate: "transform(-50%,-50%)" }}
-                            className="flex ml-4 w-14 h-14"
-                          />
-                          <div className="text-[#6D63E8]">
-                            Bus: {bus.bus_id}
-                          </div>
-                          <div className="flex flex-col text-black">
-                            <div className="flex">
-                              Amount:{" "}
-                              <span className="ml-2 text-[#2CA70D]">
-                                {bus.total_collection}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
-                            Date: {formatDate(bus.date)}
-                          </div>
-                          <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
-                            Status: {bus.status}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex flex-1 justify-center items-center text-gray-500 font-bold">
-                    No data Found
-                  </div>
-                )}
-              </div>
+              // <div className="flex flex-1 flex-wrap m-4">
+              //   {filterValues?.reportType === "conductor" &&
+              //     report?.result?.data.length !== 0 ? (
+              //     report?.result?.data.map((bus) => (
+              //       <div className="flex flex-1 flex-col">
+              //         <div
+              //           onClick={() => {
+              //             handle_dialog_busUid(
+              //               bus.bus_id,
+              //               formatDate(bus.date),
+              //               bus.total_collection
+              //             );
+              //           }}
+              //           key={bus.bus_id}
+              //           className="flex cursor-pointer flex-col h-[180px] w-[180px] m-4 rounded-md border-2 justify-center items-center border-blue-400 bg-white"
+              //         >
+              //           <div className="flex flex-1 flex-col justify-center items-center m-4">
+              //             <img
+              //               src={busstop}
+              //               style={{ translate: "transform(-50%,-50%)" }}
+              //               className="flex ml-4 w-14 h-14"
+              //             />
+              //             <div className="text-[#6D63E8]">
+              //               Bus: {bus.bus_id}
+              //             </div>
+              //             <div className="flex flex-col text-black">
+              //               <div className="flex">
+              //                 Amount:{" "}
+              //                 <span className="ml-2 text-[#2CA70D]">
+              //                   {bus.total_collection}
+              //                 </span>
+              //               </div>
+              //             </div>
+              //             <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
+              //               Date: {formatDate(bus.date)}
+              //             </div>
+              //             <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
+              //               Status: {bus.status}
+              //             </div>
+              //           </div>
+              //         </div>
+              //       </div>
+              //     ))
+              //   ) : (
+              //     <div className="flex flex-1 justify-center items-center text-gray-500 font-bold">
+              //       No data Found
+              //     </div>
+              //   )}
+              // </div>
+              <></>
             ) : (
               <div className="flex flex-1 flex-wrap m-4">
                 {filterValues?.reportType === "bus" &&

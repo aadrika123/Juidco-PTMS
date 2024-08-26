@@ -221,7 +221,7 @@ export default function CollectionReport() {
                     >
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>
-                        {new Date(row.date).toLocaleDateString()}
+                        {new Date(row?.data?.date).toLocaleDateString()}
                       </TableCell>
                       <TableCell>{row?.data?.receipt_count}</TableCell>
                       <TableCell>Rs. {row?.data?.total_amount}</TableCell>
