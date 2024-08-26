@@ -44,6 +44,7 @@ export default function CollectionReport() {
       if (response.data?.data == null) {
         console.log("data is null");
       } else {
+        console.log(response?.data?.data?.data)
         setData(response?.data?.data?.data);
         console.log("Report Response", response);
         console.log("Report data ", response?.data?.data?.data);
@@ -220,12 +221,12 @@ export default function CollectionReport() {
                     >
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>
-                        {new Date(row.date).toLocaleDateString()}
+                        {new Date(row?.data?.date).toLocaleDateString()}
                       </TableCell>
-                      <TableCell>{row.receipt_count}</TableCell>
-                      <TableCell>Rs. {row.total_amount}</TableCell>
+                      <TableCell>{row?.data?.receipt_count}</TableCell>
+                      <TableCell>Rs. {row?.data?.total_amount}</TableCell>
                       <TableCell>{row.conductor_id}</TableCell>
-                      <TableCell>{row.bus_no}</TableCell>
+                      <TableCell>{row?.data?.bus_no}</TableCell>
                     </TableRow>
                   ))
                 )}

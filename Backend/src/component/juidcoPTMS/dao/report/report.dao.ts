@@ -217,7 +217,8 @@ class ReportDao {
 
     const qr_func_2 = (conductor_id?: string, condition?: string) => {
       return `
-        select receipts.*from receipts
+        select receipts.* , conductor.* as conductor from receipts
+        JOIN conductor_master as conductor ON receipts.conductor_id = conductor.cunique_id
         where receipts.conductor_id = '${conductor_id}' ${condition || ""};
       `;
     };

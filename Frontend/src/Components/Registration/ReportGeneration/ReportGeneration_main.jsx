@@ -7,7 +7,8 @@ import * as Yup from "yup";
 import { Button, FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { Dialog, DialogContent, DialogActions } from "@mui/material";
 import Cookies from "js-cookie";
-import { ReportCard, BusCard } from "../../Ui/ReportCard";
+// import { ReportCard, BusCard } from "../../Ui/ReportCard";
+import { ReportCard, BusCard } from "../../Ui/ReportCardV2";
 import DownloadReport from "../../Ui/DownloadReport";
 export default function ReportGeneration_main() {
   const token = Cookies.get("accesstoken");
@@ -21,7 +22,7 @@ export default function ReportGeneration_main() {
   };
   const validationSchema = Yup.object({
     reportType: Yup.string().required("Report type is required"),
-    id: Yup.string().required("ID is required"),
+    // id: Yup.string().required("ID is required"),
     fromDate: Yup.date().required("From Date is required"),
     toDate: Yup.date().required("To Date is required"),
   });
@@ -48,6 +49,10 @@ export default function ReportGeneration_main() {
 
   function filterAllReportData() {
     set_filterAllReport(!filterAllReport);
+  }
+
+  const abc = () => {
+    console.log(report_all)
   }
 
   const onSubmit = async (values, rest) => {
@@ -275,7 +280,7 @@ export default function ReportGeneration_main() {
                 </div>
               </div>
             </div>
-            <div className="flex text-xl font-normal  mr-4">
+            <div className="flex text-xl font-bold  mr-4">
               Generate Report
             </div>
           </div>
@@ -327,10 +332,10 @@ export default function ReportGeneration_main() {
                               label="Bus Wise Report"
                             />
                           </RadioGroup>
-                          <div className="flex md:flex-row flex-col flex-1">
+                          <div className="flex md:flex-row flex-col flex-1 gap-8 p-4">
                             {values.reportType && (
                               <>
-                                <div className="flex flex-1 flex-col ml-4 mr-4">
+                                <div className="flex flex-1 flex-col">
                                   <label htmlFor="fromDate">
                                     {values.reportType === "conductor"
                                       ? "Conductor ID"
@@ -339,7 +344,7 @@ export default function ReportGeneration_main() {
 
                                   <Field
                                     type="text"
-                                    className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
+                                    className="border border-gray-300 rounded-md px-3 py-2 mt-1"
                                     style={{ boxShadow: "0 1px 4px #fff" }}
                                     onFocus={(e) =>
                                     (e.target.style.boxShadow =
@@ -357,7 +362,7 @@ export default function ReportGeneration_main() {
                                   />
                                 </div>
 
-                                <div className="flex flex-1 flex-col md:ml-20 ml-5 mr-4 ">
+                                <div className="flex flex-1 flex-col ">
                                   <label htmlFor="fromDate">From Date </label>
                                   <Field
                                     as="input"
@@ -365,7 +370,7 @@ export default function ReportGeneration_main() {
                                     placeholder="Select Date"
                                     id="fromDate"
                                     name="fromDate"
-                                    className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
+                                    className="border border-gray-300 rounded-md px-3 py-2 mt-1"
                                     style={{ boxShadow: "0 1px 4px #fff" }}
                                     onFocus={(e) =>
                                     (e.target.style.boxShadow =
@@ -382,7 +387,7 @@ export default function ReportGeneration_main() {
                                     className="text-red-500 ml-4"
                                   />
                                 </div>
-                                <div className="flex flex-1 flex-col ml-4 mr-4 ">
+                                <div className="flex flex-1 flex-col ">
                                   <label htmlFor="toDate">To Date </label>
                                   <Field
                                     as="input"
@@ -390,7 +395,7 @@ export default function ReportGeneration_main() {
                                     placeholder="Select Date"
                                     id="toDate"
                                     name="toDate"
-                                    className="border border-gray-300 rounded-md px-3 py-2 mt-1 w-[80vw] md:w-auto"
+                                    className="border border-gray-300 rounded-md px-3 py-2 mt-1"
                                     style={{ boxShadow: "0 1px 4px #fff" }}
                                     onFocus={(e) =>
                                     (e.target.style.boxShadow =
@@ -446,12 +451,7 @@ export default function ReportGeneration_main() {
           </div>
           <div className="flex flex-1 flex-col md:flex-row   ml-4 mr-4 mt-4 ">
             <div
-              className={`flex flex-1 m-4   ${(conductor_details?.data &&
-                conductor_details.data[0]?.first_name) ||
-                (bus_details?.data && bus_details.data[0]?.register_no)
-                ? "shadow-lg rounded-lg bg-white"
-                : ""
-                } p-8 `}
+              className={`flex flex-1 m-4  p-8 `}
             >
               {conductor_details?.data &&
                 conductor_details.data[0]?.first_name ? (
@@ -464,6 +464,9 @@ export default function ReportGeneration_main() {
                   conductor_id={conductor_details.data[0]?.cunique_id}
                   mobile_no={conductor_details.data[0]?.mobile_no}
                   aadhar_no={conductor_details.data[0]?.adhar_no}
+                  details={report?.result?.data}
+                  fromDate={fromDate}
+                  toDate={toDate}
                 />
               ) : (
                 <></>
@@ -479,26 +482,27 @@ export default function ReportGeneration_main() {
               ) : null}
             </div>
             {conductor_details?.data ? (
-              <div className="flex flex-1 justify-center items-center border  bg-white shadow-lg p-8 rounded-lg m-4 ">
-                <div className="flex flex-1 flex-row ">
-                  <div className="flex flex-1">
-                    <div className="flex flex-col flex-1">
-                      <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
-                        {/* {total_collection.data[0].total_bus_collection}/- */}
-                        {total_collection?.data &&
-                          total_collection.data[0].total_bus_collection}
-                        /-
-                      </div>
-                      <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
-                        Total Amount of the Bus Collection
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-1">
-                    <img src={busstop} className="flex ml-4 w-24 h-24" />
-                  </div>
-                </div>
-              </div>
+              // <div className="flex flex-1 justify-center items-center border  bg-white shadow-lg p-8 rounded-lg m-4 ">
+              //   <div className="flex flex-1 flex-row ">
+              //     <div className="flex flex-1">
+              //       <div className="flex flex-col flex-1">
+              //         <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+              //           {/* {total_collection.data[0].total_bus_collection}/- */}
+              //           {total_collection?.data &&
+              //             total_collection.data[0].total_bus_collection}
+              //           /-
+              //         </div>
+              //         <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
+              //           Total Amount of the Bus Collection
+              //         </div>
+              //       </div>
+              //     </div>
+              //     <div className="flex flex-1">
+              //       <img src={busstop} className="flex ml-4 w-24 h-24" />
+              //     </div>
+              //   </div>
+              // </div>
+              <></>
             ) : (
               <></>
             )}
@@ -535,7 +539,7 @@ export default function ReportGeneration_main() {
             )}
           </div>
           <div className="flex flex-1 flex-col  rounded-lg ml-4 mr-4 shadow-xl relative">
-            <div className="absolute right-[10rem] -top-[5rem] flex items-center gap-5">
+            {/* <div className="absolute right-[10rem] -top-[5rem] flex items-center gap-5">
               <div>
                 <label htmlFor="fromDate">From Date </label>
                 <input
@@ -613,7 +617,7 @@ export default function ReportGeneration_main() {
                   </div>
                 </div>
               </button>
-            </div>
+            </div> */}
             {downloadReportPopup && (
               <DownloadReport
                 reports={report_all}
@@ -622,10 +626,10 @@ export default function ReportGeneration_main() {
             )}
             {report_type === "" ? (
               <div className="flex  justify-center items-center text-gray-500 font-bold">
-                <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-5 w-full p-4">
                   {report_all?.map((report) => (
                     <div className="flex" key={report?.conductor_id}>
-                      <ReportCard
+                      {/* <ReportCard
                         first_name={report?.data?.first_name}
                         middle_name={report?.data?.middle_name}
                         last_name={report?.data?.last_name}
@@ -634,9 +638,25 @@ export default function ReportGeneration_main() {
                         mobile_no={report?.data?.mobile_no}
                         aadhar_no={report?.data?.adhar_no}
                         total_bus_collection={report?.data?.total_amount}
+                        fromDate={fromDate}
+                        toDate={toDate}
+                      /> */}
+                      {/* <button onClick={abc}>abc</button> */}
+                      <ReportCard
+                        first_name={report?.data?.first_name}
+                        middle_name={report?.data?.middle_name}
+                        last_name={report?.data?.last_name}
+                        age={report?.data?.age}
+                        conductor_id={report?.conductor_id}
+                        mobile_no={report?.data?.mobile_no}
+                        aadhar_no={report?.data?.adhar_no}
+                        total_bus_collection={report?.data?.total_amount}
+                        fromDate={fromDate}
+                        toDate={toDate}
+                        details={report?.data?.details}
                       />
 
-                      <div className="grid grid-cols-2">
+                      {/* <div className="grid grid-cols-2">
                         {report?.data?.details
                           ?.map((bus) => (
                             <BusCard
@@ -647,70 +667,71 @@ export default function ReportGeneration_main() {
                             />
                           ))
                           .slice(0, 4)}
-                      </div>
+                      </div> */}
 
-                      <div className="flex h-full justify-end  items-center mb-12">
+                      {/* <div className="flex h-full justify-end  items-center mb-12">
                         <Link
                           to={`/ReportConductor_recipt/${report?.conductor_id}/${fromDate}/${toDate}`}
                           className="font-bold"
                         >
                           See All Recipts{" "}
                         </Link>
-                      </div>
+                      </div> */}
                     </div>
                   ))}
                 </div>
               </div>
             ) : report_type === "conductor" ? (
-              <div className="flex flex-1 flex-wrap m-4">
-                {filterValues?.reportType === "conductor" &&
-                  report?.result?.data.length !== 0 ? (
-                  report?.result?.data.map((bus) => (
-                    <div className="flex flex-1 flex-col">
-                      <div
-                        onClick={() => {
-                          handle_dialog_busUid(
-                            bus.bus_id,
-                            formatDate(bus.date),
-                            bus.total_collection
-                          );
-                        }}
-                        key={bus.bus_id}
-                        className="flex cursor-pointer flex-col h-[180px] w-[180px] m-4 rounded-md border-2 justify-center items-center border-blue-400 bg-white"
-                      >
-                        <div className="flex flex-1 flex-col justify-center items-center m-4">
-                          <img
-                            src={busstop}
-                            style={{ translate: "transform(-50%,-50%)" }}
-                            className="flex ml-4 w-14 h-14"
-                          />
-                          <div className="text-[#6D63E8]">
-                            Bus: {bus.bus_id}
-                          </div>
-                          <div className="flex flex-col text-black">
-                            <div className="flex">
-                              Amount:{" "}
-                              <span className="ml-2 text-[#2CA70D]">
-                                {bus.total_collection}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
-                            Date: {formatDate(bus.date)}
-                          </div>
-                          <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
-                            Status: {bus.status}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex flex-1 justify-center items-center text-gray-500 font-bold">
-                    No data Found
-                  </div>
-                )}
-              </div>
+              // <div className="flex flex-1 flex-wrap m-4">
+              //   {filterValues?.reportType === "conductor" &&
+              //     report?.result?.data.length !== 0 ? (
+              //     report?.result?.data.map((bus) => (
+              //       <div className="flex flex-1 flex-col">
+              //         <div
+              //           onClick={() => {
+              //             handle_dialog_busUid(
+              //               bus.bus_id,
+              //               formatDate(bus.date),
+              //               bus.total_collection
+              //             );
+              //           }}
+              //           key={bus.bus_id}
+              //           className="flex cursor-pointer flex-col h-[180px] w-[180px] m-4 rounded-md border-2 justify-center items-center border-blue-400 bg-white"
+              //         >
+              //           <div className="flex flex-1 flex-col justify-center items-center m-4">
+              //             <img
+              //               src={busstop}
+              //               style={{ translate: "transform(-50%,-50%)" }}
+              //               className="flex ml-4 w-14 h-14"
+              //             />
+              //             <div className="text-[#6D63E8]">
+              //               Bus: {bus.bus_id}
+              //             </div>
+              //             <div className="flex flex-col text-black">
+              //               <div className="flex">
+              //                 Amount:{" "}
+              //                 <span className="ml-2 text-[#2CA70D]">
+              //                   {bus.total_collection}
+              //                 </span>
+              //               </div>
+              //             </div>
+              //             <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
+              //               Date: {formatDate(bus.date)}
+              //             </div>
+              //             <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
+              //               Status: {bus.status}
+              //             </div>
+              //           </div>
+              //         </div>
+              //       </div>
+              //     ))
+              //   ) : (
+              //     <div className="flex flex-1 justify-center items-center text-gray-500 font-bold">
+              //       No data Found
+              //     </div>
+              //   )}
+              // </div>
+              <></>
             ) : (
               <div className="flex flex-1 flex-wrap m-4">
                 {filterValues?.reportType === "bus" &&
@@ -806,7 +827,7 @@ export default function ReportGeneration_main() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-1 overflow-auto">
+            {/* <div className="flex flex-1 overflow-auto">
               {total_amount.map((amounts) => (
                 <div className="flex justify-center items-center flex-1 mr-4 ml-4 ">
                   {amounts.bus_id == dialog_busUid &&
@@ -852,7 +873,7 @@ export default function ReportGeneration_main() {
                     )}
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
         </DialogContent>
         <DialogActions>
