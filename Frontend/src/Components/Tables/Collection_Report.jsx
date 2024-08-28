@@ -26,6 +26,8 @@ export default function CollectionReport() {
   const [loading, set_loading] = useState(false);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [finalFromDate, setfinalFromDate] = useState("");
+  const [finalToDate, setfinalToDate] = useState("");
 
   const fetchReportData = async () => {
     try {
@@ -48,6 +50,8 @@ export default function CollectionReport() {
         setData(response?.data?.data?.data);
         console.log("Report Response", response);
         console.log("Report data ", response?.data?.data?.data);
+        setfinalFromDate(fromDate)
+        setfinalToDate(toDate)
       }
     } catch (error) {
       console.error("Error fetching report data", error);
@@ -80,6 +84,7 @@ export default function CollectionReport() {
         rowData.push(cellData);
       });
       data.push(rowData);
+      console.log('the raw data is..', rowData)
     });
 
     autoTable(doc, {
@@ -89,6 +94,7 @@ export default function CollectionReport() {
 
     doc.save("Report.pdf");
   };
+
 
   return (
     <div className="flex flex-col flex-1 bg-[#F9FAFC]">
@@ -221,7 +227,8 @@ export default function CollectionReport() {
                     >
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>
-                        {new Date(row?.data?.date).toLocaleDateString()}
+                        {/* {new Date(row?.data?.date).toLocaleDateString()} */}
+                        {finalFromDate} to {finalToDate}
                       </TableCell>
                       <TableCell>{row?.data?.receipt_count}</TableCell>
                       <TableCell>Rs. {row?.data?.total_amount}</TableCell>
