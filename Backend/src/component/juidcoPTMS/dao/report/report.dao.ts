@@ -13,14 +13,12 @@ class ReportDao {
 
     function query_fn(extend_query: string, conductor?: string): string {
       return `
-        select bus_id, sum(amount)::INT as total_collection ,date, bm.status ${
-          conductor || ""
+        select bus_id, sum(amount)::INT as total_collection ,date, bm.status ${conductor || ""
         } from receipts 
         LEFT JOIN bus_master as bm ON receipts.bus_id = bm.register_no
         LEFT JOIN conductor_master as cm ON receipts.conductor_id = cm.cunique_id
-        ${extend_query} group by bus_id, date, bm.status ${
-        conductor || ""
-      } order by date ASC
+        ${extend_query} group by bus_id, date, bm.status ${conductor || ""
+        } order by date ASC
       `;
     }
 
@@ -279,9 +277,8 @@ class ReportDao {
             SUM(amount)::INT AS total_amount,
             date
           FROM receipts
-         ${
-           condition || `where date between '${startOfWeek}' and '${endOfWeek}'`
-         } group by date
+         ${condition || `where date between '${startOfWeek}' and '${endOfWeek}'`
+        } group by date
       `;
     };
 
@@ -296,6 +293,52 @@ class ReportDao {
 
     return generateRes(data);
   };
+
+  getUlbData = async (req: Request) => {
+    const { auth } = req.body;
+
+
+    // const data: any = await prisma.$queryRaw`
+    // select id,ulb_name from ulb_masters where id=${auth?.ulb_id}
+    // `
+
+    const [data] = await prisma.$transaction([prisma.$queryRawUnsafe(`select id::INT,ulb_name from ulb_masters where id=${auth?.ulb_id}`)]);
+
+    return generateRes(data);
+  };
+
+  getHourlyRealtimeData = async () => {
+    // const { from, to } = req.body;
+
+    const query = `
+      WITH intervals AS (
+          SELECT 
+              generate_series(0, 22, 2) AS interval_start_hour
+      )
+      SELECT
+          COALESCE(COUNT(r.id), 0)::INT AS customer_count,
+          COALESCE(SUM(r.amount), 0)::INT AS total_amount,
+          i.interval_start_hour,
+          i.interval_start_hour + 2 AS interval_end_hour
+      FROM
+          intervals i
+      LEFT JOIN
+          receipts r
+          ON EXTRACT(HOUR FROM r.created_at)::INT / 2 * 2 = i.interval_start_hour
+          AND r.date = CURRENT_DATE
+      GROUP BY
+          i.interval_start_hour
+      ORDER BY
+          i.interval_start_hour;
+    `
+
+    const data: any[] = await prisma.$queryRawUnsafe(query);
+
+    return data
+  };
+
 }
+
+
 
 export default ReportDao;

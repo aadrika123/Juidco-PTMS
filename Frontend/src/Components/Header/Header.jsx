@@ -4,9 +4,14 @@ import bus from "../../assets/bus 1.png";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/slice/slice";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 const Header = ({ heading, set_hide, hide }) => {
   const dispatch = useDispatch();
+  const token = Cookies.get("accesstoken");
+
+  const [ulbData, setUlbData] = useState({})
+
   function handle_logout() {
     const confirm = window.confirm("Are you sure want to logout?");
     if (confirm) {
@@ -15,35 +20,67 @@ const Header = ({ heading, set_hide, hide }) => {
     }
   }
 
+  const fetchUlbData = async () => {
+    await axios
+      .get(
+        `${process.env.REACT_APP_BASE_URL}/report/get-ulb`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response.data, 'ulb');
+        setUlbData(response.data)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  useEffect(() => {
+    if (!ulbData || Object.keys(ulbData).length === 0) {
+      fetchUlbData()
+    }
+  }, [ulbData])
+
   return (
     <div className="flex flex-1 flex-row justify-between px-4 h-[80px] bg-white border-b-[2px]  border-r-0 shadow-md border-t-0">
       <div
         style={{ flex: 2 }}
         className="flex justify-center md:justify-start items-center"
       >
-        <div className="flex flex-row justify-start items-center md:ml-10">
-          <motion.div
-            className="flex ml-2 cursor-pointer"
-            onClick={() => {
-              set_hide(!hide);
-            }}
-            whileHover={{ rotate: 180 }}
-          >
-            <svg
-              width="28"
-              height="19"
-              viewBox="0 0 28 19"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+        <div>
+          <div className="flex flex-row justify-start items-center md:ml-10">
+            <motion.div
+              className="flex ml-2 cursor-pointer"
+              onClick={() => {
+                set_hide(!hide);
+              }}
+              whileHover={{ rotate: 180 }}
             >
-              <path
-                d="M6.79957 3.82265V0.0581055H27.6723V3.82265H6.79957ZM6.79957 11.3517V7.5872H27.6723V11.3517H6.79957ZM6.79957 18.8808V15.1163H27.6723V18.8808H6.79957ZM2.32685 3.82265C1.90442 3.82265 1.55058 3.64195 1.26532 3.28056C0.980059 2.91916 0.836931 2.47243 0.835938 1.94038C0.835938 1.40707 0.979065 0.960342 1.26532 0.6002C1.55157 0.240059 1.90542 0.0593603 2.32685 0.0581055C2.74927 0.0581055 3.10361 0.238804 3.38986 0.6002C3.67612 0.961597 3.81875 1.40832 3.81776 1.94038C3.81776 2.47369 3.67463 2.92104 3.38837 3.28244C3.10212 3.64384 2.74828 3.82391 2.32685 3.82265ZM2.32685 11.3517C1.90442 11.3517 1.55058 11.171 1.26532 10.8096C0.980059 10.4483 0.836931 10.0015 0.835938 9.46947C0.835938 8.93616 0.979065 8.48943 1.26532 8.12929C1.55157 7.76915 1.90542 7.58845 2.32685 7.5872C2.74927 7.5872 3.10361 7.76789 3.38986 8.12929C3.67612 8.49069 3.81875 8.93741 3.81776 9.46947C3.81776 10.0028 3.67463 10.4501 3.38837 10.8115C3.10212 11.1729 2.74828 11.353 2.32685 11.3517ZM2.32685 18.8808C1.90442 18.8808 1.55058 18.7001 1.26532 18.3387C0.980059 17.9773 0.836931 17.5306 0.835938 16.9986C0.835938 16.4653 0.979065 16.0185 1.26532 15.6584C1.55157 15.2982 1.90542 15.1175 2.32685 15.1163C2.74927 15.1163 3.10361 15.297 3.38986 15.6584C3.67612 16.0198 3.81875 16.4665 3.81776 16.9986C3.81776 17.5319 3.67463 17.9792 3.38837 18.3406C3.10212 18.702 2.74828 18.8821 2.32685 18.8808Z"
-                fill="#555555"
-              />
-            </svg>
-          </motion.div>
-          <div className="flex text-xl text-[#555555] ml-4 font-bold">
-            UD & HD
+              <svg
+                width="28"
+                height="19"
+                viewBox="0 0 28 19"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6.79957 3.82265V0.0581055H27.6723V3.82265H6.79957ZM6.79957 11.3517V7.5872H27.6723V11.3517H6.79957ZM6.79957 18.8808V15.1163H27.6723V18.8808H6.79957ZM2.32685 3.82265C1.90442 3.82265 1.55058 3.64195 1.26532 3.28056C0.980059 2.91916 0.836931 2.47243 0.835938 1.94038C0.835938 1.40707 0.979065 0.960342 1.26532 0.6002C1.55157 0.240059 1.90542 0.0593603 2.32685 0.0581055C2.74927 0.0581055 3.10361 0.238804 3.38986 0.6002C3.67612 0.961597 3.81875 1.40832 3.81776 1.94038C3.81776 2.47369 3.67463 2.92104 3.38837 3.28244C3.10212 3.64384 2.74828 3.82391 2.32685 3.82265ZM2.32685 11.3517C1.90442 11.3517 1.55058 11.171 1.26532 10.8096C0.980059 10.4483 0.836931 10.0015 0.835938 9.46947C0.835938 8.93616 0.979065 8.48943 1.26532 8.12929C1.55157 7.76915 1.90542 7.58845 2.32685 7.5872C2.74927 7.5872 3.10361 7.76789 3.38986 8.12929C3.67612 8.49069 3.81875 8.93741 3.81776 9.46947C3.81776 10.0028 3.67463 10.4501 3.38837 10.8115C3.10212 11.1729 2.74828 11.353 2.32685 11.3517ZM2.32685 18.8808C1.90442 18.8808 1.55058 18.7001 1.26532 18.3387C0.980059 17.9773 0.836931 17.5306 0.835938 16.9986C0.835938 16.4653 0.979065 16.0185 1.26532 15.6584C1.55157 15.2982 1.90542 15.1175 2.32685 15.1163C2.74927 15.1163 3.10361 15.297 3.38986 15.6584C3.67612 16.0198 3.81875 16.4665 3.81776 16.9986C3.81776 17.5319 3.67463 17.9792 3.38837 18.3406C3.10212 18.702 2.74828 18.8821 2.32685 18.8808Z"
+                  fill="#555555"
+                />
+              </svg>
+            </motion.div>
+            <div className="flex text-xl text-[#555555] ml-4 font-bold">
+              UD & HD
+            </div>
+          </div>
+          <div className="flex flex-row justify-start items-center md:ml-24">
+            <p>
+              {ulbData?.ulb_name || ''}
+            </p>
           </div>
         </div>
       </div>
