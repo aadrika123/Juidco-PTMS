@@ -451,23 +451,31 @@ export default function ReportGeneration_main() {
           </div>
           <div className="flex flex-1 flex-col md:flex-row   ml-4 mr-4 mt-4 ">
             <div
-              className={`flex flex-1 m-4  p-8 `}
+              className={`flex flex-col gap-4 flex-1 m-4  p-8 `}
             >
+              {/* <button onClick={() => {
+                console.log('totaaaaa', conductor_details)
+              }}>abc</button> */}
               {conductor_details?.data &&
                 conductor_details.data[0]?.first_name ? (
-                <ReportCard
-                  card_type={"conductor"}
-                  first_name={conductor_details.data[0]?.first_name}
-                  middle_name={conductor_details.data[0]?.middle_name}
-                  last_name={conductor_details.data[0]?.last_name}
-                  age={conductor_details.data[0]?.age}
-                  conductor_id={conductor_details.data[0]?.cunique_id}
-                  mobile_no={conductor_details.data[0]?.mobile_no}
-                  aadhar_no={conductor_details.data[0]?.adhar_no}
-                  details={report?.result?.data}
-                  fromDate={fromDate}
-                  toDate={toDate}
-                />
+                <>
+                  {conductor_details?.data.map((item, index) => (
+                    <ReportCard
+                      card_type={"conductor"}
+                      first_name={item?.first_name}
+                      middle_name={item?.middle_name}
+                      last_name={item?.last_name}
+                      age={item?.age}
+                      conductor_id={item?.cunique_id}
+                      mobile_no={item?.mobile_no}
+                      aadhar_no={item?.adhar_no}
+                      details={report?.result?.data}
+                      fromDate={fromDate}
+                      toDate={toDate}
+                      total_bus_collection={total_collection?.data[0]?.total_bus_collection}
+                    />
+                  ))}
+                </>
               ) : (
                 <></>
               )}
@@ -786,7 +794,7 @@ export default function ReportGeneration_main() {
                 )}
               </div>
             )}
-            {report_type === "" ? (
+            {/* {report_type === "" ? (
               <></>
             ) : report_type === "conductor" ? (
               <Link
@@ -802,7 +810,7 @@ export default function ReportGeneration_main() {
                   {`See All Recipts `}
                 </div>
               </Link>
-            )}
+            )} */}
           </div>
         </div>
       </div>

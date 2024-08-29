@@ -118,9 +118,27 @@ class ConductorOnBoarding {
       };
     }
     const [data, count] = await prisma.$transaction([
-      prisma.conductor_master.findMany(query),
+      prisma.conductor_master.findMany(query) as any,
       prisma.conductor_master.count(),
     ]);
+
+    // await Promise.all(
+    //   data.map(async (item: any) => {
+    //     const busData = await prisma.$queryRawUnsafe(`
+    //       select bus_id, sum(amount)::INT as total_collection ,date, bm.status ,receipts.conductor_id 
+    //       from receipts 
+    //       LEFT JOIN bus_master as bm ON receipts.bus_id = bm.register_no
+    //       LEFT JOIN conductor_master as cm ON receipts.conductor_id = cm.cunique_id
+    //       where cm.id = '${item?.id}'
+    //       group by bus_id, date, bm.status, receipts.conductor_id 
+    //       order by date ASC
+    //     `)
+
+    //     item.bus_data = busData
+
+    //   })
+    // )
+
     return generateRes({ data, count, page, limit });
   };
 
