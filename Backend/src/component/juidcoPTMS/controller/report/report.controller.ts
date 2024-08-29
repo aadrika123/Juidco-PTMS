@@ -160,6 +160,51 @@ class ReportController {
       return CommonRes.SERVER_ERROR(error, resObj, res);
     }
   };
+
+  getUlbData = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "POST",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.reportDao.getUlbData(req);
+      res.json(data?.data[0])
+    } catch (error) {
+      return CommonRes.SERVER_ERROR(error, resObj, res);
+    }
+  };
+
+  getHourlyRealtimeData = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "POST",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.reportDao.getHourlyRealtimeData();
+      // if (data === "null") {
+      //   return CommonRes.NOT_FOUND(
+      //     resMessage(this.initMsg).NOT_FOUND,
+      //     data,
+      //     resObj,
+      //     res
+      //   );
+      // }
+
+      return CommonRes.SUCCESS(
+        resMessage(this.initMsg).FOUND,
+        data,
+        resObj,
+        res
+      );
+    } catch (error) {
+      return CommonRes.SERVER_ERROR(error, resObj, res);
+    }
+  };
+
 }
 
 export default ReportController;

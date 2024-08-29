@@ -45,5 +45,17 @@ export default class BusReportRoute {
       .post((req: Request, res: Response) =>
         reportGeneration.demographicCount(req, res, "0505")
       );
+
+    app
+      .route(`${baseUrl}/report/get-ulb`)
+      .get((req: Request, res: Response) =>
+        reportGeneration.getUlbData(req, res, "0506")
+      );
+
+    app
+      .route(`${baseUrl}/report/hourly-real-time`)
+      .get((req: Request, res: Response) =>
+        reportGeneration.getHourlyRealtimeData(req, res, "0507")
+      );
   }
 }
