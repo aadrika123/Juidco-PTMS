@@ -40,53 +40,58 @@ const ReportCard = ({
       {details && <BusDialog open={open} setOpen={setOpen} data={details} />}
       {card_type == "conductor" ? (
 
-        <div className="flex items-center gap-10 bg-white p-4 shadow-sm rounded-md w-full">
-          <div className="flex flex-1 flex-col justify-between h-full ">
-            <p>Conductor Name : <span className="font-normal">{`${first_name} ${last_name}`}</span></p>
-            <p>Conductor ID : <span className="font-normal">{conductor_id}</span></p>
-            <p>Contact Number : <span className="font-normal">{mobile_no}</span></p>
-            <p>Aadhar Card / Pan Card : <span className="font-normal">{aadhar_no}</span></p>
-            <p>Age : <span className="font-normal">{age}</span></p>
+        <div className="flex flex-col items-center bg-white p-0 shadow-sm rounded-md w-full">
+          <div className="flex flex-row justify-end item-center bg-[#6366F1] w-full h-[20%]" >
+            <p className="text-2xl pr-4 text-white">₹{total_bus_collection}</p>
           </div>
+          <div className="flex flex items-center gap-10 p-4 rounded-md w-full">
+            <div className="flex flex-1 flex-col justify-between h-full ">
+              <p><b>Conductor Name </b>: <span className="font-normal">{`${first_name} ${last_name}`}</span></p>
+              <p><b>Conductor ID</b> : <span className="font-normal">{conductor_id}</span></p>
+              <p><b>Contact Number </b>: <span className="font-normal">{mobile_no}</span></p>
+              <p><b>Aadhar Card / Pan Card </b>: <span className="font-normal">{aadhar_no}</span></p>
+              <p><b>Age</b> : <span className="font-normal">{age}</span></p>
+            </div>
 
-          <div className="flex flex-1 justify-end gap-8 items-center ">
-            {details?.slice(0, 2).map((item, index) => (
-              <div key={index} className="flex flex-1 flex-col ">
-                <h5 className="text-xl">{item?.bus_id}</h5>
-                <div>
-                  <p>Date : <span className="font-normal">{new Date(item?.date).toLocaleDateString()}</span></p>
-                  {/* <p>Status : <span className="font-normal">{'Scheduled'}</span></p> */}
+            <div className="flex flex-1 justify-end gap-8 items-center ">
+              {details?.slice(0, 2).map((item, index) => (
+                <div key={index} className="flex flex-1 flex-col ">
+                  <h5 className="text-xl">{item?.bus_id}</h5>
+                  <div>
+                    <p>Date : <span className="font-normal">{new Date(item?.date).toLocaleDateString()}</span></p>
+                    {/* <p>Status : <span className="font-normal">{'Scheduled'}</span></p> */}
+                  </div>
+                  <button
+                    disabled
+                    className="bg-[#6366F1] h-10 text-white mt-8 px-4 py-2 rounded-sm"
+                  >
+                    <p>₹{item?.total_collection}</p>
+                  </button>
                 </div>
-                <button
-                  disabled
-                  className="bg-[#6366F1] h-10 text-white mt-8 px-4 py-2 rounded-sm"
-                >
-                  <p>₹{item?.total_collection}</p>
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          <div className="flex flex-col justify-between h-full items-end">
-            <Link
-              to={`/ReportConductor_recipt/${conductor_id}/${fromDate}/${toDate}`}
-              className="font-bold"
-            >
-              See All Recipts{" "}
-            </Link>
-            <Button
-              variant="contained"
-              sx={{
-                borderRadius: '50%',
-                aspectRatio: 1 / 1,
-                width: '40px',
-                height: '40px',
-                minWidth: '0',
-              }}
-              onClick={() => { setOpen(true) }}
-            >
-              <ArrowForwardIcon />
-            </Button>
+            <div className="flex flex-col justify-between h-full items-end">
+              <Link
+                to={`/ReportConductor_recipt/${conductor_id}/${fromDate}/${toDate}`}
+                className="font-bold"
+              >
+                See All Recipts{" "}
+              </Link>
+              <Button
+                variant="contained"
+                sx={{
+                  borderRadius: '50%',
+                  aspectRatio: 1 / 1,
+                  width: '40px',
+                  height: '40px',
+                  minWidth: '0',
+                }}
+                onClick={() => { setOpen(true) }}
+              >
+                <ArrowForwardIcon />
+              </Button>
+            </div>
           </div>
         </div>
 

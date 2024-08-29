@@ -37,7 +37,18 @@ export default function Dashboard_data() {
   const [timeIntervalTrigger, setTimeIntervalTrigger] = useState(false);
 
   const hourlyReceipts = hourlyRealTimeData.map(item => item?.customer_count)
+  let buffer = 0
+  const cumulativeReceipts = hourlyReceipts.map(item => {
+    buffer = buffer + item
+    return buffer
+  })
+
   const hourlyAmounts = hourlyRealTimeData.map(item => item?.total_amount)
+  let amountBuffer = 0
+  const cumulativeAmounts = hourlyAmounts.map(item => {
+    amountBuffer = amountBuffer + item
+    return amountBuffer
+  })
 
 
   // Conductor Status Table
@@ -120,7 +131,9 @@ export default function Dashboard_data() {
       })
       .then((res) => {
         console.log(res, "demographic");
-        setConductorStatus(res.data?.data);
+        if (res.data?.data) {
+          setConductorStatus(res.data?.data);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -178,7 +191,9 @@ export default function Dashboard_data() {
       )
       .then((res) => {
         console.log("hourly real time data", res.data?.data);
-        setHourlyRealTimeData(res.data?.data);
+        if (res.data?.data) {
+          setHourlyRealTimeData(res.data?.data);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -266,11 +281,11 @@ export default function Dashboard_data() {
     series: [
       {
         name: "Total Amount",
-        data: hourlyAmounts,
+        data: cumulativeAmounts,
       },
       {
         name: "Total Receipts",
-        data: hourlyReceipts,
+        data: cumulativeReceipts,
       },
     ],
     toolbar: {
@@ -613,8 +628,8 @@ export default function Dashboard_data() {
                       <div
                         className={`w-full md:w-full  mr-4  flex flex-col items-center justify-center relative`}
                       >
-                        <span className="text-[#1dafc9] text-2xl font-bold">
-                          {new Date().toLocaleDateString()}
+                        <span>
+                          {currentDate}
                         </span>
                       </div>
                     </div>
