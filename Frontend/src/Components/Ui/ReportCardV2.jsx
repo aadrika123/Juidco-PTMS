@@ -34,15 +34,23 @@ const ReportCard = ({
 }) => {
 
   const [open, setOpen] = React.useState(false);
+  const [breakupData, setBreakupData] = React.useState([]);
+  const [breakupOpen, setBreakupOpen] = React.useState(false);
+
+  const breakupClickHandler = (data) => {
+    setBreakupData(data)
+    setBreakupOpen(prev => !prev)
+  }
 
   return (
     <>
-      {details && <BusDialog open={open} setOpen={setOpen} data={details} />}
+      {open && <BusDialog open={open} setOpen={setOpen} data={details} breakupClickHandler={breakupClickHandler} />}
+      {breakupOpen && <BreakupDialog open={breakupOpen} setOpen={setBreakupOpen} data={breakupData} />}
       {card_type == "conductor" ? (
 
         <div className="flex flex-col items-center bg-white p-0 shadow-sm rounded-md w-full">
           <div className="flex flex-row justify-end item-center bg-[#6366F1] w-full h-[20%]" >
-            <p className="text-2xl pr-4 text-white">₹{total_bus_collection}</p>
+            <p className="text-2xl pr-4 text-white">₹{total_bus_collection || 0}</p>
           </div>
           <div className="flex flex items-center gap-10 p-4 rounded-md w-full">
             <div className="flex flex-1 flex-col justify-between h-full ">
@@ -59,11 +67,11 @@ const ReportCard = ({
                   <h5 className="text-xl">{item?.bus_id}</h5>
                   <div>
                     <p>Date : <span className="font-normal">{new Date(item?.date).toLocaleDateString()}</span></p>
-                    {/* <p>Status : <span className="font-normal">{'Scheduled'}</span></p> */}
+                    <p>Status : <span className="font-normal">{item?.status}</span></p>
                   </div>
                   <button
-                    disabled
                     className="bg-[#6366F1] h-10 text-white mt-8 px-4 py-2 rounded-sm"
+                    onClick={() => { breakupClickHandler(item?.breakup) }}
                   >
                     <p>₹{item?.total_collection}</p>
                   </button>
@@ -202,7 +210,7 @@ const ReportCard = ({
                 <h5 className="text-xl">{item?.bus_id}</h5>
                 <div>
                   <p>Date : <span className="font-normal">{new Date(item?.date).toLocaleDateString()}</span></p>
-                  {/* <p>Status : <span className="font-normal">{'Scheduled'}</span></p> */}
+                  <p>Status : <span className="font-normal">{item?.status}</span></p>
                 </div>
                 <button
                   disabled
@@ -327,7 +335,7 @@ const BusCard = ({ bus_id, total_bus_collection, date, status }) => {
 };
 
 
-const BusDialog = ({ open, setOpen, data }) => {
+const BusDialog = ({ open, setOpen, data, breakupClickHandler }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -360,19 +368,64 @@ const BusDialog = ({ open, setOpen, data }) => {
         <DialogContent>
           <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
             {data?.map((item, index) => (
-              <Grid item xs={2} sm={4} md={4} key={index}>
-                <div key={index} className="flex flex-1 flex-col ">
-                  <h5 className="text-xl">{item?.bus_id}</h5>
-                  <div>
-                    <p>Date : <span className="font-normal">{new Date(item?.date).toLocaleDateString()}</span></p>
-                    {/* <p>Status : <span className="font-normal">{'Scheduled'}</span></p> */}
+              <>
+                <Grid item xs={2} sm={4} md={4} key={index}>
+                  <div key={index} className="flex flex-1 flex-col ">
+                    <h5 className="text-xl">{item?.bus_id}</h5>
+                    <div>
+                      <p>Date : <span className="font-normal">{new Date(item?.date).toLocaleDateString()}</span></p>
+                      <p>Status : <span className="font-normal">{'Scheduled'}</span></p>
+                    </div>
+                    <button
+                      className="bg-[#6366F1] h-10 text-white mt-8 px-4 py-2 rounded-sm"
+                      onClick={() => { breakupClickHandler(item?.breakup) }}
+                    >
+                      <p>₹{item?.total_collection}</p>
+                    </button>
                   </div>
-                  <button
-                    disabled
-                    className="bg-[#6366F1] h-10 text-white mt-8 px-4 py-2 rounded-sm"
-                  >
-                    <p>₹{item?.total_collection}</p>
-                  </button>
+                </Grid>
+              </>
+            ))}
+          </Grid>
+        </DialogContent>
+      </Dialog>
+    </React.Fragment>
+
+  )
+}
+
+const BreakupDialog = ({ open, setOpen, data }) => {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('lg'));
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <React.Fragment>
+      <Dialog
+        fullScreen={fullScreen}
+        maxWidth={'lg'}
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="responsive-dialog-title"
+      >
+        <div className="flex flex-row justify-between border-2">
+          <DialogTitle id="responsive-dialog-title">
+            {"Breakup Data"}
+          </DialogTitle>
+          <IconButton onClick={handleClose}><CloseIcon /></IconButton>
+        </div>
+        <DialogContent>
+          <h3 className="text-2xl mb-4">{data[0]?.bus_id}</h3>
+          <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+            {data?.map((item, index) => (
+              <Grid item xs={12} sm={4} md={3} key={index}>
+                <div key={index} className="flex flex-1 flex-col rounded-md border-2 p-4">
+                  <p><b>Amount</b> : <span className="font-normal">{item?.amount}</span></p>
+                  <p><b>Count</b> : <span className="font-normal">{item?.count}</span></p>
+                  <p><b>Sum</b> : <span className="font-normal">{item?.sum}</span></p>
                 </div>
               </Grid>
             ))}

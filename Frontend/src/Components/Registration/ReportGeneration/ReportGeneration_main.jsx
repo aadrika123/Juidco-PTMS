@@ -51,9 +51,9 @@ export default function ReportGeneration_main() {
     set_filterAllReport(!filterAllReport);
   }
 
-  const abc = () => {
-    console.log(report_all)
-  }
+  // const abc = () => {
+  //   console.log(report_all)
+  // }
 
   const onSubmit = async (values, rest) => {
     set_filterValues(values);
@@ -64,7 +64,7 @@ export default function ReportGeneration_main() {
       set_conductor_id(values.id);
       await axios
         .get(
-          `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?id=${values.id}&limit=10&page=1`,
+          `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?id=${values.id}&limit=10&page=1&from_date=${fromDate}&to_date=${toDate}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -469,10 +469,10 @@ export default function ReportGeneration_main() {
                       conductor_id={item?.cunique_id}
                       mobile_no={item?.mobile_no}
                       aadhar_no={item?.adhar_no}
-                      details={report?.result?.data}
+                      details={item?.bus_data}
                       fromDate={fromDate}
                       toDate={toDate}
-                      total_bus_collection={total_collection?.data[0]?.total_bus_collection}
+                      total_bus_collection={item?.receipt_data?.total_bus_collection}
                     />
                   ))}
                 </>
