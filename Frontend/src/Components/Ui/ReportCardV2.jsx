@@ -475,7 +475,7 @@ const BreakupDialog = ({ open, setOpen, data, card_type }) => {
           <IconButton onClick={handleClose}><CloseIcon /></IconButton>
         </div>
         <DialogContent>
-          <h3 className="text-2xl mb-4">{data[0]?.bus_id}</h3>
+          <h3 className="text-2xl mb-4">{card_type === 'conductor' ? data[0]?.bus_id : data[0]?.conductor_id}</h3>
           <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
             {data?.map((item, index) => (
               <Grid item key={index}>

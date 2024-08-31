@@ -111,11 +111,11 @@ class BusOnboarding {
             const date = new Date(bus?.date);
             const formattedDate = date.toISOString().split('T')[0];
             const receiptBreakup: any[] = await prisma.$queryRawUnsafe(`
-              select bus_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts
+              select conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts
               WHERE bus_id = '${item?.register_no}' 
               and conductor_id = '${bus?.conductor_id}' 
               AND date = '${formattedDate}'
-              group by bus_id, amount, date
+              group by conductor_id, amount, date
               ORDER BY date ASC
             `)
 

@@ -104,6 +104,7 @@ export default class OnBoardingBusServices {
 
       return CommonRes.SUCCESS("Successfully added the bus", data, resObj, res);
     } catch (err) {
+      console.log(err)
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
