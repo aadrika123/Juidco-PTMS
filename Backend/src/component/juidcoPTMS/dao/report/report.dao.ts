@@ -230,9 +230,13 @@ class ReportDao {
       `);
     }
 
+    // const startTime = Date.now();
     const [all_conductor] = await prisma.$transaction([
       prisma.$queryRawUnsafe<any[]>(qr_1, limit, offset),
     ]);
+    // const endTime = Date.now();
+    // const duration = endTime - startTime;
+    // console.log('duration',duration, 'ms')
 
     const all_conductor_data: any[] = [];
     if (all_conductor !== null) {

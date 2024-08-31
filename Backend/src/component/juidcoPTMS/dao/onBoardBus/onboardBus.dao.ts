@@ -55,6 +55,9 @@ class BusOnboarding {
     const limit: number = Number(req.query.limit);
     const search: string = String(req.query.search);
 
+    const from_date: string = String(req.query.from_date);
+    const to_date: string = String(req.query.to_date);
+
     const query: Prisma.bus_masterFindManyArgs = {
       skip: (page - 1) * limit,
       take: limit,
@@ -86,9 +89,53 @@ class BusOnboarding {
 
     // const data = await prisma.bus_master.findMany(query);
     const [data, count] = await prisma.$transaction([
-      prisma.bus_master.findMany(query),
+      prisma.bus_master.findMany(query) as any,
       prisma.bus_master.count(),
     ]);
+
+    await Promise.all(
+      data.map(async (item: any) => {
+        const busData: any[] = await prisma.$queryRawUnsafe(`
+          select bus_id, sum(amount)::INT as total_collection ,date, bm.status ,receipts.conductor_id 
+          from receipts 
+          LEFT JOIN bus_master as bm ON receipts.bus_id = bm.register_no
+          LEFT JOIN conductor_master as cm ON receipts.conductor_id = cm.cunique_id
+          where bus_id = '${item?.register_no}'
+          and date between '${from_date}' and '${to_date}'
+          group by bus_id, date, bm.status, receipts.conductor_id 
+          order by date ASC
+        `)
+
+        await Promise.all(
+          busData.map(async (bus: any) => {
+            const date = new Date(bus?.date);
+            const formattedDate = date.toISOString().split('T')[0];
+            const receiptBreakup: any[] = await prisma.$queryRawUnsafe(`
+              select conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts
+              WHERE bus_id = '${item?.register_no}' 
+              and conductor_id = '${bus?.conductor_id}' 
+              AND date = '${formattedDate}'
+              group by conductor_id, amount, date
+              ORDER BY date ASC
+            `)
+
+            bus.breakup = receiptBreakup
+
+          })
+        )
+
+        const receiptData: any[] = await prisma.$queryRawUnsafe(`
+          select sum(amount)::INT as total_bus_collection from receipts
+          where bus_id = '${item?.register_no}'
+          and date between '${from_date}' and '${to_date}'
+        `)
+
+        item.bus_data = busData
+        item.receipt_data = receiptData[0]
+
+      })
+    )
+
     return generateRes({ data, count, page, limit });
   };
 
