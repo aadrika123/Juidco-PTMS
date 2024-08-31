@@ -151,7 +151,7 @@ export default function ReportGeneration_main() {
 
       await axios
         .get(
-          `${process.env.REACT_APP_BASE_URL}/getAllBusList?id=${values.id}&limit=10&page=1`,
+          `${process.env.REACT_APP_BASE_URL}/getAllBusList?id=${values.id}&limit=10&page=1&from_date=${fromDate}&to_date=${toDate}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -461,6 +461,7 @@ export default function ReportGeneration_main() {
                 <>
                   {conductor_details?.data.map((item, index) => (
                     <ReportCard
+                      key={index}
                       card_type={"conductor"}
                       first_name={item?.first_name}
                       middle_name={item?.middle_name}
@@ -481,12 +482,21 @@ export default function ReportGeneration_main() {
               )}
 
               {bus_details?.data && bus_details.data[0]?.register_no ? (
-                <ReportCard
-                  card_type={"bus"}
-                  bus_id={bus_details.data[0]?.id}
-                  register_no={bus_details.data[0]?.register_no}
-                  vin_no={bus_details.data[0]?.vin_no}
-                />
+                <>
+                  {bus_details?.data.map((item, index) => (
+                    <ReportCard
+                      key={index}
+                      card_type={"bus"}
+                      bus_id={item?.id}
+                      register_no={item?.register_no}
+                      vin_no={item?.vin_no}
+                      details={item?.bus_data}
+                      fromDate={fromDate}
+                      toDate={toDate}
+                      total_bus_collection={item?.receipt_data?.total_bus_collection}
+                    />
+                  ))}
+                </>
               ) : null}
             </div>
             {conductor_details?.data ? (
@@ -516,32 +526,33 @@ export default function ReportGeneration_main() {
             )}
 
             {bus_details?.data ? (
-              <div
-                className={`flex flex-1 justify-center items-center  ${bus_total_collection?.data &&
-                  bus_total_collection.data[0].total_bus_collection
-                  ? "border bg-white shadow-lg rounded-lg"
-                  : ""
-                  } p-8  m-4`}
-              >
-                <div className="flex flex-1 flex-row ">
-                  <div className="flex flex-1">
-                    <div className="flex flex-col flex-1">
-                      <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
-                        {/* {total_collection.data[0].total_bus_collection}/- */}
-                        {bus_total_collection?.data &&
-                          bus_total_collection.data[0].total_bus_collection}
-                        /-
-                      </div>
-                      <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
-                        Total Amount of the Bus Collection
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-1">
-                    <img src={busstop} className="flex ml-4 w-24 h-24" />
-                  </div>
-                </div>
-              </div>
+              // <div
+              //   className={`flex flex-1 justify-center items-center  ${bus_total_collection?.data &&
+              //     bus_total_collection.data[0].total_bus_collection
+              //     ? "border bg-white shadow-lg rounded-lg"
+              //     : ""
+              //     } p-8  m-4`}
+              // >
+              //   <div className="flex flex-1 flex-row ">
+              //     <div className="flex flex-1">
+              //       <div className="flex flex-col flex-1">
+              //         <div className="flex flex-1 text-4xl font-bold text-[#12CA46] justify-center items-centers text-center">
+              //           {/* {total_collection.data[0].total_bus_collection}/- */}
+              //           {bus_total_collection?.data &&
+              //             bus_total_collection.data[0].total_bus_collection}
+              //           /-
+              //         </div>
+              //         <div className="flex flex-1 text-lg font-bold text-gray-500 mt-2 justify-center items-centers text-center">
+              //           Total Amount of the Bus Collection
+              //         </div>
+              //       </div>
+              //     </div>
+              //     <div className="flex flex-1">
+              //       <img src={busstop} className="flex ml-4 w-24 h-24" />
+              //     </div>
+              //   </div>
+              // </div>
+              <></>
             ) : (
               <></>
             )}
@@ -741,58 +752,59 @@ export default function ReportGeneration_main() {
               // </div>
               <></>
             ) : (
-              <div className="flex flex-1 flex-wrap m-4">
-                {filterValues?.reportType === "bus" &&
-                  bus_report?.result?.data.length !== 0 ? (
-                  bus_report?.result?.data.map((bus) => (
-                    <div className="flex flex-1 flex-col">
-                      <div
-                        key={bus.id}
-                        onClick={() =>
-                          handle_dialog_busUid(
-                            bus.bus_id,
-                            formatDate(bus.date),
-                            bus.total_collection
-                          )
-                        }
-                        className="flex flex-col h-[180px] w-[180px] m-4 rounded-md border-2 justify-center items-center border-blue-400 bg-white"
-                      >
-                        {/*
-                         */}{" "}
-                        <div className="flex flex-1 flex-col justify-center items-center m-4">
-                          <img
-                            src={busstop}
-                            style={{ translate: "transform(-50%,-50%)" }}
-                            className="flex ml-4 w-14 h-14"
-                          />
-                          <div className="text-[#6D63E8]">
-                            Bus: {bus.bus_id}
-                          </div>
-                          <div className="flex flex-col text-black">
-                            <div className="flex">
-                              Amount:{" "}
-                              <span className="ml-2 text-[#2CA70D]">
-                                {bus.total_collection}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
-                            Date: {formatDate(bus.date)}
-                          </div>
-                          <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
-                            Status: {bus.status}
-                          </div>
-                        </div>
-                        {/* </Link> */}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex flex-1 justify-center items-center text-gray-500 font-bold">
-                    No data Found
-                  </div>
-                )}
-              </div>
+              // <div className="flex flex-1 flex-wrap m-4">
+              //   {filterValues?.reportType === "bus" &&
+              //     bus_report?.result?.data.length !== 0 ? (
+              //     bus_report?.result?.data.map((bus) => (
+              //       <div className="flex flex-1 flex-col">
+              //         <div
+              //           key={bus.id}
+              //           onClick={() =>
+              //             handle_dialog_busUid(
+              //               bus.bus_id,
+              //               formatDate(bus.date),
+              //               bus.total_collection
+              //             )
+              //           }
+              //           className="flex flex-col h-[180px] w-[180px] m-4 rounded-md border-2 justify-center items-center border-blue-400 bg-white"
+              //         >
+              //           {/*
+              //            */}{" "}
+              //           <div className="flex flex-1 flex-col justify-center items-center m-4">
+              //             <img
+              //               src={busstop}
+              //               style={{ translate: "transform(-50%,-50%)" }}
+              //               className="flex ml-4 w-14 h-14"
+              //             />
+              //             <div className="text-[#6D63E8]">
+              //               Bus: {bus.bus_id}
+              //             </div>
+              //             <div className="flex flex-col text-black">
+              //               <div className="flex">
+              //                 Amount:{" "}
+              //                 <span className="ml-2 text-[#2CA70D]">
+              //                   {bus.total_collection}
+              //                 </span>
+              //               </div>
+              //             </div>
+              //             <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
+              //               Date: {formatDate(bus.date)}
+              //             </div>
+              //             <div className="flex flex-1 text-xs text-gray-400 justify-start items-start">
+              //               Status: {bus.status}
+              //             </div>
+              //           </div>
+              //           {/* </Link> */}
+              //         </div>
+              //       </div>
+              //     ))
+              //   ) : (
+              //     <div className="flex flex-1 justify-center items-center text-gray-500 font-bold">
+              //       No data Found
+              //     </div>
+              //   )}
+              // </div>
+              <></>
             )}
             {/* {report_type === "" ? (
               <></>
@@ -813,7 +825,7 @@ export default function ReportGeneration_main() {
             )} */}
           </div>
         </div>
-      </div>
+      </div >
 
       <Dialog
         open={openDialog}

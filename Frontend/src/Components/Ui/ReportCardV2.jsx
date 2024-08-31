@@ -44,8 +44,8 @@ const ReportCard = ({
 
   return (
     <>
-      {open && <BusDialog open={open} setOpen={setOpen} data={details} breakupClickHandler={breakupClickHandler} />}
-      {breakupOpen && <BreakupDialog open={breakupOpen} setOpen={setBreakupOpen} data={breakupData} />}
+      {open && <BusDialog open={open} setOpen={setOpen} data={details} breakupClickHandler={breakupClickHandler} card_type={card_type} />}
+      {breakupOpen && <BreakupDialog open={breakupOpen} setOpen={setBreakupOpen} data={breakupData} card_type={card_type} />}
       {card_type == "conductor" ? (
 
         <div className="flex flex-col items-center bg-white p-0 shadow-sm rounded-md w-full">
@@ -179,20 +179,77 @@ const ReportCard = ({
         //   </div>
         // </div>
       ) : card_type === "bus" ? (
-        <div className="flex flex-1 flex-col ">
-          <div className="flex mt-5 flex-row">
-            <div className="flex font-bold">Id:</div>
-            <div className="flex ml-4">{bus_id}</div>
+
+        <div className="flex flex-col items-center bg-white p-0 shadow-sm rounded-md w-full min-h-[13rem]">
+          <div className="flex flex-row justify-end item-center bg-[#6366F1] w-full h-[20%]" >
+            <p className="text-2xl pr-4 text-white">₹{total_bus_collection || 0}</p>
           </div>
-          <div className="flex mt-5 flex-row">
-            <div className="flex font-bold">Registration Number :</div>
-            <div className="flex ml-4">{register_no}</div>
-          </div>
-          <div className="flex mt-5 flex-row">
-            <div className="flex font-bold">VIN Number:</div>
-            <div className="flex ml-4">{vin_no}</div>
+          <div className="flex flex items-center gap-10 p-4 rounded-md w-full h-full">
+            <div className="flex flex-1 flex-col justify-start h-full ">
+              <p><b>Registration No. </b>: <span className="font-normal">{register_no}</span></p>
+              <p><b>VIN/Chassis No.</b> : <span className="font-normal">{vin_no}</span></p>
+            </div>
+
+            <div className="flex flex-1 justify-end gap-8 items-center ">
+              {details.length !== 0 ? details?.slice(0, 2).map((item, index) => (
+                <div key={index} className="flex flex-1 flex-col ">
+                  <h5 className="text-xl">{item?.conductor_id}</h5>
+                  <div>
+                    <p>Date : <span className="font-normal">{new Date(item?.date).toLocaleDateString()}</span></p>
+                    <p>Status : <span className="font-normal">{item?.status}</span></p>
+                  </div>
+                  <button
+                    className="bg-[#6366F1] h-10 text-white mt-8 px-4 py-2 rounded-sm"
+                    onClick={() => { breakupClickHandler(item?.breakup) }}
+                  >
+                    <p>₹{item?.total_collection}</p>
+                  </button>
+                </div>
+              )) : (
+                <div className="flex flex-1 flex-col ">
+                  <h5 className="text-3xl">No Data</h5>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col justify-between h-full items-end h-full">
+              <Link
+                to={`/ReportBus_recipt/${register_no}/${fromDate}/${toDate}`}
+                className="font-bold"
+              >
+                See All Recipts{" "}
+              </Link>
+              <Button
+                variant="contained"
+                sx={{
+                  borderRadius: '50%',
+                  aspectRatio: 1 / 1,
+                  width: '40px',
+                  height: '40px',
+                  minWidth: '0',
+                }}
+                onClick={() => { setOpen(true) }}
+              >
+                <ArrowForwardIcon />
+              </Button>
+            </div>
           </div>
         </div>
+
+        // <div className="flex flex-1 flex-col ">
+        //   <div className="flex mt-5 flex-row">
+        //     <div className="flex font-bold">Id:</div>
+        //     <div className="flex ml-4">{bus_id}</div>
+        //   </div>
+        //   <div className="flex mt-5 flex-row">
+        //     <div className="flex font-bold">Registration Number :</div>
+        //     <div className="flex ml-4">{register_no}</div>
+        //   </div>
+        //   <div className="flex mt-5 flex-row">
+        //     <div className="flex font-bold">VIN Number:</div>
+        //     <div className="flex ml-4">{vin_no}</div>
+        //   </div>
+        // </div>
       ) : (
 
         <div className="flex items-center gap-10 bg-white p-4 shadow-sm rounded-md w-full">
@@ -335,7 +392,7 @@ const BusCard = ({ bus_id, total_bus_collection, date, status }) => {
 };
 
 
-const BusDialog = ({ open, setOpen, data, breakupClickHandler }) => {
+const BusDialog = ({ open, setOpen, data, breakupClickHandler, card_type }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -369,9 +426,9 @@ const BusDialog = ({ open, setOpen, data, breakupClickHandler }) => {
           <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
             {data?.map((item, index) => (
               <>
-                <Grid item xs={2} sm={4} md={4} key={index}>
+                <Grid item key={index}>
                   <div key={index} className="flex flex-1 flex-col ">
-                    <h5 className="text-xl">{item?.bus_id}</h5>
+                    <h5 className="text-xl">{card_type === 'conductor' ? item?.bus_id : item?.conductor_id}</h5>
                     <div>
                       <p>Date : <span className="font-normal">{new Date(item?.date).toLocaleDateString()}</span></p>
                       <p>Status : <span className="font-normal">{'Scheduled'}</span></p>
@@ -394,7 +451,7 @@ const BusDialog = ({ open, setOpen, data, breakupClickHandler }) => {
   )
 }
 
-const BreakupDialog = ({ open, setOpen, data }) => {
+const BreakupDialog = ({ open, setOpen, data, card_type }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -421,7 +478,7 @@ const BreakupDialog = ({ open, setOpen, data }) => {
           <h3 className="text-2xl mb-4">{data[0]?.bus_id}</h3>
           <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
             {data?.map((item, index) => (
-              <Grid item xs={12} sm={4} md={3} key={index}>
+              <Grid item key={index}>
                 <div key={index} className="flex flex-1 flex-col rounded-md border-2 p-4">
                   <p><b>Amount</b> : <span className="font-normal">{item?.amount}</span></p>
                   <p><b>Count</b> : <span className="font-normal">{item?.count}</span></p>

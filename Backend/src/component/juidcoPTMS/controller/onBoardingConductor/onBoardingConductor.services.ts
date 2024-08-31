@@ -92,6 +92,7 @@ export default class OnBoardingConductorServices {
         res
       );
     } catch (err) {
+      console.log(err)
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
