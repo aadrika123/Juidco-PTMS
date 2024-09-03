@@ -1,18 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import busstop from "../../../assets/bus-stop.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { Button, FormControlLabel, Radio, RadioGroup } from "@mui/material";
+import { Button, FormControlLabel, Radio, RadioGroup, CircularProgress, Box } from "@mui/material";
 import { Dialog, DialogContent, DialogActions } from "@mui/material";
 import Cookies from "js-cookie";
 // import { ReportCard, BusCard } from "../../Ui/ReportCard";
 import { ReportCard, BusCard } from "../../Ui/ReportCardV2";
 import DownloadReport from "../../Ui/DownloadReport";
+import Paginator from "../../Ui/Paginator";
+
 export default function ReportGeneration_main() {
   const token = Cookies.get("accesstoken");
   const navigate = useNavigate();
+
+  const formikRef = useRef(null)
+  const topRef = useRef(null);
+
+  const scrollToTop = () => {
+    topRef.current.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const initialValues = {
     reportType: "",
@@ -47,6 +56,10 @@ export default function ReportGeneration_main() {
   const [filterAllReport, set_filterAllReport] = useState([]);
   const [downloadReportPopup, setDownloadReportPopup] = useState(false);
 
+  const [page, setPage] = useState(1);
+  const [totalCount, setToalCount] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
   function filterAllReportData() {
     set_filterAllReport(!filterAllReport);
   }
@@ -62,9 +75,11 @@ export default function ReportGeneration_main() {
     set_report_type(values.reportType);
     if (values.reportType === "conductor") {
       set_conductor_id(values.id);
+      setIsLoading(true)
+      scrollToTop()
       await axios
         .get(
-          `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?id=${values.id}&limit=10&page=1&from_date=${fromDate}&to_date=${toDate}`,
+          `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?id=${values.id}&limit=10&page=${page}&from_date=${values.fromDate}&to_date=${values.toDate}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -74,9 +89,14 @@ export default function ReportGeneration_main() {
         .then((response) => {
           console.log(response.data.data);
           set_conductor_details(response.data.data);
+          setToalCount(Math.ceil(response?.data?.data?.count / 10))
+          setIsLoading(false)
         })
         .catch((error) => {
           console.log(error);
+        })
+        .finally(() => {
+          setIsLoading(false)
         });
 
       await axios
@@ -151,7 +171,7 @@ export default function ReportGeneration_main() {
 
       await axios
         .get(
-          `${process.env.REACT_APP_BASE_URL}/getAllBusList?id=${values.id}&limit=10&page=1&from_date=${fromDate}&to_date=${toDate}`,
+          `${process.env.REACT_APP_BASE_URL}/getAllBusList?id=${values.id}&limit=10&page=1&from_date=${values.fromDate}&to_date=${values.toDate}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -161,9 +181,14 @@ export default function ReportGeneration_main() {
         .then((response) => {
           console.log("Bus details", response.data.data);
           set_bus_details(response.data.data);
+          setToalCount(Math.ceil(response?.data?.data?.count / 10))
+          setIsLoading(false)
         })
         .catch((error) => {
           console.log(error);
+        })
+        .finally(() => {
+          setIsLoading(false)
         });
 
       await axios
@@ -193,6 +218,12 @@ export default function ReportGeneration_main() {
       return window.alert("Please select the Report Type");
     }
   };
+
+  useEffect(() => {
+    if (conductor_details || bus_details) {
+      formikRef.current.submitForm()
+    }
+  }, [page])
 
   // fetch all report data
   useEffect(() => {
@@ -242,7 +273,7 @@ export default function ReportGeneration_main() {
 
   return (
     <>
-      <div className="flex flex-1 overflow-auto">
+      <div ref={topRef} className="flex flex-1 overflow-auto">
         <div className="flex flex-col flex-1 bg-[#F9FAFC]">
           <div className="flex h-10 justify-between items-center">
             <div className="flex ml-4 ">
@@ -294,6 +325,7 @@ export default function ReportGeneration_main() {
               </div>
               <div className="flex justofy-between flex-1">
                 <Formik
+                  innerRef={formikRef}
                   initialValues={initialValues}
                   validationSchema={validationSchema}
                   onSubmit={onSubmit}
@@ -456,6 +488,11 @@ export default function ReportGeneration_main() {
               {/* <button onClick={() => {
                 console.log('totaaaaa', conductor_details)
               }}>abc</button> */}
+              {isLoading && (
+                <Box sx={{ display: 'flex', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                  <CircularProgress />
+                </Box>
+              )}
               {conductor_details?.data &&
                 conductor_details.data[0]?.first_name ? (
                 <>
@@ -824,6 +861,8 @@ export default function ReportGeneration_main() {
               </Link>
             )} */}
           </div>
+          {/* <Pagination count={10} /> */}
+          <Paginator page={page} setPage={setPage} totalCount={totalCount} />
         </div>
       </div >
 

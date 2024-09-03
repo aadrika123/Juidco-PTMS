@@ -87,6 +87,14 @@ class BusOnboarding {
       };
     }
 
+    query.orderBy = [
+      {
+        receipts: {
+          _count: 'desc'
+        }
+      }
+    ]
+
     // const data = await prisma.bus_master.findMany(query);
     const [data, count] = await prisma.$transaction([
       prisma.bus_master.findMany(query) as any,

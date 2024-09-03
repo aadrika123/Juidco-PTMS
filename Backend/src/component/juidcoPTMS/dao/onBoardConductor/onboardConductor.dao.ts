@@ -121,6 +121,15 @@ class ConductorOnBoarding {
         ],
       };
     }
+
+    query.orderBy = [
+      {
+        receipts: {
+          _count: 'desc'
+        }
+      }
+    ]
+
     const [data, count] = await prisma.$transaction([
       prisma.conductor_master.findMany(query) as any,
       prisma.conductor_master.count(),
