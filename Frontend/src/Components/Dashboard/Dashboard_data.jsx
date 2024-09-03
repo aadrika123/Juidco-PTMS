@@ -254,7 +254,7 @@ export default function Dashboard_data() {
   //   },
   // };
 
-  const reaclTimeCollectionOptions = {
+  const realTimeCollectionOptions = {
     chart: {
       type: "line",
       toolbar: {
@@ -272,8 +272,16 @@ export default function Dashboard_data() {
     xaxis: {
       categories: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22],
     },
+    // legend: {
+    //   show: false,
+    // },
     legend: {
-      show: false,
+      show: true,
+      position: 'bottom',
+      horizontalAlign: 'center',
+      labels: {
+        useSeriesColors: true // Use the colors defined in the series
+      }
     },
     dataLabels: {
       enabled: false,
@@ -315,23 +323,29 @@ export default function Dashboard_data() {
         endingShape: "rounded",
       },
     },
+
     colors: ["#00599C", "#1A91C1", "#01D8FF", "#00599C"],
     xaxis: {
       categories: categories,
     },
     legend: {
-      show: false,
+      show: true,
+      position: 'bottom',
+      horizontalAlign: 'center',
+      labels: {
+        useSeriesColors: true // Use the colors defined in the series
+      }
     },
     dataLabels: {
       enabled: false,
     },
     series: [
       {
-        name: "Real Time Collection",
+        name: "Total amount",
         data: seriesData,
       },
       {
-        name: "Real Time Receipt",
+        name: "Total bill cut",
         data: realTimeReceipt,
       },
     ],
@@ -628,7 +642,7 @@ export default function Dashboard_data() {
                       <div
                         className={`w-full md:w-full  mr-4  flex flex-col items-center justify-center relative`}
                       >
-                        <span>
+                        <span className="text-sm">
                           {currentDate}
                         </span>
                       </div>
@@ -639,8 +653,8 @@ export default function Dashboard_data() {
                 <div className="w-full flex flex-col sm:flex-row justify-between">
                   <div className={` m-1 flex flex-col relative p-5 w-full`}>
                     <ApexChart
-                      options={reaclTimeCollectionOptions}
-                      series={reaclTimeCollectionOptions.series}
+                      options={realTimeCollectionOptions}
+                      series={realTimeCollectionOptions.series}
                       type="line"
                       height={265}
                       width={"100%"}
