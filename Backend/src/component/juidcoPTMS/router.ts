@@ -7,6 +7,7 @@ import OnBoardingConductorRoute from "./route/onBoardingConductor/onBoardingCond
 import UploadImgRoute from "./route/uploadImage/uploadImg.route";
 import BusConductorScheduleRoute from "./route/busConductorSchedule/busConductorSchedule.route";
 import ConductorReportRoute from "./route/conductorReport/conductorReport.route";
+import ExportRoute from "./route/export/export.route";
 // import BusGenerateReportServices from "./controller/reportGeneration/busReport.services";
 import BusReportRoute from "./route/busReport/busReport.route";
 
@@ -37,5 +38,6 @@ export default class PtmsRoute {
     new BusConductorScheduleRoute(app);
     new ConductorReportRoute(app);
     new BusReportRoute(app);
+    new ExportRoute(app);
   }
 }

@@ -6,6 +6,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Button, FormControlLabel, Radio, RadioGroup, CircularProgress, Box } from "@mui/material";
 import { Dialog, DialogContent, DialogActions } from "@mui/material";
+import DownloadIcon from '@mui/icons-material/Download';
 import Cookies from "js-cookie";
 // import { ReportCard, BusCard } from "../../Ui/ReportCard";
 import { ReportCard, BusCard } from "../../Ui/ReportCardV2";
@@ -271,6 +272,29 @@ export default function ReportGeneration_main() {
     setOpenDialog(true);
   };
 
+  const handleExport = async () => {
+    if (report_type) {
+      await axios
+        .get(
+          `${process.env.REACT_APP_BASE_URL}/common/export`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          setIsLoading(false)
+        });
+    }
+  }
+
   return (
     <>
       <div ref={topRef} className="flex flex-1 overflow-auto">
@@ -320,8 +344,17 @@ export default function ReportGeneration_main() {
               <img src={busstop} className="ml-4 w-14 h-14" />
             </div>
             <div className="flex flex-1 ml-4 h-fit flex-col">
-              <div className="flex mb-4 ml-2 text-xl font-semibold">
+              <div className="flex flex-row justify-between 2 mb-4 ml-2 text-xl font-semibold">
                 Search Filter
+                {report_type && (
+                  <button
+                    className="bg-[#6366F1] text-white p-2 rounded-md"
+                    onClick={handleExport}
+                  >
+                    Export {report_type === 'bus' ? 'bus list' : 'conductor list'} {' '}
+                    <DownloadIcon />
+                  </button>
+                )}
               </div>
               <div className="flex justofy-between flex-1">
                 <Formik
@@ -349,6 +382,7 @@ export default function ReportGeneration_main() {
                             value={values.reportType}
                             onChange={(e) => {
                               setFieldValue("reportType", e.target.value);
+                              set_report_type(e.target.value)
                             }}
                           >
                             <FormControlLabel
@@ -493,7 +527,7 @@ export default function ReportGeneration_main() {
                   <CircularProgress />
                 </Box>
               )}
-              {conductor_details?.data &&
+              {(conductor_details?.data && report_type === 'conductor' && !isLoading) &&
                 conductor_details.data[0]?.first_name ? (
                 <>
                   {conductor_details?.data.map((item, index) => (
@@ -518,7 +552,7 @@ export default function ReportGeneration_main() {
                 <></>
               )}
 
-              {bus_details?.data && bus_details.data[0]?.register_no ? (
+              {(bus_details?.data && bus_details.data[0]?.register_no && report_type === 'bus' && !isLoading) ? (
                 <>
                   {bus_details?.data.map((item, index) => (
                     <ReportCard
