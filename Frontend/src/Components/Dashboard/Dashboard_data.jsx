@@ -42,6 +42,7 @@ export default function Dashboard_data() {
     buffer = buffer + item
     return buffer
   })
+  const hourlyReceiptsSum = hourlyReceipts.reduce((sum, item) => sum + item, 0)
 
   const hourlyAmounts = hourlyRealTimeData.map(item => item?.total_amount)
   let amountBuffer = 0
@@ -49,6 +50,7 @@ export default function Dashboard_data() {
     amountBuffer = amountBuffer + item
     return amountBuffer
   })
+  const hourlyAmountsSum = hourlyAmounts.reduce((sum, item) => sum + item, 0)
 
 
   // Conductor Status Table
@@ -647,6 +649,28 @@ export default function Dashboard_data() {
                         </span>
                       </div>
                     </div>
+                  </div>
+                </div>
+                <div className="w-full flex justify-end ">
+                  <div
+                    className={` mr-4  flex flex-col items-center justify-center `}
+                  >
+                    <span className="text-[#095ea4] text-2xl font-bold">
+                      ₹{hourlyReceiptsSum}
+                    </span>
+                    <h4 className="text-center text-xs whitespace-nowrap">
+                      Total bill cut
+                    </h4>
+                  </div>
+                  <div
+                    className={` mr-4  flex flex-col items-center justify-center `}
+                  >
+                    <span className="text-[#095ea4] text-2xl font-bold">
+                      ₹{hourlyAmountsSum}
+                    </span>
+                    <h4 className="text-center text-xs whitespace-nowrap">
+                      Total Amount
+                    </h4>
                   </div>
                 </div>
 
