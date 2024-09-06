@@ -1,6 +1,6 @@
 import { json2csv } from 'json-2-csv'
 
-const csvGenerator = (jsonData: any) => {
+const csvGenerator = (jsonData) => {
     try {
         const csvData = json2csv(jsonData)
         return csvData
