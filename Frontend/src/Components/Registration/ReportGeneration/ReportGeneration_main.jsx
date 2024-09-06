@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { Button, FormControlLabel, Radio, RadioGroup, CircularProgress, Box } from "@mui/material";
+import { Button, FormControlLabel, Radio, RadioGroup, CircularProgress, Box, Menu, MenuItem } from "@mui/material";
 import { Dialog, DialogContent, DialogActions } from "@mui/material";
 import DownloadIcon from '@mui/icons-material/Download';
 import Cookies from "js-cookie";
@@ -13,6 +13,7 @@ import { ReportCard, BusCard } from "../../Ui/ReportCardV2";
 import DownloadReport from "../../Ui/DownloadReport";
 import Paginator from "../../Ui/Paginator";
 import csvGenerator from "../../../utils/csvGenerator";
+import DownloadReportV2 from "../../Ui/DownloadReportV2";
 
 export default function ReportGeneration_main() {
   const token = Cookies.get("accesstoken");
@@ -57,10 +58,20 @@ export default function ReportGeneration_main() {
 
   const [filterAllReport, set_filterAllReport] = useState([]);
   const [downloadReportPopup, setDownloadReportPopup] = useState(false);
+  const [exportData, setExportData] = useState([]);
 
   const [page, setPage] = useState(1);
   const [totalCount, setToalCount] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const currentDate = new Date()
 
@@ -275,7 +286,7 @@ export default function ReportGeneration_main() {
     setOpenDialog(true);
   };
 
-  const handleExport = async () => {
+  const handleExport = async (exportType) => {
     if (report_type) {
       await axios
         .get(
@@ -287,14 +298,19 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          const exportData = csvGenerator(response?.data?.data)
-          const url = window.URL.createObjectURL(new Blob([exportData]));
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `${report_type}${currentDate.getDate()}${currentDate.getMonth()}${currentDate.getFullYear()}.csv`;
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
+          if (exportType === 'csv') {
+            const exportData = csvGenerator(response?.data?.data)
+            const url = window.URL.createObjectURL(new Blob([exportData]));
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${report_type}${currentDate.getDate()}${currentDate.getMonth()}${currentDate.getFullYear()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+          } else {
+            setDownloadReportPopup(true)
+            setExportData(response?.data?.data)
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -357,13 +373,37 @@ export default function ReportGeneration_main() {
               <div className="flex flex-row justify-between 2 mb-4 ml-2 text-xl font-semibold">
                 Search Filter
                 {report_type && (
-                  <button
-                    className="bg-[#6366F1] text-white p-2 rounded-md"
-                    onClick={handleExport}
-                  >
-                    Export {report_type === 'bus' ? 'bus list' : 'conductor list'} {' '}
-                    <DownloadIcon />
-                  </button>
+                  // <button
+                  //   className="bg-[#6366F1] text-white p-2 rounded-md"
+                  //   onClick={() => handleExport('pdf')}
+                  // >
+                  //   Export {report_type === 'bus' ? 'bus list' : 'conductor list'} {' '}
+                  //   <DownloadIcon />
+                  // </button>
+                  <>
+                    <Button
+                      id="basic-button"
+                      aria-controls={open ? 'basic-menu' : undefined}
+                      aria-haspopup="true"
+                      aria-expanded={open ? 'true' : undefined}
+                      onClick={handleClick}
+                      variant="outlined"
+                    >
+                      Export {report_type}
+                    </Button>
+                    <Menu
+                      id="basic-menu"
+                      anchorEl={anchorEl}
+                      open={open}
+                      onClose={handleClose}
+                      MenuListProps={{
+                        'aria-labelledby': 'basic-button',
+                      }}
+                    >
+                      <MenuItem onClick={() => { handleClose(); handleExport('csv') }}>CSV</MenuItem>
+                      <MenuItem onClick={() => { handleClose(); handleExport('pdf') }}>PDF</MenuItem>
+                    </Menu>
+                  </>
                 )}
               </div>
               <div className="flex justofy-between flex-1">
@@ -719,9 +759,10 @@ export default function ReportGeneration_main() {
               </button>
             </div> */}
             {downloadReportPopup && (
-              <DownloadReport
-                reports={report_all}
+              <DownloadReportV2
+                reports={exportData}
                 closePopup={setDownloadReportPopup}
+                report_type={report_type}
               />
             )}
             {report_type === "" ? (
