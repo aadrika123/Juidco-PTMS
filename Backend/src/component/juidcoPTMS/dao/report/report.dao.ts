@@ -213,9 +213,16 @@ class ReportDao {
       `;
     };
 
+    // const qr_func_2 = (conductor_id?: string, condition?: string) => {
+    //   return `
+    //     select receipts.* , conductor.* as conductor from receipts
+    //     JOIN conductor_master as conductor ON receipts.conductor_id = conductor.cunique_id
+    //     where receipts.conductor_id = '${conductor_id}' ${condition || ""};
+    //   `;
+    // };
     const qr_func_2 = (conductor_id?: string, condition?: string) => {
       return `
-        select receipts.* , conductor.* as conductor from receipts
+        select receipts.* , conductor.first_name, conductor.last_name, conductor.age, conductor.mobile_no, conductor.emergency_mob_no, conductor.email_id  from receipts
         JOIN conductor_master as conductor ON receipts.conductor_id = conductor.cunique_id
         where receipts.conductor_id = '${conductor_id}' ${condition || ""};
       `;

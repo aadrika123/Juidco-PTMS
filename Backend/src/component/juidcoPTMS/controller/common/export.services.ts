@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import CommonRes from "../../../../util/helper/commonResponse";
 import { PrismaClient } from "@prisma/client";
 import { resObj } from "../../../../util/types";
-import csvGenerator from "../../../../util/csvGenerator";
 import { resMessage } from "../../../../util/common";
 
 export default class ExportServices {
@@ -64,9 +63,12 @@ export default class ExportServices {
             }
           }
         })
-        res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', 'attachment; filename="exported_data.csv"');
-        res.status(200).send(csvGenerator(dataToExport));
+        return CommonRes.SUCCESS(
+          resMessage("export data fetched successfully").FOUND,
+          dataToExport,
+          resObj,
+          res
+        );
       } else {
         return CommonRes.NOT_FOUND(
           resMessage("No data found").FOUND,

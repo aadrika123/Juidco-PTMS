@@ -12,6 +12,7 @@ import Cookies from "js-cookie";
 import { ReportCard, BusCard } from "../../Ui/ReportCardV2";
 import DownloadReport from "../../Ui/DownloadReport";
 import Paginator from "../../Ui/Paginator";
+import csvGenerator from "../../../utils/csvGenerator";
 
 export default function ReportGeneration_main() {
   const token = Cookies.get("accesstoken");
@@ -60,6 +61,8 @@ export default function ReportGeneration_main() {
   const [page, setPage] = useState(1);
   const [totalCount, setToalCount] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+
+  const currentDate = new Date()
 
   function filterAllReportData() {
     set_filterAllReport(!filterAllReport);
@@ -276,7 +279,7 @@ export default function ReportGeneration_main() {
     if (report_type) {
       await axios
         .get(
-          `${process.env.REACT_APP_BASE_URL}/common/export`,
+          `${process.env.REACT_APP_BASE_URL}/common/export${report_type === 'conductor' ? '?type=conductor' : '?type=bus'}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -284,7 +287,14 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          console.log(response);
+          const exportData = csvGenerator(response?.data?.data)
+          const url = window.URL.createObjectURL(new Blob([exportData]));
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${report_type}${currentDate.getDate()}${currentDate.getMonth()}${currentDate.getFullYear()}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
         })
         .catch((error) => {
           console.log(error);
