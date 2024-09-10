@@ -10,6 +10,7 @@ import ConductorReportRoute from "./route/conductorReport/conductorReport.route"
 import ExportRoute from "./route/export/export.route";
 // import BusGenerateReportServices from "./controller/reportGeneration/busReport.services";
 import BusReportRoute from "./route/busReport/busReport.route";
+import PrimeDashboardRoute from "./route/primeDashboard/primeDashboard.route";
 
 // const app = express();
 
@@ -39,5 +40,6 @@ export default class PtmsRoute {
     new ConductorReportRoute(app);
     new BusReportRoute(app);
     new ExportRoute(app);
+    new PrimeDashboardRoute(app);
   }
 }
