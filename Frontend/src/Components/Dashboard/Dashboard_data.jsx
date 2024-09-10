@@ -656,20 +656,20 @@ export default function Dashboard_data() {
                     className={` mr-4  flex flex-col items-center justify-center `}
                   >
                     <span className="text-[#095ea4] text-2xl font-bold">
-                      ₹{hourlyReceiptsSum}
+                      ₹{hourlyAmountsSum}
                     </span>
                     <h4 className="text-center text-xs whitespace-nowrap">
-                      Total bill cut
+                      Total Amount
                     </h4>
                   </div>
                   <div
                     className={` mr-4  flex flex-col items-center justify-center `}
                   >
                     <span className="text-[#095ea4] text-2xl font-bold">
-                      ₹{hourlyAmountsSum}
+                      {hourlyReceiptsSum}
                     </span>
                     <h4 className="text-center text-xs whitespace-nowrap">
-                      Total Amount
+                      Total bill cut
                     </h4>
                   </div>
                 </div>
