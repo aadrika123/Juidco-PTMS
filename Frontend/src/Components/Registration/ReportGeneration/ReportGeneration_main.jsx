@@ -241,30 +241,30 @@ export default function ReportGeneration_main() {
   }, [page])
 
   // fetch all report data
-  useEffect(() => {
-    const fetchReport = async () => {
-      await axios
-        .post(
-          `${process.env.REACT_APP_BASE_URL}/report/all?limit=10&page=1`,
-          {
-            from_date: fromDate,
-            to_date: toDate,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((response) => {
-          set_report_all(response?.data?.data?.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    };
-    fetchReport();
-  }, [filterAllReport]);
+  // useEffect(() => {
+  //   const fetchReport = async () => {
+  //     await axios
+  //       .post(
+  //         `${process.env.REACT_APP_BASE_URL}/report/all?limit=10&page=1`,
+  //         {
+  //           from_date: fromDate,
+  //           to_date: toDate,
+  //         },
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //         }
+  //       )
+  //       .then((response) => {
+  //         set_report_all(response?.data?.data?.data);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       });
+  //   };
+  //   fetchReport();
+  // }, [filterAllReport]);
 
   const formatDate = (dateString) => {
     const options = {
@@ -783,7 +783,7 @@ export default function ReportGeneration_main() {
                         toDate={toDate}
                       /> */}
                       {/* <button onClick={abc}>abc</button> */}
-                      <ReportCard
+                      {/* <ReportCard
                         first_name={report?.data?.first_name}
                         middle_name={report?.data?.middle_name}
                         last_name={report?.data?.last_name}
@@ -795,7 +795,7 @@ export default function ReportGeneration_main() {
                         fromDate={fromDate}
                         toDate={toDate}
                         details={report?.data?.details}
-                      />
+                      /> */}
 
                       {/* <div className="grid grid-cols-2">
                         {report?.data?.details

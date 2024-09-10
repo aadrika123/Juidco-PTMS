@@ -83,8 +83,8 @@ class ConductorOnBoarding {
     const limit: number = Number(req.query.limit);
     const search: string = String(req.query.search);
 
-    const from_date: string = String(req.query.from_date);
-    const to_date: string = String(req.query.to_date);
+    const from_date: string | undefined = req.query.from_date && String(req.query.from_date);
+    const to_date: string | undefined = req.query.from_date && String(req.query.to_date);
 
     const query: Prisma.conductor_masterFindManyArgs = {
       skip: (page - 1) * limit,
@@ -143,7 +143,7 @@ class ConductorOnBoarding {
           LEFT JOIN bus_master as bm ON receipts.bus_id = bm.register_no
           LEFT JOIN conductor_master as cm ON receipts.conductor_id = cm.cunique_id
           where conductor_id = '${item?.cunique_id}'
-          and date between '${from_date}' and '${to_date}'
+          ${(from_date && to_date) ? `and date between '${from_date}' and '${to_date}'` : ''}
           group by bus_id, date, bm.status, receipts.conductor_id 
           order by date ASC
         `)
@@ -169,7 +169,7 @@ class ConductorOnBoarding {
         const receiptData: any[] = await prisma.$queryRawUnsafe(`
           select sum(amount)::INT as total_bus_collection from receipts
           where conductor_id = '${item?.cunique_id}'
-          and date between '${from_date}' and '${to_date}'
+          ${(from_date && to_date) ? `and date between '${from_date}' and '${to_date}'` : ''}
         `)
 
         item.bus_data = busData
