@@ -26,51 +26,47 @@ export default class AccountsSummaryController {
         };
 
         try {
-            // 2. Post The data from frontend to Acountant Table prams-- 
-            // > Conductor ID, system Date, Total Amount, Busid, Status = 0(Not validated)
-            const { conductor_id,date,total_amount,bus_id} = req.body;
+            const { conductor_id, date, total_amount, bus_id, ulb_id, } = req.body;
 
-            if (!conductor_id || !date || !total_amount||!bus_id ) {
-                return CommonRes.BAD_REQUEST('Conductor ID and date and total amount busid required', resObj, res);
+            if (!conductor_id || !date || !total_amount || !bus_id || !ulb_id ) {
+                return CommonRes.BAD_REQUEST('Conductor ID, date, total amount, bus ID, ULID, and sequence are required', resObj, res);
             }
 
-            // Fetch the total amount for the given conductor_id and date
-            // const totalAmountData = await this.accountsSummaryDAO.getTotalAmount(conductor_id, new Date(date));
+            // Fetch the name of the conductor
             const { name } = await this.accountsSummaryDAO.getName(conductor_id);
-            // const { bus_id } = await this.accountsSummaryDAO.getbus_id(conductor_id);
-
-
-
             // In-memory storage for the last sequence by date
-            let lastSequenceByDate: Record<string, number> = {};
-
-            const generateCustomTransactionNo = (): string => {
+            
+            const generateCustomTransactionNo = (ulbId: string): string => {
                 const prefix = 'TR'; // Prefix for the transaction ID
 
-                // Get current date in YYYYMMDD format
+                // Get current date in DDMMYYYY format
                 const currentDate = new Date();
-                const year = currentDate.getFullYear(); // Get full year (YYYY)
+                const day = (currentDate.getDate()).toString().padStart(2, '0');
                 const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-                const day = currentDate.getDate().toString().padStart(2, '0');
+                const year = currentDate.getFullYear().toString().slice(-2); // Last 2 digits of the year
 
+                // Generate sequence with zero padding
+                // Zero-padding to 3 digits
+
+                // return `${prefix}${day}${month}${year}${ulbId}`;
                 // Generate a random number between 1 and 999 for the sequence
                 const randomSequence = Math.floor(Math.random() * 999) + 1;
                 const sequenceStr = randomSequence.toString().padStart(3, '0');
 
-                return `${prefix}${year}${month}${day}${sequenceStr}`;
+                return `${prefix}${day}${month}${year}${ulbId}${sequenceStr}`;
             };
 
-            const transaction_id = generateCustomTransactionNo();
+
+            // Generate the transaction ID
+            const transaction_id = generateCustomTransactionNo(ulb_id);
             console.log(transaction_id);
 
-            // console.log(transaction_id);
-
-            // Create summary data with updated status
+            // Create summary data
             const summaryData: AccountsType = {
                 transaction_id,
                 conductor_id,
                 total_amount: total_amount,
-                date: new Date(), // Ensure date is of type Date
+                date: new Date(),
                 time: new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata' }),
                 description: 'Transaction Summary',
                 transaction_type: 'Credit',
@@ -101,6 +97,7 @@ export default class AccountsSummaryController {
             CommonRes.SERVER_ERROR(error, resObj, res);
         }
     };
+
 
     // 
 

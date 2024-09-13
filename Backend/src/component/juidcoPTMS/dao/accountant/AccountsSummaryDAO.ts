@@ -19,7 +19,7 @@ export default class AccountsSummaryDAO {
         return { total_amount: result._sum.amount || 0 };
     }
 
-    
+    //post
     async createSummary(summaryData: {
         transaction_id: string;
         conductor_id: string;
