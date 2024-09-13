@@ -9,6 +9,9 @@ import BusConductorScheduleRoute from "./route/busConductorSchedule/busConductor
 import ConductorReportRoute from "./route/conductorReport/conductorReport.route";
 // import BusGenerateReportServices from "./controller/reportGeneration/busReport.services";
 import BusReportRoute from "./route/busReport/busReport.route";
+import AccountsSummaryRoutes from "./route/accountant/accountsSummaryRoutes";
+// import ConductorValildateRoute from './route/conductorValidation/conductorValidate.route'
+// import conductorValidateRoutes from "./route/conductorValidation/conductorValidate.route";
 
 // const app = express();
 
@@ -37,5 +40,10 @@ export default class PtmsRoute {
     new BusConductorScheduleRoute(app);
     new ConductorReportRoute(app);
     new BusReportRoute(app);
+    new AccountsSummaryRoutes(app);
+
+
+
+
   }
 }

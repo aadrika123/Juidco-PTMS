@@ -80,3 +80,20 @@ model receipts {
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
 }
+
+model accounts_summary {
+  conductor_id      String
+  transaction_id    String   @unique
+  total_amount      Int
+  date              DateTime @db.Date
+  time              String
+  description       String
+  transaction_type  String
+  conductor_name    String
+  bus_id            String
+  status              Int? @default(0) 
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at        DateTime @updatedAt      
+}
+ 
+

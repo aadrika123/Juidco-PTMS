@@ -30,6 +30,7 @@ import All_report_conductor from "../Components/Conductor/All_report_conductor";
 import Collection_Report from "../Components/Tables/Collection_Report";
 import AccountantDashboard from "../Components/Accountant/AccountantDashboard";
 import ConductorDetails from "../Components/Accountant/ConductorDetails";
+import Conductor_CashValidation from "../Components/Conductor/Conductor_CashValidation";
 
 const AppRoutes = ({ access_token, userType }) => {
   console.log("AppRoutes with token >>> ", access_token, userType);
@@ -104,7 +105,7 @@ const AppRoutes = ({ access_token, userType }) => {
           <Route
             path="dashboard"
             element={<PrivateRoute element={Dashboard_data} />}
-            // element={<Dashboard_data/>}
+          // element={<Dashboard_data/>}
           />
           <Route path="/*" element={<No_access />} />
         </>
@@ -130,6 +131,12 @@ const AppRoutes = ({ access_token, userType }) => {
             path="/conductor_Report"
             element={
               <ProtectedApproute element={Conductor_Report_Generation} />
+            }
+          />
+          <Route
+            path="/conductor_CashValidation"
+            element={
+              <ProtectedApproute element={Conductor_CashValidation} />
             }
           />
           <Route path="/*" element={<No_access />} />
