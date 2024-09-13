@@ -70,9 +70,10 @@ const Conductor_CashValidation = () => {
             date: new Date().toISOString().split('T')[0], // Format the date as YYYY-MM-DD
         };
 
-        axios.post('/api/submit-cash-validation', payload)
+        axios.post('http://localhost:5006/api/ptms/v1/report/daywise_data', payload)
             .then(response => {
                 console.log('Cash validation successful:', response);
+                window.alert('Cash validation successful!');
                 setIsModalOpen(false);
             })
             .catch(error => {
@@ -135,16 +136,20 @@ const Conductor_CashValidation = () => {
                             >
                                 Cancel
                             </button>
-                            <button
-                                onClick={handleSubmit}
-                                className="bg-indigo-700 text-white py-2 px-4 rounded-lg w-full md:w-auto"
-                            >
-                                Submit
-                            </button>
+                            <div>
+                                <button
+                                    onClick={handleSubmit}
+                                    className="bg-indigo-700 text-white py-2 px-4 rounded-lg w-full md:w-auto"
+                                >
+                                    Submit
+                                </button>
+                            </div>
+                          
                         </div>
                     </div>
                 </div>
             )}
+
         </>
     );
 };

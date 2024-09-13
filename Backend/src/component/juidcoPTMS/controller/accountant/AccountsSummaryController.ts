@@ -26,14 +26,16 @@ export default class AccountsSummaryController {
         };
 
         try {
-            const { conductor_id, date, total_amount, bus_id, ulb_id, } = req.body;
+            const { conductorId, date, amount, busId, ulbId } = req.body;
 
-            if (!conductor_id || !date || !total_amount || !bus_id || !ulb_id ) {
-                return CommonRes.BAD_REQUEST('Conductor ID, date, total amount, bus ID, ULID, and sequence are required', resObj, res);
+            console.log(conductorId, date, amount, busId, ulbId)
+
+            if (!conductorId || !date || amount === null || amount === undefined || !busId || !ulbId ) {
+                return CommonRes.BAD_REQUEST('Conductor ID, date, total amount, bus ID, ULID', resObj, res);
             }
 
             // Fetch the name of the conductor
-            const { name } = await this.accountsSummaryDAO.getName(conductor_id);
+            const { name } = await this.accountsSummaryDAO.getName(conductorId);
             // In-memory storage for the last sequence by date
             
             const generateCustomTransactionNo = (ulbId: string): string => {
@@ -58,20 +60,20 @@ export default class AccountsSummaryController {
 
 
             // Generate the transaction ID
-            const transaction_id = generateCustomTransactionNo(ulb_id);
+            const transaction_id = generateCustomTransactionNo(ulbId);
             console.log(transaction_id);
 
             // Create summary data
             const summaryData: AccountsType = {
                 transaction_id,
-                conductor_id,
-                total_amount: total_amount,
+                conductor_id: conductorId,
+                total_amount: amount,
                 date: new Date(),
                 time: new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata' }),
                 description: 'Transaction Summary',
                 transaction_type: 'Credit',
                 conductor_name: name,
-                bus_id: bus_id,
+                bus_id: busId,
                 status: 0, // Updated status
             };
 
