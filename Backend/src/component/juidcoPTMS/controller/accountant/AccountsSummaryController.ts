@@ -150,28 +150,79 @@ export default class AccountsSummaryController {
     // api
 
 // Controller method to get all transactions with status 0 (Not Validated)
-getUnvalidatedTransactions = async (req: Request, res: Response): Promise<void> => {
-    const resObj: resObj = {
-        apiId: '0504',
-        action: 'GET',
-        version: '1.0',
+    getUnvalidatedTransactions = async (req: Request, res: Response): Promise<void> => {
+        const resObj: resObj = {
+            apiId: '0504',
+            action: 'GET',
+            version: '1.0',
+        };
+
+        try {
+            // Fetch transactions with statuses 0, 1, 2, and 3 from the DAO
+            const transactions = await this.accountsSummaryDAO.getUnvalidatedTransactions([0, 1, 2, 3]);
+
+            // Group the transactions based on their status
+            const groupedData = {
+                "Submitted_Cash": transactions
+                    .filter(t => t.status === 0)
+                    .map(t => ({
+                        id: t.conductor_id,
+                        date: t.date.toISOString().split('T')[0],
+                        time: t.time,
+                        amount: `₹${t.total_amount}`,
+                        payee: t.conductor_name,
+                        description: t.description,  // Use the existing description from the database
+                        referenceNumber: t.transaction_id,
+                    })),
+                "Validated_Cash": transactions
+                    .filter(t => t.status === 1)
+                    .map(t => ({
+                        id: t.conductor_id,
+                        date: t.date.toISOString().split('T')[0],
+                        time: t.time,
+                        amount: `₹${t.total_amount}`,
+                        payee: t.conductor_name,
+                        description: t.description,  // Use the existing description from the database
+                        referenceNumber: t.transaction_id,
+                    })),
+                "Disputed_Cash": transactions
+                    .filter(t => t.status === 2)
+                    .map(t => ({
+                        id: t.conductor_id,
+                        date: t.date.toISOString().split('T')[0],
+                        time: t.time,
+                        amount: `₹${t.total_amount}`,
+                        payee: t.conductor_name,
+                        description: t.description,  // Use the existing description from the database
+                        referenceNumber: t.transaction_id,
+                    })),
+                "Suspense_Cash": transactions
+                    .filter(t => t.status === 3)
+                    .map(t => ({
+                        id: t.conductor_id,
+                        date: t.date.toISOString().split('T')[0],
+                        time: t.time,
+                        amount: `₹${t.total_amount}`,
+                        payee: t.conductor_name,
+                        description: t.description,  // Use the existing description from the database
+                        referenceNumber: t.transaction_id,
+                    })),
+            };
+
+            // Return the grouped transactions
+            CommonRes.SUCCESS(
+                'Transactions categorized by status successfully',
+                groupedData,
+                resObj,
+                res
+            );
+        } catch (error) {
+            CommonRes.SERVER_ERROR(error, resObj, res);
+        }
     };
 
-    try {
-        // Call the DAO method to get transactions with status 0
-        const transactions = await this.accountsSummaryDAO.getTransactionsByStatus(0);
 
-        // Return the response with the fetched transactions
-        CommonRes.SUCCESS(
-            'Transactions retrieved successfully',
-            transactions,
-            resObj,
-            res
-        );
-    } catch (error) {
-        CommonRes.SERVER_ERROR(error, resObj, res);
-    }
-};
+
 
 
     
@@ -287,7 +338,7 @@ getConductorSummary = async (req: Request, res: Response): Promise<void> => {
         }
 
         // Validate status value
-        if (![0, 1, 2].includes(status)) {
+        if (![0, 1, 2,3].includes(status)) {
             return CommonRes.BAD_REQUEST('Invalid status value', resObj, res);
         }
 

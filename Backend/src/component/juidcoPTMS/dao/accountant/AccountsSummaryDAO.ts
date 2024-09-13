@@ -93,13 +93,18 @@ export default class AccountsSummaryDAO {
 }
 
     // DAO method to get all transactions with status 0 (Not Validated)
-    async getTransactionsByStatus(status: number): Promise<any[]> {
+    // DAO method to get transactions by multiple statuses
+    async getUnvalidatedTransactions(statuses: number[]): Promise<any[]> {
         return prisma.accounts_summary.findMany({
             where: {
-                status: status,
+                status: {
+                    in: statuses,  // Get transactions where status is in the array [0, 1, 2, 3]
+                },
             },
         });
     }
+
+
 
 
     // DAO method to get scheduled buses and conductors for a specific date
