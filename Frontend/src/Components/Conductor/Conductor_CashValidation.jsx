@@ -8,24 +8,46 @@ const Conductor_CashValidation = () => {
     const [amount, setAmount] = useState(null);
     const [conductorId, setConductorId] = useState('');
     const [busId, setBusId] = useState('');
+    const [ulbId, setulbId] = useState('');
+
 
     useEffect(() => {
-        // Retrieve conductorId and busId from localStorage when the component loads
+        // Retrieve conductorId and busId from localStorage
         const storedConductorId = localStorage.getItem('conductorId');
-        const storedBusId = localStorage.getItem('busId');
-        setConductorId(storedConductorId);
-        setBusId(storedBusId);
+        const storedBusId = localStorage.getItem('BusID');
+        const storedUlbId = localStorage.getItem('ulbId');
 
+
+        // Set state with the retrieved values
+        setConductorId(storedConductorId || '');
+        setBusId(storedBusId || '');
+        setulbId(storedUlbId || '');
+
+        // Get current date in YYYY-MM-DD format
+        const currentDate = new Date().toISOString().split('T')[0];
+
+        // Construct API URL with stored values
+        const apiUrl = `http://localhost:5006/api/ptms/v1/report/total_amount?conductor_id=${storedConductorId}&bus_id=${storedBusId}&date=${currentDate}`;
+
+        // Debugging: Log the API URL
+        console.log("API URL:", apiUrl);
+
+        // Fetch the amount if the modal is open
         if (isModalOpen) {
-            axios.get('/api/get-amount')
+            axios.get(apiUrl)
                 .then(response => {
-                    setAmount(response.data.amount);
+                    // Debugging: Log the entire response
+                    console.log("API Response:", response);
+
+                    // Set the fetched amount
+                    setAmount(response.data.data._sum.amount || 0);
                 })
                 .catch(error => {
                     console.error('Error fetching amount:', error);
                 });
         }
-    }, [isModalOpen]);
+    }, [isModalOpen]); // Ensure dependencies are correct
+
 
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -34,8 +56,8 @@ const Conductor_CashValidation = () => {
 
     const handleSubmit = () => {
         // Check if conductorId and busId are available
-        if (!conductorId || !busId) {
-            console.error('Conductor ID or Bus ID is missing from local storage.');
+        if (!conductorId || !busId || !ulbId) {
+            console.error('Conductor ID or Bus ID or Ulb Id is missing from local storage.');
             return;
         }
 
@@ -44,6 +66,7 @@ const Conductor_CashValidation = () => {
             amount,
             conductorId,
             busId,
+            ulbId,
             date: new Date().toISOString().split('T')[0], // Format the date as YYYY-MM-DD
         };
 
@@ -102,6 +125,8 @@ const Conductor_CashValidation = () => {
                         <p className="text-sm md:text-base">Date: {formattedDate}</p>
                         <p className="text-sm md:text-base">Conductor ID: {conductorId}</p> {/* Display Conductor ID */}
                         <p className="text-sm md:text-base">Bus ID: {busId}</p> {/* Display Bus ID */}
+                        <p className="text-sm md:text-base">ULB ID: {ulbId}</p> {/* Display Bus ID */}
+
 
                         <div className="mt-4 flex flex-col md:flex-row justify-end space-y-2 md:space-y-0 md:space-x-2">
                             <button
