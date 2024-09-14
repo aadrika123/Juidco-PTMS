@@ -237,18 +237,14 @@ export default class AccountsSummaryController {
             // Extract date from query parameters
             const { date } = req.query;
 
-            if (!date || typeof date !== 'string') {
-                return CommonRes.BAD_REQUEST('Date is required and must be a string', resObj, res);
-            }
+            // Use the current system date if no date is provided
+            const currentDate = new Date();
+            const formattedDate = date && typeof date === 'string'
+                ? new Date(date)
+                : currentDate;
 
-            // Parse the date query parameter
-            const parsedDate = new Date(date);
-            if (isNaN(parsedDate.getTime())) {
-                return CommonRes.BAD_REQUEST('Invalid date format', resObj, res);
-            }
-
-            // Fetch the scheduled buses and conductors for the given date
-            const schedules = await this.accountsSummaryDAO.getScheduledBusesAndConductors(parsedDate);
+            // Fetch the scheduled buses and conductors for the specified date
+            const schedules = await this.accountsSummaryDAO.getScheduledBusesAndConductors(formattedDate);
 
             // Return the response with the fetched data
             CommonRes.SUCCESS(
@@ -261,6 +257,7 @@ export default class AccountsSummaryController {
             CommonRes.SERVER_ERROR(error, resObj, res);
         }
     };
+
 
 
 
@@ -330,10 +327,10 @@ getConductorSummary = async (req: Request, res: Response): Promise<void> => {
     };
 
     try {
-        const { transaction_id, status } = req.body;
+        const { conductor_id, status } = req.body;
 
         // Validate input
-        if (!transaction_id || typeof status !== 'number') {
+        if (!conductor_id || typeof status !== 'number') {
             return CommonRes.BAD_REQUEST('Transaction ID and status are required', resObj, res);
         }
 
@@ -343,11 +340,11 @@ getConductorSummary = async (req: Request, res: Response): Promise<void> => {
         }
 
         // Update the status in the database using DAO
-        const updatedTransaction = await this.accountsSummaryDAO.updateTransactionStatus(transaction_id, status);
+        const updatedTransaction = await this.accountsSummaryDAO.updateTransactionStatus(conductor_id, status);
 
         // Respond with success
         CommonRes.SUCCESS(
-            'Transaction status updated successfully',
+            'conductor status updated successfully',
             updatedTransaction,
             resObj,
             res
@@ -357,6 +354,39 @@ getConductorSummary = async (req: Request, res: Response): Promise<void> => {
         CommonRes.SERVER_ERROR(error, resObj, res);
     }
 };
+
+
+    getAccountsByStatus = async (req: Request, res: Response): Promise<void> => {
+        const resObj: resObj = {
+            apiId: '0506',
+            action: 'GET',
+            version: '1.0',
+        };
+
+        try {
+            // Extract status from query parameters
+            const { status } = req.query;
+
+            // If status is provided, convert it to an array of numbers; otherwise, default to [0, 1, 2, 3]
+            const statusArray = status
+                ? (Array.isArray(status) ? status : [status]).map(Number)
+                : [0, 1, 2, 3];
+
+            // Fetch accounts based on the given statuses
+            const accounts = await this.accountsSummaryDAO.getAccountsByStatus(statusArray);
+
+            // Return the response with the fetched data
+            CommonRes.SUCCESS(
+                'Accounts retrieved successfully by status',
+                accounts,
+                resObj,
+                res
+            );
+        } catch (error) {
+            CommonRes.SERVER_ERROR(error, resObj, res);
+        }
+    };
+
 
 };
 

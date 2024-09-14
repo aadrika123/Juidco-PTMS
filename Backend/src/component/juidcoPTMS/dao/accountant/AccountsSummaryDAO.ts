@@ -1,6 +1,7 @@
 // import { Request } from 'express';
 
 import { PrismaClient } from '@prisma/client';
+import { string } from 'yup';
 
 
 const prisma = new PrismaClient();
@@ -108,18 +109,18 @@ export default class AccountsSummaryDAO {
 
 
     // DAO method to get scheduled buses and conductors for a specific date
-    async getScheduledBusesAndConductors(date: Date): Promise<any[]> {
-        return prisma.scheduler.findMany({
-            where: {
-                date: date,
-            },
-            select: {
-                conductor_id: true,
-                bus_id: true,
-                date: true,
-            },
-        });
-    }
+  async getScheduledBusesAndConductors(date: Date): Promise<any[]> {
+    return prisma.$queryRaw`
+        SELECT s.conductor_id, s.bus_id, s.from_time, s.to_time,
+               cm.first_name || ' ' || COALESCE(cm.middle_name || ' ', '') || cm.last_name AS conductor_name,
+               cm.mobile_no
+        FROM public.scheduler s
+        JOIN conductor_master cm ON s.conductor_id = cm.cunique_id
+        WHERE s.date::date = ${date.toISOString().split('T')[0]}::date;
+    `;
+}
+
+
 
     
     async transactions(conductor_id:string): Promise<any[]> {
@@ -129,16 +130,28 @@ export default class AccountsSummaryDAO {
         });
     }
 
-    async updateTransactionStatus(transaction_id: string, status: number): Promise<any> {
+    async updateTransactionStatus(conductor_id: string, status: number): Promise<any> {
         try {
-            const updatedTransaction = await prisma.accounts_summary.update({
-                where: { transaction_id },
+            const updatedTransaction = await prisma.accounts_summary.updateMany({
+                where: { conductor_id },
                 data: { status }
             });
+
             return updatedTransaction;
         } catch (error) {
             // Handle or log error as needed
             throw new Error('Failed to update transaction status');
         }
     }
+
+    async getAccountsByStatus(statuses: number[]): Promise<any[]> {
+        return prisma.accounts_summary.findMany({
+            where: {
+                status: {
+                    in: statuses, // Filter by multiple statuses
+                },
+            },
+        });
+    }
+
 }
