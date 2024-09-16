@@ -92,6 +92,7 @@ model accounts_summary {
   conductor_name   String
   bus_id           String
   status           Int?     @default(0)
+  ulb_id           Int      @default(2)
   created_at       DateTime @default(now()) @map("created_at")
   updated_at       DateTime @updatedAt
 }
