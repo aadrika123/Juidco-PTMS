@@ -577,6 +577,13 @@ export default function ReportGeneration_main() {
                   <CircularProgress />
                 </Box>
               )}
+
+              {((report_type === 'conductor' && (conductor_details?.data?.length === 0 || !conductor_details)) || (report_type === 'bus' && (bus_details?.data?.length === 0 || !bus_details))) && (
+                <Box sx={{ display: 'flex', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                  <h1>No Data</h1>
+                </Box>
+              )}
+
               {(conductor_details?.data && report_type === 'conductor' && !isLoading) &&
                 conductor_details.data[0]?.first_name ? (
                 <>
