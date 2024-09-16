@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 class ReportDao {
   generateReport = async (req: Request) => {
     const { conductor_id, bus_id, from_date, to_date } = req.body;
+    const { ulb_id } = req.body.auth
     let amounts: any = [];
     let query: string = "";
     const conductor: string = ", receipts.conductor_id ";
@@ -93,6 +94,25 @@ class ReportDao {
     }
     // ======================== BY BUS================================//
 
+    const conditionRegex = /(JOIN|ORDER BY|LIMIT|OFFSET)/i;
+    const whereData = 'where';
+    const whereRegex = new RegExp(`\\b${whereData}\\b`, 'i');
+
+    // First, check if WHERE clause exists
+    if (whereRegex.test(query)) {
+      // If WHERE exists, insert ulb_id before JOIN, ORDER BY, LIMIT, or OFFSET
+      query = query.replace(conditionRegex, `AND ulb_id = '${ulb_id}' $1`);
+    } else {
+      // If WHERE does not exist, insert WHERE ulb_id before JOIN, ORDER BY, LIMIT, or OFFSET
+      if (conditionRegex.test(query)) {
+        // If there is a JOIN, ORDER BY, LIMIT, or OFFSET, insert WHERE ulb_id before them
+        query = query.replace(conditionRegex, `WHERE ulb_id = '${ulb_id}' $1`);
+      } else {
+        // If no JOIN, ORDER BY, LIMIT, or OFFSET, just append WHERE ulb_id
+        query += ` WHERE ulb_id = '${ulb_id}'`;
+      }
+    }
+
     const [data] = await prisma.$transaction([
       prisma.$queryRawUnsafe<any[]>(`${query}`),
     ]);
@@ -106,6 +126,7 @@ class ReportDao {
 
   getTotalAmount = async (req: Request) => {
     const { bus_id, conductor_id, from_date, to_date, curr_date } = req.body;
+    const { ulb_id } = req.body.auth
     let query: string = "";
     function query_fn(extend_query: string): string {
       return `
@@ -150,6 +171,26 @@ class ReportDao {
     if (curr_date) {
       query = query_fn(`where date = '${curr_date}'`);
     }
+
+    const conditionRegex = /(JOIN|ORDER BY|LIMIT|OFFSET)/i;
+    const whereData = 'where';
+    const whereRegex = new RegExp(`\\b${whereData}\\b`, 'i');
+
+    // First, check if WHERE clause exists
+    if (whereRegex.test(query)) {
+      // If WHERE exists, insert ulb_id before JOIN, ORDER BY, LIMIT, or OFFSET
+      query = query.replace(conditionRegex, `AND ulb_id = '${ulb_id}' $1`);
+    } else {
+      // If WHERE does not exist, insert WHERE ulb_id before JOIN, ORDER BY, LIMIT, or OFFSET
+      if (conditionRegex.test(query)) {
+        // If there is a JOIN, ORDER BY, LIMIT, or OFFSET, insert WHERE ulb_id before them
+        query = query.replace(conditionRegex, `WHERE ulb_id = '${ulb_id}' $1`);
+      } else {
+        // If no JOIN, ORDER BY, LIMIT, or OFFSET, just append WHERE ulb_id
+        query += ` WHERE ulb_id = '${ulb_id}'`;
+      }
+    }
+
     //   ------------------------- FILTER BY CURRENT_DATE TOTAL COLLECTION-----------------------------//
     const data = await prisma.$queryRawUnsafe(`${query}`);
 
@@ -158,13 +199,15 @@ class ReportDao {
 
   //   ------------------------- GET REAL-TIME COLLECTION ----------------------------//
 
-  getRealTimeCollection = async () => {
+  getRealTimeCollection = async (req: Request) => {
     // const date = new Date().toISOString().split("T")[0];
     // const qr_real_time = `
     //       SELECT SUM (amount)::INT, extract (HOUR from created_at) as "from" , extract (HOUR from created_at)+1 as "to", COUNT(id)::INT as receipts FROM receipts
     //     	where date = '${date}'
     //     	group by (extract (HOUR from created_at))
     //     `;
+
+    const { ulb_id } = req.body.auth
 
     const qr_real_time = `
       SELECT
@@ -174,6 +217,7 @@ class ReportDao {
       FROM
           receipts
       WHERE
+          ulb_id = ${ulb_id} and
           created_at >= DATE_TRUNC('month', CURRENT_DATE)
           AND created_at < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
       GROUP BY
@@ -192,6 +236,7 @@ class ReportDao {
   //   ------------------------- GET ALL REPORT COLLECITON ----------------------------//
   generateAllReports = async (req: Request) => {
     const { from_date, to_date } = req.body;
+    const { ulb_id } = req.body.auth
     const limit: number = Number(req.query.limit);
     const page: number = Number(req.query.page);
 
@@ -237,6 +282,30 @@ class ReportDao {
       `);
     }
 
+    const conditionRegex = /(JOIN|ORDER BY|LIMIT|OFFSET)/i;
+    const whereData = 'where';
+    const whereRegex = new RegExp(`\\b${whereData}\\b`, 'i');
+
+    if (whereRegex.test(qr_1)) {
+      qr_1 = qr_1.replace(conditionRegex, `AND ulb_id = '${ulb_id}' $1`);
+    } else {
+      if (conditionRegex.test(qr_1)) {
+        qr_1 = qr_1.replace(conditionRegex, `WHERE ulb_id = '${ulb_id}' $1`);
+      } else {
+        qr_1 += ` WHERE ulb_id = '${ulb_id}'`;
+      }
+    }
+
+    if (whereRegex.test(qr_2)) {
+      qr_2 = qr_2.replace(conditionRegex, `AND ulb_id = '${ulb_id}' $1`);
+    } else {
+      if (conditionRegex.test(qr_2)) {
+        qr_2 = qr_2.replace(conditionRegex, `WHERE ulb_id = '${ulb_id}' $1`);
+      } else {
+        qr_2 += ` WHERE ulb_id = '${ulb_id}'`;
+      }
+    }
+
     // const startTime = Date.now();
     const [all_conductor] = await prisma.$transaction([
       prisma.$queryRawUnsafe<any[]>(qr_1, limit, offset),
@@ -278,6 +347,7 @@ class ReportDao {
 
   demographicCount = async (req: Request) => {
     const { from_date, to_date } = req.body;
+    const { ulb_id } = req.body.auth
 
     const { startOfWeek, endOfWeek } = getCurrentWeekRange();
 
@@ -300,6 +370,20 @@ class ReportDao {
       `);
     }
 
+    const conditionRegex = /(JOIN|ORDER BY|LIMIT|OFFSET)/i;
+    const whereData = 'where';
+    const whereRegex = new RegExp(`\\b${whereData}\\b`, 'i');
+
+    if (whereRegex.test(qr_1)) {
+      qr_1 = qr_1.replace(conditionRegex, `AND ulb_id = '${ulb_id}' $1`);
+    } else {
+      if (conditionRegex.test(qr_1)) {
+        qr_1 = qr_1.replace(conditionRegex, `WHERE ulb_id = '${ulb_id}' $1`);
+      } else {
+        qr_1 += ` WHERE ulb_id = '${ulb_id}'`;
+      }
+    }
+
     const [data] = await prisma.$transaction([prisma.$queryRawUnsafe(qr_1)]);
 
     return generateRes(data);
@@ -318,8 +402,8 @@ class ReportDao {
     return generateRes(data);
   };
 
-  getHourlyRealtimeData = async () => {
-    // const { from, to } = req.body;
+  getHourlyRealtimeData = async (req: Request) => {
+    const { ulb_id } = req.body.auth
 
     const query = `
       WITH intervals AS (
@@ -337,6 +421,7 @@ class ReportDao {
           receipts r
           ON EXTRACT(HOUR FROM r.created_at)::INT / 2 * 2 = i.interval_start_hour
           AND r.date = CURRENT_DATE
+          AND r.ulb_id = ${ulb_id}
       GROUP BY
           i.interval_start_hour
       ORDER BY

@@ -34,6 +34,8 @@ class ConductorOnBoarding {
       fitness_doc,
     } = req.body as TOnBoardingConductorData;
 
+    const { ulb_id } = req.body.auth
+
     const isExistingConductor = await prisma.conductor_master.findUnique({
       where: { adhar_no },
     });
@@ -70,6 +72,7 @@ class ConductorOnBoarding {
         adhar_no: adhar_no,
         fitness_doc: fitness_doc,
         cunique_id: cUniqueId,
+        ulb_id: ulb_id
       },
     };
 
@@ -85,6 +88,8 @@ class ConductorOnBoarding {
 
     const from_date: string | undefined = req.query.from_date && String(req.query.from_date);
     const to_date: string | undefined = req.query.from_date && String(req.query.to_date);
+
+    const { ulb_id } = req.body.auth
 
     const query: Prisma.conductor_masterFindManyArgs = {
       skip: (page - 1) * limit,
@@ -120,6 +125,10 @@ class ConductorOnBoarding {
           },
         ],
       };
+    }
+
+    query.where = {
+      ulb_id: ulb_id
     }
 
     query.orderBy = [
@@ -181,10 +190,11 @@ class ConductorOnBoarding {
     return generateRes({ data, count, page, limit });
   };
 
-  getConductorStatus = async () => {
+  getConductorStatus = async (req: Request) => {
     const date = new Date().toISOString().split("T")[0];
+    const { ulb_id } = req.body.auth
     const qr_total_conductor: string =
-      "SELECT COUNT(id)::INT FROM conductor_master;";
+      `SELECT COUNT(id)::INT FROM conductor_master where ulb_id=${ulb_id};`;
     const qr_conductor_status: string = `
        SELECT 
 	    COUNT(DISTINCT sche.conductor_id)::INT AS scheduled_conductor,
@@ -195,7 +205,7 @@ class ConductorOnBoarding {
 
     const [total_conductor, conductor_status] = await prisma.$transaction([
       prisma.$queryRawUnsafe(`${qr_total_conductor}`),
-      prisma.$queryRawUnsafe(`${qr_conductor_status}AND sche.date = '${date}'`),
+      prisma.$queryRawUnsafe(`${qr_conductor_status}AND sche.date = '${date}' where cm.ulb_id=${ulb_id}`),
     ]);
 
     return generateRes({ total_conductor, conductor_status });
@@ -204,9 +214,10 @@ class ConductorOnBoarding {
   // !----------------------------- CHECK EMPLOYEE ID EXIST OR NOT ------------------------------//
   validate_aadhar = async (req: Request) => {
     const adhar_no = req.body.adhar_no;
+    const { ulb_id } = req.body.auth
 
     const exist = await prisma.$queryRaw`
-        SELECT EXISTS (SELECT 1 FROM conductor_master WHERE adhar_no = ${adhar_no});
+        SELECT EXISTS (SELECT 1 FROM conductor_master WHERE adhar_no = ${adhar_no} and ulb_id=${ulb_id});
       `;
 
     console.log(exist);

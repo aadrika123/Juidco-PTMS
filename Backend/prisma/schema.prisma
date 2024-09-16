@@ -16,17 +16,17 @@ model bus_master {
   pollution_doc        Json
   taxCopy_doc          Json
   registrationCert_doc Json
-  status               String? @default("Not Scheduled")// ---> scheduled || not_scheduled
+  status               String? @default("Not Scheduled") // ---> scheduled || not_scheduled
 
-  schedules scheduler[]
-  receipts  receipts[]
-
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  schedules  scheduler[]
+  receipts   receipts[]
+  ulb_id     Int         @default(2)
+  created_at DateTime    @default(now()) @map("created_at")
+  updated_at DateTime    @updatedAt @map("updated_at")
 }
 
 model conductor_master {
-  id               Int    @id @default(autoincrement())
+  id               Int     @id @default(autoincrement())
   first_name       String
   middle_name      String?
   last_name        String
@@ -34,17 +34,17 @@ model conductor_master {
   blood_grp        String
   mobile_no        String
   emergency_mob_no String
-  email_id         String @unique
-  cunique_id       String @unique
+  email_id         String  @unique
+  cunique_id       String  @unique
   adhar_doc        Json
-  adhar_no         String @unique
+  adhar_no         String  @unique
   fitness_doc      Json
 
-  schedules scheduler[]
-  receipts  receipts[]
-
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  schedules  scheduler[]
+  receipts   receipts[]
+  ulb_id     Int         @default(2)
+  created_at DateTime    @default(now()) @map("created_at")
+  updated_at DateTime    @updatedAt @map("updated_at")
 }
 
 model scheduler {
@@ -53,14 +53,14 @@ model scheduler {
   conductor_id String
   conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
 
-  bus_id    String
-  bus       bus_master @relation(fields: [bus_id], references: [register_no])
-  date      DateTime
-  from_time Int
-  to_time   Int
-
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  bus_id     String
+  bus        bus_master @relation(fields: [bus_id], references: [register_no])
+  date       DateTime
+  from_time  Int
+  to_time    Int
+  ulb_id     Int        @default(2)
+  created_at DateTime   @default(now()) @map("created_at")
+  updated_at DateTime   @updatedAt @map("updated_at")
 }
 
 model receipts {
@@ -76,7 +76,22 @@ model receipts {
   amount     Int
   date       DateTime @db.Date
   time       String
-
+  ulb_id     Int      @default(2)
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
+}
+
+model accounts_summary {
+  conductor_id     String
+  transaction_id   String   @unique
+  total_amount     Int
+  date             DateTime @db.Date
+  time             String
+  description      String
+  transaction_type String
+  conductor_name   String
+  bus_id           String
+  status           Int?     @default(0)
+  created_at       DateTime @default(now()) @map("created_at")
+  updated_at       DateTime @updatedAt
 }

@@ -105,7 +105,7 @@ export default class OnBoardingConductorServices {
     };
 
     try {
-      const data = await this.constructorOnboarding.getConductorStatus();
+      const data = await this.constructorOnboarding.getConductorStatus(req);
 
       if (!data) {
         return CommonRes.NOT_FOUND("Conductor Not Found", data, resObj, res);
