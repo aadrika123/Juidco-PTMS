@@ -82,7 +82,7 @@ class ReportController {
     };
 
     try {
-      const data = await this.reportDao.getRealTimeCollection();
+      const data = await this.reportDao.getRealTimeCollection(req);
       if (data === "null") {
         return CommonRes.NOT_FOUND(
           resMessage(this.initMsg).NOT_FOUND,
@@ -184,7 +184,7 @@ class ReportController {
     };
 
     try {
-      const data = await this.reportDao.getHourlyRealtimeData();
+      const data = await this.reportDao.getHourlyRealtimeData(req);
       // if (data === "null") {
       //   return CommonRes.NOT_FOUND(
       //     resMessage(this.initMsg).NOT_FOUND,

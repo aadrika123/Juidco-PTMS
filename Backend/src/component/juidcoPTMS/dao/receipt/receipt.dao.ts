@@ -5,11 +5,13 @@ import { generateReceiptNumber } from "../../../../util/helper/generateUniqueNo"
 
 const prisma = new PrismaClient();
 
-export const genrateDate = () => {};
+export const genrateDate = () => { };
 class ReceiptDao {
   post = async (req: Request) => {
+    const { ulb_id } = req.body.auth
     console.log("before creating");
     console.log(req.body.data, "req.body.data");
+
 
     // const time = Number(req.body.data.time);
     //const date = new Date(`${req.body.data.date}T10:19:58.523Z`);
@@ -33,6 +35,7 @@ class ReceiptDao {
         conductor_id: req.body.data.conductor_id,
         time: req.body.data.time,
         receipt_no: req.body.data.receipt_no,
+        ulb_id: ulb_id
         // conductor: { connect: { cunique_id: req.body.data.conductor_id } },
       },
     });
@@ -53,6 +56,7 @@ class ReceiptDao {
     const page: number = Number(req.query.page);
     const limit: number = Number(req.query.limit);
     const search: string = String(req.query.search);
+    const { ulb_id } = req.body.auth
 
     const d1 = new Date(from_date);
     const d2 = new Date(to_date);
@@ -87,6 +91,10 @@ class ReceiptDao {
         date: true,
       },
     };
+
+    query.where = {
+      ulb_id: ulb_id
+    }
 
     if (conductor_id) {
       query.where = {
@@ -176,13 +184,13 @@ class ReceiptDao {
 
   passenger_status = async (req: Request) => {
     const { from_date, to_date } = req.body;
+    const { ulb_id } = req.body.auth
 
     const date = new Date().toISOString().split("T")[0];
 
     const qr_func = (condition?: string) => {
       return `
-        SELECT COUNT(id)::INT,SUM (amount)::INT,COUNT(id)::INT as no_of_receips FROM receipts ${
-          condition ? condition : `where date = '${date}'`
+        SELECT COUNT(id)::INT,SUM (amount)::INT,COUNT(id)::INT as no_of_receips FROM receipts ${condition ? condition : `where ulb_id=${ulb_id} and date = '${date}'`
         } 
       `;
     };
@@ -190,7 +198,7 @@ class ReceiptDao {
     let qr = qr_func();
 
     if (from_date && to_date) {
-      qr = qr_func(`where date BETWEEN '${from_date}' AND '${to_date}'`);
+      qr = qr_func(`where ulb_id=${ulb_id} and date BETWEEN '${from_date}' AND '${to_date}'`);
     }
 
     const data = await prisma.$queryRawUnsafe(qr);

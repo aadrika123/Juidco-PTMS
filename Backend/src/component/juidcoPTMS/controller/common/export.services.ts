@@ -24,9 +24,13 @@ export default class ExportServices {
 
     try {
       const type = req.query.type
+      const { ulb_id } = req.body.auth
       let jsonData: any = []
       if (type === 'conductor') {
         jsonData = await this.prisma.conductor_master.findMany({
+          where: {
+            ulb_id: ulb_id
+          },
           select: {
             id: true,
             first_name: true,
@@ -39,6 +43,9 @@ export default class ExportServices {
         })
       } else {
         jsonData = await this.prisma.bus_master.findMany({
+          where: {
+            ulb_id: ulb_id
+          },
           select: {
             register_no: true,
             vin_no: true,

@@ -67,6 +67,8 @@ class BusConductorScheduleDao {
     const from_date: string = String(req.query.from_date);
     const to_date: string = String(req.query.to_date);
 
+    const { ulb_id } = req.body.auth
+
     const query: Prisma.schedulerFindManyArgs = {
       skip: (page - 1) * limit,
       take: limit,
@@ -98,6 +100,8 @@ class BusConductorScheduleDao {
         },
       },
     };
+
+
 
     if (search !== "" && typeof search === "string" && search !== "undefined") {
       query.where = {
@@ -186,16 +190,24 @@ class BusConductorScheduleDao {
         ],
       };
     }
+
+    query.where = {
+      ulb_id: ulb_id
+    }
+
     const [data, count] = await prisma.$transaction([
       prisma.scheduler.findMany(query),
-      prisma.scheduler.count({where: query.where}),
+      prisma.scheduler.count({ where: query.where }),
     ]);
+
     return generateRes({ data, count, page, limit });
   };
 
   updateScheduleBusConductor = async (req: Request) => {
     const { id, bus_no, conductor_id, date, from_time, to_time, is_scheduled } =
       req.body;
+
+    const { ulb_id } = req.body.auth
 
     const setDate = new Date(date).toISOString();
 
@@ -222,6 +234,7 @@ class BusConductorScheduleDao {
       await prisma.bus_master.update({
         data: {
           status: is_scheduled,
+          ulb_id: ulb_id
         },
         where: {
           register_no: bus_no,
@@ -245,12 +258,14 @@ class BusConductorScheduleDao {
 
   todaySchedulesBuses = async (req: Request) => {
     const curr_date = String(req.body.curr_date);
+    const { ulb_id } = req.body.auth
     const data = await prisma.$queryRawUnsafe(`
       SELECT 
         COUNT(DISTINCT sche.bus_id)::INT AS scheduled_buses,
         COUNT(DISTINCT bm.register_no)::INT - COUNT(DISTINCT sche.bus_id)::INT AS absent_buses
       FROM bus_master AS bm
-      LEFT JOIN scheduler AS sche ON bm.register_no = sche.bus_id AND sche.date = '${curr_date}';
+      LEFT JOIN scheduler AS sche ON bm.register_no = sche.bus_id AND sche.date = '${curr_date}' and sche.ulb_id=${ulb_id}
+      where bm.ulb_id=${ulb_id};
     `);
 
     return generateRes(data);
@@ -258,10 +273,11 @@ class BusConductorScheduleDao {
 
   getBusScheduleConductor = async (req: Request) => {
     const { conductor_id, date, from_time, to_time } = req.body;
+    const { ulb_id } = req.body.auth
 
     const query: string = `
 	    select conductor_id, bus_id, created_at, updated_at, from_time, to_time from scheduler
-    	where conductor_id = '${conductor_id}' AND date = '${date}' and from_time <= '${from_time}' and '${to_time}' <= to_time;
+    	where ulb_id=${ulb_id} and conductor_id = '${conductor_id}' AND date = '${date}' and from_time <= '${from_time}' and '${to_time}' <= to_time;
     `;
 
     const data = await prisma.$queryRawUnsafe<any[]>(query);

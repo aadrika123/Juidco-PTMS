@@ -23,6 +23,8 @@ class BusOnboarding {
       pollution_cert,
     } = req.body as TOnBoardingBusData;
 
+    const { ulb_id } = req.body.auth
+
     const isExistingBus = await prisma.bus_master.findUnique({
       where: { vin_no: vin_no },
     });
@@ -41,6 +43,7 @@ class BusOnboarding {
         register_no: registration_no,
         taxCopy_doc: taxCopy_cert,
         vin_no: vin_no,
+        ulb_id: ulb_id
       },
     };
 
@@ -55,6 +58,8 @@ class BusOnboarding {
     const limit: number = Number(req.query.limit);
     const search: string = String(req.query.search);
 
+    const { ulb_id } = req.body.auth
+
     const from_date: string | undefined = req.query.from_date && String(req.query.from_date);
     const to_date: string | undefined = req.query.from_date && String(req.query.to_date);
 
@@ -67,6 +72,10 @@ class BusOnboarding {
         vin_no: true,
       },
     };
+
+    query.where = {
+      ulb_id: ulb_id
+    }
 
     if (id !== "" && id !== "undefined") {
       query.where = {
