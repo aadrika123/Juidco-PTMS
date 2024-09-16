@@ -80,14 +80,14 @@ export default class AccountsSummaryDAO {
         return { bus_id: result.bus_id };
     }
 
-    async getTotalAmountByConductorId(conductor_id: string, bus_id: string, systemDate: Date): Promise<any> {
+    async getTotalAmountByConductorId(conductor_id: string, systemDate: Date): Promise<any> {
     return prisma.receipts.aggregate({
         _sum: {
             amount: true,  
         },
         where: {
             conductor_id: conductor_id,
-            bus_id: bus_id,
+            // bus_id: bus_id,
             date: systemDate, 
         },
     });
@@ -95,15 +95,34 @@ export default class AccountsSummaryDAO {
 
     // DAO method to get all transactions with status 0 (Not Validated)
     // DAO method to get transactions by multiple statuses
+    // async getUnvalidatedTransactions(statuses: number[]): Promise<any[]> {
+    //     return prisma.accounts_summary.findMany({
+    //         where: {
+    //             status: {
+    //                 in: statuses,  // Get transactions where status is in the array [0, 1, 2, 3]
+    //             },
+    //         },
+    //     });
+    // }
+
     async getUnvalidatedTransactions(statuses: number[]): Promise<any[]> {
+        const today = new Date();
+        const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Start of today
+        const endOfDay = new Date(today.setHours(23, 59, 59, 999)); // End of today
+
         return prisma.accounts_summary.findMany({
             where: {
                 status: {
                     in: statuses,  // Get transactions where status is in the array [0, 1, 2, 3]
                 },
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay
+                },
             },
         });
     }
+
 
 
 
@@ -123,12 +142,23 @@ export default class AccountsSummaryDAO {
 
 
     
-    async transactions(conductor_id:string): Promise<any[]> {
+    async transactions(conductor_id: string): Promise<any[]> {
+        const today = new Date();
+        const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Start of today
+        const endOfDay = new Date(today.setHours(23, 59, 59, 999)); // End of today
+
         return prisma.accounts_summary.findMany({
-            where: { conductor_id },
+            where: {
+                conductor_id,
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay
+                }
+            },
             orderBy: { created_at: 'desc' }
         });
     }
+
 
     async updateTransactionStatus(conductor_id: string, status: number): Promise<any> {
         try {

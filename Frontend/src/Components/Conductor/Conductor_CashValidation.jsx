@@ -7,27 +7,26 @@ const Conductor_CashValidation = () => {
     const [isModalOpen, setIsModalOpen] = useState(true);
     const [amount, setAmount] = useState(null);
     const [conductorId, setConductorId] = useState('');
-    const [busId, setBusId] = useState('');
+    // const [busId, setBusId] = useState('');
     const [ulbId, setulbId] = useState('');
 
 
     useEffect(() => {
         // Retrieve conductorId and busId from localStorage
         const storedConductorId = localStorage.getItem('conductorId');
-        const storedBusId = localStorage.getItem('BusID');
+        // const storedBusId = localStorage.getItem('BusID');
         const storedUlbId = localStorage.getItem('ulbId');
 
 
         // Set state with the retrieved values
         setConductorId(storedConductorId || '');
-        setBusId(storedBusId || '');
         setulbId(storedUlbId || '');
 
         // Get current date in YYYY-MM-DD format
         const currentDate = new Date().toISOString().split('T')[0];
 
         // Construct API URL with stored values
-        const apiUrl = `http://localhost:5006/api/ptms/v1/report/total_amount?conductor_id=${storedConductorId}&bus_id=${storedBusId}&date=${currentDate}`;
+        const apiUrl = `http://localhost:5006/api/ptms/v1/report/total_amount?conductor_id=${storedConductorId}&date=${currentDate}`;
 
         // Debugging: Log the API URL
         console.log("API URL:", apiUrl);
@@ -56,8 +55,8 @@ const Conductor_CashValidation = () => {
 
     const handleSubmit = () => {
         // Check if conductorId and busId are available
-        if (!conductorId || !busId || !ulbId) {
-            console.error('Conductor ID or Bus ID or Ulb Id is missing from local storage.');
+        if (!conductorId || !ulbId) {
+            console.error('Conductor ID  or Ulb Id is missing from local storage.');
             return;
         }
 
@@ -65,7 +64,7 @@ const Conductor_CashValidation = () => {
         const payload = {
             amount,
             conductorId,
-            busId,
+            // busId,
             ulbId,
             date: new Date().toISOString().split('T')[0], // Format the date as YYYY-MM-DD
         };
@@ -125,7 +124,7 @@ const Conductor_CashValidation = () => {
                         <p className="text-sm md:text-base">Amount: {amount !== null ? amount : 'Loading...'}</p>
                         <p className="text-sm md:text-base">Date: {formattedDate}</p>
                         <p className="text-sm md:text-base">Conductor ID: {conductorId}</p> {/* Display Conductor ID */}
-                        <p className="text-sm md:text-base">Bus ID: {busId}</p> {/* Display Bus ID */}
+                        {/* <p className="text-sm md:text-base">Bus ID: {busId}</p> Display Bus ID */}
                         <p className="text-sm md:text-base">ULB ID: {ulbId}</p> {/* Display Bus ID */}
 
 
