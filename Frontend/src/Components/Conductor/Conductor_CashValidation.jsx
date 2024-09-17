@@ -39,7 +39,7 @@ const Conductor_CashValidation = () => {
                     console.log("API Response:", response);
 
                     // Set the fetched amount
-                    setAmount(response.data.data._sum.amount || 0);
+                    setAmount(response.data.data.total_amount || 0);
                 })
                 .catch(error => {
                     console.error('Error fetching amount:', error);
@@ -87,6 +87,8 @@ const Conductor_CashValidation = () => {
         day: '2-digit',
     });
 
+    console.log(amount,"amount==")
+
     return (
         <>
             <div className="flex h-12 justify-between items-center">
@@ -121,7 +123,7 @@ const Conductor_CashValidation = () => {
                         <h2 className="text-lg md:text-xl lg:text-2xl font-semibold mb-4">
                             Are you sure you want to do the cash validation?
                         </h2>
-                        <p className="text-sm md:text-base">Amount: {amount !== null ? amount : 'Loading...'}</p>
+                        <p className="text-sm md:text-base">Amount: {amount || 0}</p>
                         <p className="text-sm md:text-base">Date: {formattedDate}</p>
                         <p className="text-sm md:text-base">Conductor ID: {conductorId}</p> {/* Display Conductor ID */}
                         {/* <p className="text-sm md:text-base">Bus ID: {busId}</p> Display Bus ID */}

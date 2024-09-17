@@ -45,8 +45,7 @@ export default class AccountsSummaryController {
                 const currentDate = new Date();
                 const day = (currentDate.getDate()).toString().padStart(2, '0');
                 const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-                const year = currentDate.getFullYear().toString().slice(-2); // Last 2 digits of the year
-
+                const year = currentDate.getFullYear();
                 // Generate sequence with zero padding
                 // Zero-padding to 3 digits
 
@@ -55,7 +54,11 @@ export default class AccountsSummaryController {
                 const randomSequence = Math.floor(Math.random() * 999) + 1;
                 const sequenceStr = randomSequence.toString().padStart(3, '0');
 
-                return `${prefix}${day}${month}${year}${ulbId}${sequenceStr}`;
+                console.log('====================================');
+                console.log("sequenceStr", sequenceStr);
+                console.log('====================================');
+
+                return `${prefix}${day}${month}${year}${ulbId}-${sequenceStr}`;
             };
 
 
@@ -113,33 +116,28 @@ export default class AccountsSummaryController {
         };
 
         try {
-            // Cast the query params to string
-            // const bus_id = req.query.bus_id as string;
             const dateString = req.query.date as string;
             const conductor_id = req.query.conductor_id as string;
 
             if (!conductor_id) {
                 return CommonRes.BAD_REQUEST('Conductor ID is required', resObj, res);
             }
-            // if (!bus_id) {
-            //     return CommonRes.BAD_REQUEST('Bus ID is required', resObj, res);
-            // }
+
             if (!dateString) {
                 return CommonRes.BAD_REQUEST('Date is required', resObj, res);
             }
 
-            // Convert the date string to a Date object
             const date = new Date(dateString);
             if (isNaN(date.getTime())) {
                 return CommonRes.BAD_REQUEST('Invalid Date format', resObj, res);
             }
 
-            // Assuming your accountsSummaryDAO function takes Date
-            const totalAmountByConductorId = await this.accountsSummaryDAO.getTotalAmountByConductorId(conductor_id, date);
+            // Fetch total amount where isvalidated is false
+            const { total_amount } = await this.accountsSummaryDAO.getTotalAmount(conductor_id, date);
 
             CommonRes.SUCCESS(
                 'Summary data retrieved successfully',
-                totalAmountByConductorId,
+                { total_amount },
                 resObj,
                 res
             );
@@ -147,79 +145,11 @@ export default class AccountsSummaryController {
             CommonRes.SERVER_ERROR(error, resObj, res);
         }
     };
+
     // api
 
 // Controller method to get all transactions with status 0 (Not Validated)
-    // getUnvalidatedTransactions = async (req: Request, res: Response): Promise<void> => {
-    //     const resObj: resObj = {
-    //         apiId: '0504',
-    //         action: 'GET',
-    //         version: '1.0',
-    //     };
-
-    //     try {
-    //         // Fetch transactions with statuses 0, 1, 2, and 3 from the DAO
-    //         const transactions = await this.accountsSummaryDAO.getUnvalidatedTransactions([0, 1, 2, 3]);
-
-    //         // Group the transactions based on their status
-    //         const groupedData = {
-    //             "Submitted_Cash": transactions
-    //                 .filter(t => t.status === 0)
-    //                 .map(t => ({
-    //                     id: t.conductor_id,
-    //                     date: t.date.toISOString().split('T')[0],
-    //                     time: t.time,
-    //                     amount: `₹${t.total_amount}`,
-    //                     payee: t.conductor_name,
-    //                     description: t.description,  // Use the existing description from the database
-    //                     referenceNumber: t.transaction_id,
-    //                 })),
-    //             "Validated_Cash": transactions
-    //                 .filter(t => t.status === 1)
-    //                 .map(t => ({
-    //                     id: t.conductor_id,
-    //                     date: t.date.toISOString().split('T')[0],
-    //                     time: t.time,
-    //                     amount: `₹${t.total_amount}`,
-    //                     payee: t.conductor_name,
-    //                     description: t.description,  // Use the existing description from the database
-    //                     referenceNumber: t.transaction_id,
-    //                 })),
-    //             "Disputed_Cash": transactions
-    //                 .filter(t => t.status === 2)
-    //                 .map(t => ({
-    //                     id: t.conductor_id,
-    //                     date: t.date.toISOString().split('T')[0],
-    //                     time: t.time,
-    //                     amount: `₹${t.total_amount}`,
-    //                     payee: t.conductor_name,
-    //                     description: t.description,  // Use the existing description from the database
-    //                     referenceNumber: t.transaction_id,
-    //                 })),
-    //             "Suspense_Cash": transactions
-    //                 .filter(t => t.status === 3)
-    //                 .map(t => ({
-    //                     id: t.conductor_id,
-    //                     date: t.date.toISOString().split('T')[0],
-    //                     time: t.time,
-    //                     amount: `₹${t.total_amount}`,
-    //                     payee: t.conductor_name,
-    //                     description: t.description,  // Use the existing description from the database
-    //                     referenceNumber: t.transaction_id,
-    //                 })),
-    //         };
-
-    //         // Return the grouped transactions
-    //         CommonRes.SUCCESS(
-    //             'Transactions categorized by status successfully',
-    //             groupedData,
-    //             resObj,
-    //             res
-    //         );
-    //     } catch (error) {
-    //         CommonRes.SERVER_ERROR(error, resObj, res);
-    //     }
-    // };
+ 
     getUnvalidatedTransactions = async (req: Request, res: Response): Promise<void> => {
         const resObj: resObj = {
             apiId: '0504',
@@ -230,6 +160,9 @@ export default class AccountsSummaryController {
         try {
             // Fetch transactions with statuses 0, 1, 2, and 3 from the DAO, filtered by today's date
             const transactions = await this.accountsSummaryDAO.getUnvalidatedTransactions([0, 1, 2, 3]);
+
+            // Get the current date
+            const currentDate = new Date().toISOString().split('T')[0];
 
             // Group the transactions based on their status
             const groupedData = {
@@ -243,6 +176,8 @@ export default class AccountsSummaryController {
                         payee: t.conductor_name,
                         description: t.description,  // Use the existing description from the database
                         referenceNumber: t.transaction_id,
+                        status: t.status, // Include status
+                        currentDate: currentDate // Include current date
                     })),
                 "Validated_Cash": transactions
                     .filter(t => t.status === 1)
@@ -254,6 +189,8 @@ export default class AccountsSummaryController {
                         payee: t.conductor_name,
                         description: t.description,  // Use the existing description from the database
                         referenceNumber: t.transaction_id,
+                        status: t.status, // Include status
+                        currentDate: currentDate // Include current date
                     })),
                 "Disputed_Cash": transactions
                     .filter(t => t.status === 2)
@@ -265,6 +202,8 @@ export default class AccountsSummaryController {
                         payee: t.conductor_name,
                         description: t.description,  // Use the existing description from the database
                         referenceNumber: t.transaction_id,
+                        status: t.status, // Include status
+                        currentDate: currentDate // Include current date
                     })),
                 "Suspense_Cash": transactions
                     .filter(t => t.status === 3)
@@ -276,6 +215,8 @@ export default class AccountsSummaryController {
                         payee: t.conductor_name,
                         description: t.description,  // Use the existing description from the database
                         referenceNumber: t.transaction_id,
+                        status: t.status, // Include status
+                        currentDate: currentDate // Include current date
                     })),
             };
 
@@ -290,6 +231,7 @@ export default class AccountsSummaryController {
             CommonRes.SERVER_ERROR(error, resObj, res);
         }
     };
+
 
 
 

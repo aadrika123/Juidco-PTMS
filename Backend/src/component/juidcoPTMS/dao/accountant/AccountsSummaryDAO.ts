@@ -7,6 +7,8 @@ import { string } from 'yup';
 const prisma = new PrismaClient();
 
 export default class AccountsSummaryDAO {
+
+    // get api totoal amount
     async getTotalAmount(conductor_id: string, date: Date): Promise<{ total_amount: number }> {
         const result = await prisma.receipts.aggregate({
             _sum: {
@@ -15,10 +17,15 @@ export default class AccountsSummaryDAO {
             where: {
                 conductor_id: conductor_id,
                 date: date,
+                isvalidated: false,
             },
         });
+
+        console.log(result);
+
         return { total_amount: result._sum.amount || 0 };
     }
+
 
     //post
     async createSummary(summaryData: {
@@ -33,9 +40,22 @@ export default class AccountsSummaryDAO {
         bus_id: string;
         status: number;
     }): Promise<any> {
+
+        await prisma.receipts.updateMany({
+            where: {
+                conductor_id: summaryData.conductor_id,
+                date: summaryData.date
+            },
+            data: {
+                isvalidated: true,
+            },
+        })
+
         return prisma.accounts_summary.create({
             data: summaryData,
         });
+
+
     }
 
 
@@ -120,8 +140,19 @@ export default class AccountsSummaryDAO {
                     lte: endOfDay
                 },
             },
+            select: {
+                conductor_id: true,
+                date: true,
+                time: true,
+                total_amount: true,
+                conductor_name: true,
+                description: true,
+                transaction_id: true,
+                status: true,
+            }
         });
     }
+
 
 
 
