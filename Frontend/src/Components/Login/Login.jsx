@@ -54,6 +54,7 @@ const Login = () => {
         localStorage.setItem("userType", userDetails.user_type);
         localStorage.setItem("userName", userDetails.user_name);
         localStorage.setItem("device", deviceType);
+        localStorage.setItem("name", userDetails?.name);
         // localStorage.setItem("ulbId", userDetails.ulb_id);
         localStorage.setItem("userUlbName", userDetails.ulbName);
         localStorage.setItem("roles", JSON.stringify(userDetails.role));
