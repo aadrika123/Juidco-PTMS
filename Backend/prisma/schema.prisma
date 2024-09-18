@@ -82,9 +82,8 @@ model receipts {
 }
 
 model accounts_summary {
-  id Int @id @default(autoincrement())
   conductor_id      String
-  transaction_id    String   @unique
+  transaction_id    String    @id @unique
   total_amount      Int
   date              DateTime @db.Date
   time              String

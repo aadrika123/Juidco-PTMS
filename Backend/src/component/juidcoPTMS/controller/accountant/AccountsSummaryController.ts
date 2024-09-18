@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import AccountsSummaryDAO from '../../dao/accountant/AccountsSummaryDAO';
 // import { v4 as uuidv4 } from 'uuid';
+import { PrismaClient } from '@prisma/client';
 import CommonRes from "../../../../util/helper/commonResponse";
 import { resMessage } from '../../../../util/common';
 import { resObj } from '../../../../util/types';
 import * as Yup from "yup";
 import { AccountsType } from "../../../../util/types/accountant/accountant.type";
 import { AccountValidatorData, AccountValidatorDataSchema } from '../../validators/accountant/accountant.validator1';
+const prisma = new PrismaClient();
 
 export default class AccountsSummaryController {
     private accountsSummaryDAO: AccountsSummaryDAO;
@@ -26,44 +28,59 @@ export default class AccountsSummaryController {
         };
 
         try {
-            const { conductorId, date, amount,  ulbId } = req.body;
+            const { conductorId, date, amount, ulbId } = req.body;
 
-            console.log(conductorId, date, amount, ulbId)
+            console.log(conductorId, date, amount, ulbId);
 
-            if (!conductorId || !date || amount === null || amount === undefined || !ulbId ) {
-                return CommonRes.BAD_REQUEST('Conductor ID, date, total amount,  ULID', resObj, res);
+            if (!conductorId || !date || amount === null || amount === undefined || !ulbId) {
+                return CommonRes.BAD_REQUEST('Conductor ID, date, total amount, ULID are required', resObj, res);
             }
 
             // Fetch the name of the conductor
             const { name } = await this.accountsSummaryDAO.getName(conductorId);
+
             // In-memory storage for the last sequence by date
-            
-            const generateCustomTransactionNo = (ulbId: string): string => {
+            const generateCustomTransactionNo = async (ulbId: string): Promise<string> => {
                 const prefix = 'TR'; // Prefix for the transaction ID
 
                 // Get current date in DDMMYYYY format
                 const currentDate = new Date();
-                const day = (currentDate.getDate()).toString().padStart(2, '0');
+                const day = currentDate.getDate().toString().padStart(2, '0');
                 const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
                 const year = currentDate.getFullYear();
-                // Generate sequence with zero padding
-                // Zero-padding to 3 digits
 
-                // return `${prefix}${day}${month}${year}${ulbId}`;
-                // Generate a random number between 1 and 999 for the sequence
-                const randomSequence = Math.floor(Math.random() * 999) + 1;
-                const sequenceStr = randomSequence.toString().padStart(3, '0');
+                // Get the latest transaction ID from the database (order by descending transaction_id)
+                const lastTransaction = await prisma.accounts_summary.findFirst({
+                    where: {
+                        transaction_id: {
+                            contains: `${prefix}${day}${month}${year}${ulbId}`, // Check for the current day and ULB
+                        },
+                    },
+                    orderBy: {
+                        transaction_id: 'desc', // Order by descending to get the last transaction
+                    },
+                });
 
-                console.log('====================================');
-                console.log("sequenceStr", sequenceStr);
-                console.log('====================================');
+                // Check if lastTransaction and transaction_id exist
+                let newSequence = 1;
+                if (lastTransaction?.transaction_id) {
+                    const lastTransactionId = lastTransaction.transaction_id;
 
+                    // Extract the sequence part (last 3 digits) from the last transaction ID
+                    const lastSequence = parseInt(lastTransactionId.split('-').pop()!, 10); // Add non-null assertion operator "!"
+                    newSequence = lastSequence + 1; // Increment the sequence number
+                }
+
+                // Zero-padding the sequence to 3 digits
+                const sequenceStr = newSequence.toString().padStart(3, '0');
+
+                // Return the new transaction ID in the format TRddmmyyyyulbid-001
                 return `${prefix}${day}${month}${year}${ulbId}-${sequenceStr}`;
             };
 
 
             // Generate the transaction ID
-            const transaction_id = generateCustomTransactionNo(ulbId);
+            const transaction_id = await generateCustomTransactionNo(ulbId); // Await the async function
             console.log(transaction_id);
 
             // Create summary data
@@ -102,6 +119,7 @@ export default class AccountsSummaryController {
             CommonRes.SERVER_ERROR(error, resObj, res);
         }
     };
+
 
 
     // 
