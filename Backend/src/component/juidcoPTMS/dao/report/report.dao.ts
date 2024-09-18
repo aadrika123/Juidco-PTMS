@@ -282,15 +282,15 @@ class ReportDao {
       `);
     }
 
-    const conditionRegex = /(JOIN|ORDER BY|LIMIT|OFFSET)/i;
+    const conditionRegex = /(ORDER BY|GROUP BY|LIMIT|OFFSET)/i;
     const whereData = 'where';
     const whereRegex = new RegExp(`\\b${whereData}\\b`, 'i');
 
     if (whereRegex.test(qr_1)) {
-      qr_1 = qr_1.replace(conditionRegex, `AND ulb_id = '${ulb_id}' $1`);
+      qr_1 = qr_1.replace(conditionRegex, `AND receipts.ulb_id = '${ulb_id}' $1`);
     } else {
       if (conditionRegex.test(qr_1)) {
-        qr_1 = qr_1.replace(conditionRegex, `WHERE ulb_id = '${ulb_id}' $1`);
+        qr_1 = qr_1.replace(conditionRegex, `WHERE receipts.ulb_id = '${ulb_id}' $1`);
       } else {
         qr_1 += ` WHERE ulb_id = '${ulb_id}'`;
       }
