@@ -41,6 +41,12 @@ export default class AccountsSummaryDAO {
         status: number;
     }): Promise<any> {
 
+       
+        const receiptData = await prisma.accounts_summary.create({
+            data: summaryData,
+        });
+
+
         await prisma.receipts.updateMany({
             where: {
                 conductor_id: summaryData.conductor_id,
@@ -51,9 +57,20 @@ export default class AccountsSummaryDAO {
             },
         })
 
-        return prisma.accounts_summary.create({
-            data: summaryData,
-        });
+        await prisma.receipts.updateMany({
+            where: {
+                conductor_id: summaryData.conductor_id,
+                date: summaryData.date,
+                transaction_id: null,
+                isvalidated: true
+            },
+            data: {
+                transaction_id: summaryData?.transaction_id,
+            },
+        })
+
+        return receiptData
+
 
 
     }

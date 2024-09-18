@@ -113,6 +113,7 @@ export default class AccountsSummaryController {
                 res
             );
         } catch (error) {
+            console.log(error)
             if (error instanceof Yup.ValidationError) {
                 return CommonRes.BAD_REQUEST(error.message, resObj, res);
             }

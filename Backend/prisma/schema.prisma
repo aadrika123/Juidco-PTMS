@@ -69,21 +69,26 @@ model receipts {
   conductor_id String
   conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
 
+  transaction_id String?
+  transaction   accounts_summary? @relation(fields: [transaction_id], references: [transaction_id])
+
   bus_id String
   bus    bus_master @relation(fields: [bus_id], references: [register_no])
-
   receipt_no String   @unique
   amount     Int
   date       DateTime @db.Date
   time       String
   isvalidated Boolean @default(false)
+  payment_type String @default("cash")
+
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
 }
 
 model accounts_summary {
   conductor_id      String
-  transaction_id    String    @id @unique
+  transaction_id    String    @id 
+  receipts receipts[] 
   total_amount      Int
   date              DateTime @db.Date
   time              String
