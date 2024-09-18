@@ -37,6 +37,13 @@ export default class AccountsSummaryRoutes {
         app
             .route(`${baseUrl}/Cash/validate/status`)
             .get((req: Request, res: Response) => accountsSummaryController.getAccountsByStatus(req, res));
+        
+        
+        app
+          .route(`${baseUrl}/transactions/receipts/:transaction_id`)
+          .get((req: Request, res: Response) =>
+            accountsSummaryController.getReceiptsByTransactionId(req, res)
+          );
     } 
     
     
