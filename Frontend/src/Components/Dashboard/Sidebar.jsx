@@ -7,6 +7,7 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
+  const name = localStorage.getItem('name')
   return (
     <div className="flex h-[90vh] justify-center items-start ">
       <div className="flex flex-1 ">
@@ -15,7 +16,7 @@ export default function Sidebar() {
             <Avatar src={sample_profile} sx={{ width: 100, height: 100 }} />
           </div>
           <div className="flex flex-1 text-2xl text-[#555555] font-bold">
-            State Admin
+            {name || ''}
           </div>
 
           <div className="flex flex-col  w-[90%] m-10 justify-start items-start">
@@ -60,8 +61,8 @@ export default function Sidebar() {
             </div>
             <div
               className={`flex h-[50px] justify-center items-center rounded-md  ${path == "/Bus-onboarding"
-                  ? "bg-[#5457D6] text-white"
-                  : "bg-white "
+                ? "bg-[#5457D6] text-white"
+                : "bg-white "
                 } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
               <Link className="flex flex-1" to="/Bus-onboarding">
@@ -101,8 +102,8 @@ export default function Sidebar() {
             </div>
             <div
               className={`flex h-[50px] justify-center items-center rounded-md  ${path == "/Conductor-onboarding"
-                  ? "bg-[#5457D6] text-white"
-                  : "bg-white "
+                ? "bg-[#5457D6] text-white"
+                : "bg-white "
                 } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
               <Link className="flex flex-1" to="/Conductor-onboarding">
@@ -145,8 +146,8 @@ export default function Sidebar() {
             </div>
             <div
               className={`flex h-[50px] justify-center items-center rounded-md  ${path == "/ChangeScheduling-Main"
-                  ? "bg-[#5457D6] text-white"
-                  : "bg-white "
+                ? "bg-[#5457D6] text-white"
+                : "bg-white "
                 } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
               <Link to={"/ChangeScheduling-Main"} className="flex flex-1">
@@ -178,8 +179,8 @@ export default function Sidebar() {
 
             <div
               className={`flex h-[50px] justify-center items-center rounded-md  ${path == "/ReportGeneration-main"
-                  ? "bg-[#5457D6] text-white"
-                  : "bg-white "
+                ? "bg-[#5457D6] text-white"
+                : "bg-white "
                 } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
               <Link to="/ReportGeneration-main" className="flex flex-1">
