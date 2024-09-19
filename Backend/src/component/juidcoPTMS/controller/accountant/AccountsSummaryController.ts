@@ -54,7 +54,8 @@ export default class AccountsSummaryController {
 
       // In-memory storage for the last sequence by date
       const generateCustomTransactionNo = async (
-        ulbId: string
+        ulbId: string,
+        conductorId: string 
       ): Promise<string> => {
         const prefix = "TR"; // Prefix for the transaction ID
 
@@ -62,13 +63,13 @@ export default class AccountsSummaryController {
         const currentDate = new Date();
         const day = currentDate.getDate().toString().padStart(2, "0");
         const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
-        const year = currentDate.getFullYear();
+        const year = currentDate.getFullYear() % 100;
 
         // Get the latest transaction ID from the database (order by descending transaction_id)
         const lastTransaction = await prisma.accounts_summary.findFirst({
           where: {
             transaction_id: {
-              contains: `${prefix}${day}${month}${year}${ulbId}`, // Check for the current day and ULB
+              contains: `${prefix}${day}${month}${year}0${ulbId}`, // Check for the current day and ULB
             },
           },
           orderBy: {
@@ -91,13 +92,13 @@ export default class AccountsSummaryController {
 
         // Zero-padding the sequence to 3 digits
         const sequenceStr = newSequence.toString().padStart(3, "0");
-
+        const conductorLastFour = conductorId.slice(-4);
         // Return the new transaction ID in the format TRddmmyyyyulbid-001
-        return `${prefix}${day}${month}${year}${ulbId}-${sequenceStr}`;
+        return `${prefix}${day}${month}${year}${ulbId}${conductorLastFour}-${sequenceStr}`;
       };
 
       // Generate the transaction ID
-      const transaction_id = await generateCustomTransactionNo(ulbId); // Await the async function
+      const transaction_id = await generateCustomTransactionNo(ulbId, conductorId); // Await the async function
       console.log(transaction_id);
 
       // Create summary data
@@ -110,7 +111,7 @@ export default class AccountsSummaryController {
           timeZone: "Asia/Kolkata",
         }),
         description: "Transaction Summary",
-        transaction_type: "Credit",
+        transaction_type: "Cash",
         conductor_name: name,
         bus_id: "null",
         status: 0, // Updated status
