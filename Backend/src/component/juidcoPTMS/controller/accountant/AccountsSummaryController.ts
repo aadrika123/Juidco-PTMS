@@ -517,5 +517,38 @@ export default class AccountsSummaryController {
       CommonRes.SERVER_ERROR(error, resObj, res);
     }
   };
+
+
+
+  // .....................................
+  getTotalAmountByConductorId_currentDate = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    const resObj: resObj = {
+      apiId: "0503",
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      // Use the current date
+      const currentDate = new Date();
+
+      // Fetch total amount and count for the current date
+      const { total_amount, total_count, results } = await this.accountsSummaryDAO.getTotalAmountScheduleConductor();
+
+      CommonRes.SUCCESS(
+        "Summary data retrieved successfully",
+        { total_amount, total_count, results },
+        resObj,
+        res
+      );
+    } catch (error) {
+      CommonRes.SERVER_ERROR(error, resObj, res);
+    }
+  };
+
+
 };
 

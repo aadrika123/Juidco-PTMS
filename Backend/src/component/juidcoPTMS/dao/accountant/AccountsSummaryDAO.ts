@@ -264,4 +264,57 @@ export default class AccountsSummaryDAO {
       },
     });
   }
+
+//   ................................
+    async getTotalAmountScheduleConductor(): Promise<{
+        total_amount: number;
+        total_count: number;
+        results: any[]; // Use any[] for results; // Include results to return the detailed data
+    }> {
+        const result: any[] = await prisma.$queryRaw`
+    SELECT 
+        sch.conductor_id,
+        cm.cunique_id,
+        CONCAT(cm.first_name, ' ', cm.last_name) AS full_name,
+        cm.mobile_no,
+        sch.bus_id,
+        sch.date,
+        sch.from_time,
+        sch.to_time,
+        SUM(r.amount)::numeric AS total_amount,  -- Cast to numeric
+        COUNT(r.id)::integer AS total_receipts    -- Cast to integer
+    FROM
+        public.scheduler sch
+    JOIN
+        public.receipts r ON sch.conductor_id = r.conductor_id
+        AND DATE(sch.date) = DATE(r.date)
+    JOIN
+        public.conductor_master cm ON sch.conductor_id = cm.cunique_id
+    WHERE
+        DATE(sch.date) = CURRENT_DATE
+    GROUP BY
+        sch.conductor_id,
+        cm.cunique_id,
+        full_name,
+        cm.mobile_no,
+        sch.bus_id,
+        sch.date,
+        sch.from_time,
+        sch.to_time
+    ORDER BY
+        sch.conductor_id ASC;
+`;
+
+
+        const total_amount = result.reduce((sum:any, row:any) => sum + (row.total_amount || 0), 0);
+        const total_count = result.reduce((count:any, row:any) => count + (row.total_receipts || 0), 0);
+
+        return {
+            total_amount,
+            total_count,
+            results: result, // Return the detailed results
+        };
+    }
+
+
 }

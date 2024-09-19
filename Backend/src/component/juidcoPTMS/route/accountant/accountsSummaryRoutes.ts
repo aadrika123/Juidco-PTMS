@@ -44,6 +44,13 @@ export default class AccountsSummaryRoutes {
           .get((req: Request, res: Response) =>
             accountsSummaryController.getReceiptsByTransactionId(req, res)
           );
+
+        //   ......................
+        app
+            .route(`${baseUrl}/scheduled/receipts/current-date`)
+            .get((req: Request, res: Response) =>
+                accountsSummaryController.getTotalAmountByConductorId_currentDate(req, res)
+            );
     } 
     
     
