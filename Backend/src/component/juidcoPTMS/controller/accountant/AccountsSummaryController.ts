@@ -450,10 +450,10 @@ export default class AccountsSummaryController {
     };
 
     try {
-      const { conductor_id, status } = req.body;
-
+      const { transaction_id, status } = req.body;
+      console.log(transaction_id, status);
       // Validate input
-      if (!conductor_id || typeof status !== "number") {
+      if (!transaction_id || typeof status !== "number") {
         return CommonRes.BAD_REQUEST(
           "Transaction ID and status are required",
           resObj,
@@ -469,7 +469,7 @@ export default class AccountsSummaryController {
       // Update the status in the database using DAO
       const updatedTransaction =
         await this.accountsSummaryDAO.updateTransactionStatus(
-          conductor_id,
+          transaction_id,
           status
         );
 

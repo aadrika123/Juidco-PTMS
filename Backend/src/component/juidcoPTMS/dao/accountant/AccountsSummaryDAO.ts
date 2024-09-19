@@ -239,12 +239,12 @@ export default class AccountsSummaryDAO {
   // ................................
 
   async updateTransactionStatus(
-    conductor_id: string,
+      transaction_id: string,
     status: number
   ): Promise<any> {
     try {
       const updatedTransaction = await prisma.accounts_summary.updateMany({
-        where: { conductor_id },
+          where: { transaction_id },
         data: { status },
       });
 
