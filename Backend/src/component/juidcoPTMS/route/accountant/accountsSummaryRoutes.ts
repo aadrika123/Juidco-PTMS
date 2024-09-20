@@ -32,7 +32,7 @@ export default class AccountsSummaryRoutes {
 
         app
             .route(`${baseUrl}/report/validate`)
-            .put((req: Request, res: Response) => accountsSummaryController.updateTransactionStatus(req, res));
+            .post((req: Request, res: Response) => accountsSummaryController.updateTransactionStatus(req, res));
 
         app
             .route(`${baseUrl}/Cash/validate/status`)

@@ -446,7 +446,7 @@ export default class AccountsSummaryController {
   ): Promise<void> => {
     const resObj = {
       apiId: "0506",
-      action: "PUT",
+      action: "POST",
       version: "1.0",
     };
 
