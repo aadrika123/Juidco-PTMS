@@ -9,6 +9,8 @@ class BusConductorScheduleDao {
     const { bus_no, conductor_id, date, from_time, to_time, is_scheduled } =
       req.body;
 
+    const { ulb_id } = req.body.auth
+
     const setDate = new Date(date).toISOString();
 
     const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
@@ -40,6 +42,7 @@ class BusConductorScheduleDao {
         date: setDate,
         from_time: setFromTime,
         to_time: setToTime,
+        ulb_id: ulb_id
       },
     });
 
