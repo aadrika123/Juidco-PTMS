@@ -265,7 +265,7 @@ export default class AccountsSummaryDAO {
     });
   }
 
-//   ................................
+//   ..................................................
     async getTotalAmountScheduleConductor(): Promise<{
         total_amount: number;
         total_count: number;

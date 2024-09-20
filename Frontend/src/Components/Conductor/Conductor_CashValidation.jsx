@@ -12,11 +12,10 @@ const Conductor_CashValidation = () => {
 
 
     useEffect(() => {
-        // Retrieve conductorId and busId from localStorage
+        // Retrieve conductorId and ulbId from localStorage
         const storedConductorId = localStorage.getItem('conductorId');
-        // const storedBusId = localStorage.getItem('BusID');
         const storedUlbId = localStorage.getItem('ulbId');
-
+        const token = localStorage.getItem('token'); // Retrieve the token for authorization
 
         // Set state with the retrieved values
         setConductorId(storedConductorId || '');
@@ -25,15 +24,19 @@ const Conductor_CashValidation = () => {
         // Get current date in YYYY-MM-DD format
         const currentDate = new Date().toISOString().split('T')[0];
 
-        // Construct API URL with stored values
-        const apiUrl = `http://localhost:5006/api/ptms/v1/report/total_amount?conductor_id=${storedConductorId}&date=${currentDate}`;
+        // Construct API URL with base URL from environment variables
+        const apiUrl = `${process.env.REACT_APP_BASE_URL}/report/total_amount?conductor_id=${storedConductorId}&date=${currentDate}`;
 
         // Debugging: Log the API URL
         console.log("API URL:", apiUrl);
 
         // Fetch the amount if the modal is open
         if (isModalOpen) {
-            axios.get(apiUrl)
+            axios.get(apiUrl, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Add Authorization header with Bearer token
+                },
+            })
                 .then(response => {
                     // Debugging: Log the entire response
                     console.log("API Response:", response);
@@ -69,7 +72,11 @@ const Conductor_CashValidation = () => {
             date: new Date().toISOString().split('T')[0], // Format the date as YYYY-MM-DD
         };
 
-        axios.post('http://localhost:5006/api/ptms/v1/report/daywise_data', payload)
+        axios.post(`${process.env.REACT_APP_BASE_URL}/report/daywise_data`, payload, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`, // Adding the Authorization header
+            },
+        })
             .then(response => {
                 console.log('Cash validation successful:', response);
                 window.alert('Cash validation successful!');

@@ -39,8 +39,8 @@ const Login = () => {
         data: {
           email: values.user_id,
           password: values.password,
-          // type: window.ReactNativeWebView ? "mobile" : null,
-          type: 'mobile',
+          type: window.ReactNativeWebView ? "mobile" : null,
+          // type: 'mobile',
         },
       });
 
