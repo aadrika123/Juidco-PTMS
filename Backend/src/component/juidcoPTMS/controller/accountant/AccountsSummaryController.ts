@@ -8,6 +8,7 @@ import { resObj } from '../../../../util/types';
 import * as Yup from "yup";
 import { AccountsType } from "../../../../util/types/accountant/accountant.type";
 import { AccountValidatorData, AccountValidatorDataSchema } from '../../validators/accountant/accountant.validator1';
+import { error } from 'console';
 const prisma = new PrismaClient();
 
 export default class AccountsSummaryController {
@@ -52,6 +53,29 @@ export default class AccountsSummaryController {
       // Fetch the name of the conductor
       const { name } = await this.accountsSummaryDAO.getName(conductorId);
 
+
+      // Fetch the bus_id from the receipts table by conductor_id
+      const receipt = await prisma.receipts.findFirst({
+        where: {
+          conductor_id: conductorId,
+          isvalidated: false, // Only fetch bus_id
+
+          date: {
+            equals: new Date(date), // Make sure the date is in the right format
+          },
+        },
+        select: {
+          bus_id: true,
+        },
+      });
+
+      if(!receipt?.bus_id){
+        throw new Error('No bus_id found');
+      }
+
+      // Handle case where no receipt is found
+      const busId = receipt?.bus_id ?? null; 
+
       // In-memory storage for the last sequence by date
       const generateCustomTransactionNo = async (
         ulbId: string,
@@ -69,7 +93,7 @@ export default class AccountsSummaryController {
         const lastTransaction = await prisma.accounts_summary.findFirst({
           where: {
             transaction_id: {
-              contains: `${prefix}${day}${month}${year}0${ulbId}`, // Check for the current day and ULB
+              contains: `${prefix}${day}${month}${year}${ulbId}`, // Check for the current day and ULB
             },
           },
           orderBy: {
@@ -113,7 +137,7 @@ export default class AccountsSummaryController {
         description: "Transaction Summary",
         transaction_type: "Cash",
         conductor_name: name,
-        bus_id: "null",
+        bus_id: busId,
         status: 0, // Updated status
       };
 
