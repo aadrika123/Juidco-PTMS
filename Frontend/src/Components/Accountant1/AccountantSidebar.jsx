@@ -21,10 +21,10 @@ export default function AccountantSidebar() {
           <div className="flex flex-col  w-[90%] m-10 justify-start items-start">
             <div
               className={`flex h-[50px] justify-center items-center rounded-md  ${
-                path == "/accountant_dashboard" ? "bg-[#5457D6] text-white" : "bg-white "
+                path == "/accountant-view" ? "bg-[#5457D6] text-white" : "bg-white "
               } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
-              <Link className="flex flex-1" to="/accountant_dashboard">
+              <Link className="flex flex-1" to="/accountant-view">
                 <div className="flex w-full justify-between">
                   <div className="flex w-fit">
                     <div className="h-10 w-10 bg-[#5457D6] flex rounded-md justify-center items-center">
@@ -62,12 +62,12 @@ export default function AccountantSidebar() {
 
             <div
               className={`flex h-[50px] justify-center items-center rounded-md  ${
-                path == "/Conductor-onboarding"
+                path == "/ValidationListView"
                   ? "bg-[#5457D6] text-white"
                   : "bg-white "
               } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
-              <Link className="flex flex-1" to="/Conductor-onboarding">
+              <Link className="flex flex-1" to="/ValidationListView">
                 {" "}
                 <div className="flex w-full justify-between">
                   <div className="flex w-fit">
