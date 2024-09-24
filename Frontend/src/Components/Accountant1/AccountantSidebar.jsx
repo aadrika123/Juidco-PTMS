@@ -7,6 +7,7 @@ export default function AccountantSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
+  const name = localStorage.getItem('name') || 'Accountant';
   return (
     <div className="flex h-[90vh] justify-center items-start ">
       <div className="flex flex-1 ">
@@ -15,7 +16,7 @@ export default function AccountantSidebar() {
             <Avatar src={sample_profile} sx={{ width: 100, height: 100 }} />
           </div>
           <div className="flex flex-1 text-2xl text-[#555555] font-bold">
-            RMC Admin
+            {name}
           </div>
 
           <div className="flex flex-col  w-[90%] m-10 justify-start items-start">

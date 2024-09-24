@@ -266,55 +266,64 @@ export default class AccountsSummaryDAO {
   }
 
 //   ..................................................
-    async getTotalAmountScheduleConductor(): Promise<{
-        total_amount: number;
-        total_count: number;
-        results: any[]; // Use any[] for results; // Include results to return the detailed data
-    }> {
-        const result: any[] = await prisma.$queryRaw`
-    SELECT 
-        sch.conductor_id,
-        cm.cunique_id,
-        CONCAT(cm.first_name, ' ', cm.last_name) AS full_name,
-        cm.mobile_no,
-        sch.bus_id,
-        sch.date,
-        sch.from_time,
-        sch.to_time,
-        SUM(r.amount)::numeric AS total_amount,  -- Cast to numeric
-        COUNT(r.id)::integer AS total_receipts    -- Cast to integer
-    FROM
-        public.scheduler sch
-    JOIN
-        public.receipts r ON sch.conductor_id = r.conductor_id
-        AND DATE(sch.date) = DATE(r.date)
-    JOIN
-        public.conductor_master cm ON sch.conductor_id = cm.cunique_id
-    WHERE
-        DATE(sch.date) = CURRENT_DATE
-    GROUP BY
-        sch.conductor_id,
-        cm.cunique_id,
-        full_name,
-        cm.mobile_no,
-        sch.bus_id,
-        sch.date,
-        sch.from_time,
-        sch.to_time
-    ORDER BY
-        sch.conductor_id ASC;
-`;
+  async getTotalAmountScheduleConductor(): Promise<{
+    total_amount: number;
+    total_count: number;
+    results: any[]; // Use any[] for results; // Include results to return the detailed data
+  }> {
+    const result: any[] = await prisma.$queryRaw`
+        SELECT 
+            unique_sch.conductor_id,
+            cm.cunique_id,
+            CONCAT(cm.first_name, ' ', cm.last_name) AS full_name,
+            cm.mobile_no,
+            unique_sch.bus_id,
+            unique_sch.date,
+            unique_sch.from_time,
+            unique_sch.to_time,
+            SUM(r.amount)::numeric AS total_amount,  -- Cast to numeric
+            COUNT(r.id)::integer AS total_receipts    -- Cast to integer
+        FROM
+            (
+                SELECT DISTINCT 
+                    sch.conductor_id,
+                    sch.bus_id,
+                    sch.date::DATE,
+                    sch.from_time,
+                    sch.to_time
+                FROM 
+                    public.scheduler sch
+                WHERE 
+                    sch.date::DATE = CURRENT_DATE -- Filter for today's date
+            ) AS unique_sch
+        JOIN
+            public.receipts r ON unique_sch.conductor_id = r.conductor_id
+            AND unique_sch.bus_id = r.bus_id
+            AND unique_sch.date = r.date::DATE -- Ensure the date matches in the receipts table
+        JOIN
+            public.conductor_master cm ON unique_sch.conductor_id = cm.cunique_id
+        GROUP BY
+            unique_sch.conductor_id,
+            cm.cunique_id,
+            full_name,
+            cm.mobile_no,
+            unique_sch.bus_id,
+            unique_sch.date,
+            unique_sch.from_time,
+            unique_sch.to_time
+        ORDER BY
+            unique_sch.conductor_id ASC;
+    `;
 
+    const total_amount = result.reduce((sum: number, row: any) => sum + (row.total_amount || 0), 0);
+    const total_count = result.reduce((count: number, row: any) => count + (row.total_receipts || 0), 0);
 
-        const total_amount = result.reduce((sum:any, row:any) => sum + (row.total_amount || 0), 0);
-        const total_count = result.reduce((count:any, row:any) => count + (row.total_receipts || 0), 0);
-
-        return {
-            total_amount,
-            total_count,
-            results: result, // Return the detailed results
-        };
-    }
+    return {
+      total_amount,
+      total_count,
+      results: result, // Return the detailed results
+    };
+  }
 
 
 }

@@ -53,6 +53,8 @@ const Login = () => {
         localStorage.setItem("token", token);
         localStorage.setItem("userType", userDetails.user_type);
         localStorage.setItem("userName", userDetails.user_name);
+        localStorage.setItem("name", userDetails.name);
+
         localStorage.setItem("device", deviceType);
         // localStorage.setItem("ulbId", userDetails.ulb_id);
         localStorage.setItem("userUlbName", userDetails.ulbName);
