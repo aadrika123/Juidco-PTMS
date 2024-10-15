@@ -19,6 +19,7 @@ class ReceiptServices {
       action: "GET",
       version: "1.0",
     };
+    console.log("00000")
 
     try {
       const data = await this.receiptDao.get(req);
@@ -81,6 +82,7 @@ class ReceiptServices {
         res
       );
     } catch (error) {
+      console.log(error)
       return CommonRes.SERVER_ERROR(error, resObj, res);
     }
   };

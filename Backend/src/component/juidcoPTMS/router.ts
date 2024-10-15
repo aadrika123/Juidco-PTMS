@@ -11,6 +11,7 @@ import ExportRoute from "./route/export/export.route";
 // import BusGenerateReportServices from "./controller/reportGeneration/busReport.services";
 import BusReportRoute from "./route/busReport/busReport.route";
 import PrimeDashboardRoute from "./route/primeDashboard/primeDashboard.route";
+import AccountsSummaryRoutes from "./route/accountant/accountsSummaryRoutes";
 
 // const app = express();
 
@@ -41,5 +42,6 @@ export default class PtmsRoute {
     new BusReportRoute(app);
     new ExportRoute(app);
     new PrimeDashboardRoute(app);
+    new AccountsSummaryRoutes(app);
   }
 }

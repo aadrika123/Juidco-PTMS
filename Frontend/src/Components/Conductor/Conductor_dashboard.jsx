@@ -179,11 +179,10 @@ export default function Conductor_dashboard() {
                   onClick={() => {
                     navigate("/ticket_check");
                   }}
-                  className={`flex m-4 flex-row w-[90%] text-lg md:text-xl lg:text-2xl xl:text-3xl border-2 ${
-                    busData == undefined
+                  className={`flex m-4 flex-row w-[90%] text-lg md:text-xl lg:text-2xl xl:text-3xl border-2 ${busData == undefined
                       ? "bg-slate-200 text-white"
                       : "border-[#4338CA] hover:bg-[#4338CA] hover:text-white text-black"
-                  } font-md p-2 rounded-md justify-center items-center`}
+                    } font-md p-2 rounded-md justify-center items-center`}
                 >
                   Ticket Booking
                   <svg
@@ -215,6 +214,29 @@ export default function Conductor_dashboard() {
                   className="flex m-4 flex-row w-[90%] text-lg md:text-xl lg:text-2xl xl:text-3xl  border-2 text-black hover:text-white font-md border-[#4338CA] hover:bg-[#4338CA] p-2 rounded-md justify-center items-center hover:fill-white"
                 >
                   Report Generation
+                  <svg
+                    width="34"
+                    height="34"
+                    className="ml-4 fill-current"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 16.423C12.1747 16.423 12.321 16.364 12.439 16.246C12.5563 16.128 12.615 15.982 12.615 15.808C12.615 15.634 12.556 15.4877 12.438 15.369C12.32 15.2503 12.174 15.1913 12 15.192C11.826 15.1927 11.68 15.2517 11.562 15.369C11.444 15.4863 11.385 15.6327 11.385 15.808C11.385 15.9833 11.444 16.1293 11.562 16.246C11.68 16.3627 11.826 16.4217 12 16.423ZM11.5 13.462H12.5V7.384H11.5V13.462ZM8.673 20L4 15.336V8.673L8.664 4H15.327L20 8.664V15.327L15.336 20H8.673ZM9.1 19H14.9L19 14.9V9.1L14.9 5H9.1L5 9.1V14.9L9.1 19Z"
+                      fill="#373030"
+                    />
+                  </svg>
+                </button>
+
+
+                <button
+                  onClick={() => {
+                    navigate("/conductor_CashValidation");
+                  }}
+                  className="flex m-4 flex-row w-[90%] text-lg md:text-xl lg:text-2xl xl:text-3xl  border-2 text-black hover:text-white font-md border-[#4338CA] hover:bg-[#4338CA] p-2 rounded-md justify-center items-center hover:fill-white"
+                >
+                  Cash Validation
                   <svg
                     width="34"
                     height="34"

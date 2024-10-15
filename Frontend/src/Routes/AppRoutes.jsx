@@ -28,8 +28,13 @@ import ReportBus_recipt from "../Components/Registration/ReportGeneration/Report
 import ReportConductor_Bus from "../Components/Registration/ReportGeneration/ReportConductor_Bus";
 import All_report_conductor from "../Components/Conductor/All_report_conductor";
 import Collection_Report from "../Components/Tables/Collection_Report";
-import AccountantDashboard from "../Components/Accountant/AccountantDashboard";
-import ConductorDetails from "../Components/Accountant/ConductorDetails";
+// import AccountantDashboard from "../Components/Accountant/AccountantDashboard";
+// import ConductorDetails from "../Components/Accountant/ConductorDetails";
+import Conductor_CashValidation from "../Components/Conductor/Conductor_CashValidation";
+import AccountantViewPage from "../Components/Accountant/AccountantViewPage.jsx";
+import AccountantViews from "../Components/Accountant/AccountantViews.jsx";
+import ValidateTransaction from "../Components/Accountant/ValidateTransaction.jsx";
+
 
 const AppRoutes = ({ access_token, userType }) => {
   console.log("AppRoutes with token >>> ", access_token, userType);
@@ -104,7 +109,7 @@ const AppRoutes = ({ access_token, userType }) => {
           <Route
             path="dashboard"
             element={<PrivateRoute element={Dashboard_data} />}
-            // element={<Dashboard_data/>}
+          // element={<Dashboard_data/>}
           />
           <Route path="/*" element={<No_access />} />
         </>
@@ -132,15 +137,88 @@ const AppRoutes = ({ access_token, userType }) => {
               <ProtectedApproute element={Conductor_Report_Generation} />
             }
           />
+          <Route
+            path="/conductor_CashValidation"
+            element={
+              <ProtectedApproute element={Conductor_CashValidation} />
+            }
+          />
           <Route path="/*" element={<No_access />} />
+
+
+          {/* .....................accountant */}
+          {/* <Route
+            path="/accountant-view"
+            element={
+              <ProtectedApproute element={AccountantViewPage} />
+            }
+          />
+          <Route
+            path="/accountantListView"
+            element={
+              <ProtectedApproute element={AccountantViewPage} />
+            }
+          />
+          <Route
+            path="/accountantViews/:id"
+            element={
+              <ProtectedApproute element={AccountantViews} />
+            }
+          />
+
+          <Route
+            path="/ValidationListView"
+            element={
+              <ProtectedApproute element={ValidateTransaction} />
+            }
+          /> */}
+          {/* {path: "/accountant-view", element: <AccountantViewPage /> },,
+
+
+
+          {
+            path: "/accountantListView",
+          element: <AccountantViewPage />,
+    },
+          {
+            path: "/accountantViews/:id",
+          element: <AccountantViews />,
+    }
+          ,
+          {
+            path: "/ValidationListView",
+          element: <ValidateTransaction />,
+    }, */}
+
         </>
       )}
 
-      {access_token && userType === "TL" && (
+      {access_token && userType === "Accountant" && (
         <>
           <Route
-            path="/accountant_dashboard"
-            element={<ProtectedApproute element={ConductorDetails} />}
+            path="/accountant-view"
+            element={
+              <ProtectedApproute element={AccountantViewPage} />
+            }
+          />
+          <Route
+            path="/accountantListView"
+            element={
+              <ProtectedApproute element={AccountantViewPage} />
+            }
+          />
+          <Route
+            path="/accountantViews/:id"
+            element={
+              <ProtectedApproute element={AccountantViews} />
+            }
+          />
+
+          <Route
+            path="/ValidationListView"
+            element={
+              <ProtectedApproute element={ValidateTransaction} />
+            }
           />
         </>
       )}
