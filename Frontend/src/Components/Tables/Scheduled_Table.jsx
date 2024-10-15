@@ -342,7 +342,6 @@ const ScheduledTable = () => {
                         {`${loading ? "loading... " : "Search Result"}`}
                       </div>
                     </div>
-                    component
                   </button>
                 </Form>
               )}

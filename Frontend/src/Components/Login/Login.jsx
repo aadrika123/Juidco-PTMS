@@ -40,7 +40,7 @@ const Login = () => {
           email: values.user_id,
           password: values.password,
           type: window.ReactNativeWebView ? "mobile" : null,
-          //type: "mobile",
+          // type: 'mobile',
         },
       });
 
@@ -53,6 +53,8 @@ const Login = () => {
         localStorage.setItem("token", token);
         localStorage.setItem("userType", userDetails.user_type);
         localStorage.setItem("userName", userDetails.user_name);
+        localStorage.setItem("name", userDetails.name);
+
         localStorage.setItem("device", deviceType);
         localStorage.setItem("name", userDetails?.name);
         // localStorage.setItem("ulbId", userDetails.ulb_id);
@@ -73,8 +75,8 @@ const Login = () => {
           window.location.replace("/ptms/dashboard");
         } else if (userDetails.user_type === "TC") {
           window.location.replace("/ptms/conductor_dashboard");
-        } else if (userDetails.user_type === "TL") {
-          window.location.replace("/ptms/accountant_dashboard");
+        } else if (userDetails.user_type === "Accountant") {
+          window.location.replace("/ptms/accountant-view");
         } else {
           window.location.replace("/");
         }
