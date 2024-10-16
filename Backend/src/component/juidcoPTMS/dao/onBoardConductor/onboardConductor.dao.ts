@@ -95,6 +95,7 @@ class ConductorOnBoarding {
       skip: (page - 1) * limit,
       take: limit,
       select: {
+        id: true,
         first_name: true,
         middle_name: true,
         last_name: true,

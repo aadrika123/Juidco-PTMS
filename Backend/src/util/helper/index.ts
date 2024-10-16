@@ -24,3 +24,22 @@ export function getCurrentWeekRange() {
     endOfWeek: formatDate(endOfWeek),
   };
 }
+
+export function getCurrentMonthRange() {
+  const today = new Date();
+
+  // Calculate the start of the month (1st day of the current month)
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  startOfMonth.setHours(0, 0, 0, 0); // Set time to midnight
+
+  // End of the range is the current date
+  const endOfMonth = new Date(today);
+  endOfMonth.setHours(23, 59, 59, 999); // Set time to the end of the current day
+
+  const formatDate = (date: any) => date.toISOString().slice(0, 10);
+
+  return {
+    startOfMonth: formatDate(startOfMonth),
+    endOfMonth: formatDate(endOfMonth),
+  };
+}
