@@ -224,6 +224,51 @@ class ConductorOnBoarding {
 
     return generateRes(exist);
   };
+
+  getConductorImage = async (req: Request) => {
+    const { id } = req.params;
+
+    const data = await prisma.conductor_master.findFirst({
+      where: {
+        id: Number(id),
+      },
+      select: {
+        adhar_doc: true,
+        fitness_doc: true
+      }
+    });
+
+    return generateRes(data);
+  };
+
+  updateConductorDetails = async (req: Request) => {
+    const {
+      id,
+      mobileNo,
+      emergencyMobNo,
+    } = req.body;
+
+    if (!id) {
+      throw new Error('ID is required')
+    }
+
+    if (!mobileNo && !emergencyMobNo) {
+      throw new Error('No data provided to update')
+    }
+
+    const query: Prisma.conductor_masterUpdateArgs = {
+      data: {
+        ...(mobileNo && { mobile_no: mobileNo }),
+        ...(emergencyMobNo && { emergency_mob_no: emergencyMobNo })
+      },
+      where: {
+        id: id,
+      },
+    };
+    const data = await prisma.conductor_master.update(query);
+    return generateRes(data);
+  };
+
 }
 
 export default ConductorOnBoarding;

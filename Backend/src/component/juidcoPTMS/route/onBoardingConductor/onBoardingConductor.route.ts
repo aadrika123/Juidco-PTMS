@@ -35,5 +35,11 @@ export default class OnBoardingConductorRoute {
       .post((req: Request, res: Response) =>
         onBoardingConductorServices.validate_aadhar(req, res, "021G")
       );
+    app
+      .route(`${baseUrl}/conductor/image/:id`)
+      .get((req: Request, res: Response) =>
+        onBoardingConductorServices.getConductorImage(req, res, "021X")
+      );
+
   }
 }
