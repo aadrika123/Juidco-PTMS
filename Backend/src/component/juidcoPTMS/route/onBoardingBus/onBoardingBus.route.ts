@@ -34,5 +34,18 @@ export default class OnBoardingBusRoute {
       .post((req: Request, res: Response) =>
         onBoardingBusServices.deleteBus(req, res, "0204")
       );
+
+    app
+      .route(`${baseUrl}/bus/image/:id`)
+      .get((req: Request, res: Response) =>
+        onBoardingBusServices.getBusImage(req, res, "0205")
+      );
+
+    app
+      .route(`${baseUrl}/bus/update/v2`)
+      .post((req: Request, res: Response) =>
+        onBoardingBusServices.updateBusDetailsV2(req, res, "0206")
+      );
+
   }
 }

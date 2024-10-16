@@ -193,6 +193,54 @@ class BusOnboarding {
 
     return generateRes(data);
   };
+
+  getBusImage = async (req: Request) => {
+    const { id } = req.params;
+
+    const data = await prisma.bus_master.findFirst({
+      where: {
+        id: Number(id),
+      },
+      select: {
+        taxCopy_doc: true,
+        pollution_doc: true,
+        registrationCert_doc: true
+      }
+    });
+
+    return generateRes(data);
+  };
+
+  updateBusDetailsV2 = async (req: Request) => {
+    const {
+      id,
+      taxCopy_cert,
+      registration_cert,
+      pollution_cert,
+    } = req.body as TOnBoardingBusData;
+
+    if (!id) {
+      throw new Error('ID is required')
+    }
+
+    if (!taxCopy_cert && !registration_cert && !pollution_cert) {
+      throw new Error('No data provided to update')
+    }
+
+    const query: Prisma.bus_masterUpdateArgs = {
+      data: {
+        ...(pollution_cert && { pollution_doc: pollution_cert }),
+        ...(registration_cert && { registrationCert_doc: registration_cert }),
+        ...(taxCopy_cert && { taxCopy_doc: taxCopy_cert }),
+      },
+      where: {
+        id: id,
+      },
+    };
+    const data = await prisma.bus_master.update(query);
+    return generateRes(data);
+  };
+
 }
 
 export default BusOnboarding;

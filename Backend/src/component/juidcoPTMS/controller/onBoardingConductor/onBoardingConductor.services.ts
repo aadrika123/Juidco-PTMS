@@ -141,4 +141,30 @@ export default class OnBoardingConductorServices {
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
+
+  getConductorImage = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.constructorOnboarding.getConductorImage(req);
+
+      if (!data) {
+        return CommonRes.NOT_FOUND("Data Not Found", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS(
+        "Successfully fetched",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
 }
