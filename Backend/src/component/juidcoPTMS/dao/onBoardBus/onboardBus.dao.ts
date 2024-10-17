@@ -241,6 +241,15 @@ class BusOnboarding {
     return generateRes(data);
   };
 
+  getBusById = async (id: number) => {
+    const data = await prisma.bus_master.findFirst({
+      where: {
+        id: id
+      }
+    });
+    return generateRes(data);
+  };
+
 }
 
 export default BusOnboarding;

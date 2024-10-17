@@ -209,4 +209,30 @@ export default class OnBoardingBusServices {
     }
   };
 
+  getBusById = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const { id } = req.params
+      const data = await this.busOnboarding.getBusById(Number(id));
+
+      if (!data) {
+        return CommonRes.NOT_FOUND("Vehicle Not Found", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS(
+        "Successfully fetched the bus",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
 }

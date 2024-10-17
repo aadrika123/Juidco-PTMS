@@ -36,15 +36,21 @@ export default class OnBoardingBusRoute {
       );
 
     app
-      .route(`${baseUrl}/bus/image/:id`)
-      .get((req: Request, res: Response) =>
-        onBoardingBusServices.getBusImage(req, res, "0205")
-      );
-
-    app
       .route(`${baseUrl}/bus/update/v2`)
       .post((req: Request, res: Response) =>
         onBoardingBusServices.updateBusDetailsV2(req, res, "0206")
+      );
+
+    app
+      .route(`${baseUrl}/bus/:id`)
+      .get((req: Request, res: Response) =>
+        onBoardingBusServices.getBusById(req, res, "0203")
+      );
+
+    app
+      .route(`${baseUrl}/bus/image/:id`)
+      .get((req: Request, res: Response) =>
+        onBoardingBusServices.getBusImage(req, res, "0205")
       );
 
   }
