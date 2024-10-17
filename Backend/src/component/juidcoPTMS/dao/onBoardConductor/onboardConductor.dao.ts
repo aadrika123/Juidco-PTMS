@@ -270,6 +270,15 @@ class ConductorOnBoarding {
     return generateRes(data);
   };
 
+  getConductorById = async (id: number) => {
+    const data = await prisma.conductor_master.findFirst({
+      where: {
+        id: id
+      }
+    });
+    return generateRes(data);
+  };
+
 }
 
 export default ConductorOnBoarding;
