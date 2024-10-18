@@ -16,13 +16,14 @@ export default function Sidebar() {
             <Avatar src={sample_profile} sx={{ width: 100, height: 100 }} />
           </div>
           <div className="flex flex-1 text-2xl text-[#555555] font-bold">
-            {name || ''}
+            {name || ""}
           </div>
 
           <div className="flex flex-col  w-[90%] m-10 justify-start items-start">
             <div
-              className={`flex h-[50px] justify-center items-center rounded-md  ${path == "/dashboard" ? "bg-[#5457D6] text-white" : "bg-white "
-                } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
+              className={`flex h-[50px] justify-center items-center rounded-md  ${
+                path == "/dashboard" ? "bg-[#5457D6] text-white" : "bg-white "
+              } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
               <Link className="flex flex-1" to="/dashboard">
                 <div className="flex w-full justify-between">
@@ -60,12 +61,13 @@ export default function Sidebar() {
               </Link>
             </div>
             <div
-              className={`flex h-[50px] justify-center items-center rounded-md  ${path == "/Bus-onboarding"
-                ? "bg-[#5457D6] text-white"
-                : "bg-white "
-                } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
+              className={`flex h-[50px] justify-center items-center rounded-md  ${
+                path == "/Bus-onboarding"
+                  ? "bg-[#5457D6] text-white"
+                  : "bg-white "
+              } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
-              <Link className="flex flex-1" to="/Bus-onboarding">
+              <Link className="flex flex-1" to="/Bus-onboarding-view">
                 <div className="flex w-full justify-between">
                   <div className="flex w-fit">
                     <div className="h-10 w-10 bg-[#5457D6] flex rounded-md justify-center items-center">
@@ -101,12 +103,13 @@ export default function Sidebar() {
               </Link>
             </div>
             <div
-              className={`flex h-[50px] justify-center items-center rounded-md  ${path == "/Conductor-onboarding"
-                ? "bg-[#5457D6] text-white"
-                : "bg-white "
-                } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
+              className={`flex h-[50px] justify-center items-center rounded-md  ${
+                path == "/Conductor-onboarding-view"
+                  ? "bg-[#5457D6] text-white"
+                  : "bg-white "
+              } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
-              <Link className="flex flex-1" to="/Conductor-onboarding">
+              <Link className="flex flex-1" to="/Conductor-onboarding-view">
                 {" "}
                 <div className="flex w-full justify-between">
                   <div className="flex w-fit">
@@ -145,10 +148,11 @@ export default function Sidebar() {
               </Link>
             </div>
             <div
-              className={`flex h-[50px] justify-center items-center rounded-md  ${path == "/ChangeScheduling-Main"
-                ? "bg-[#5457D6] text-white"
-                : "bg-white "
-                } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
+              className={`flex h-[50px] justify-center items-center rounded-md  ${
+                path == "/ChangeScheduling-Main"
+                  ? "bg-[#5457D6] text-white"
+                  : "bg-white "
+              } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
               <Link to={"/ChangeScheduling-Main"} className="flex flex-1">
                 <div className="flex w-full justify-between">
@@ -178,10 +182,11 @@ export default function Sidebar() {
             </div>
 
             <div
-              className={`flex h-[50px] justify-center items-center rounded-md  ${path == "/ReportGeneration-main"
-                ? "bg-[#5457D6] text-white"
-                : "bg-white "
-                } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
+              className={`flex h-[50px] justify-center items-center rounded-md  ${
+                path == "/ReportGeneration-main"
+                  ? "bg-[#5457D6] text-white"
+                  : "bg-white "
+              } hover:text-white hover:bg-[#5457D6] cursor-pointer w-full mt-4 mb-4 `}
             >
               <Link to="/ReportGeneration-main" className="flex flex-1">
                 <div className="flex w-full justify-between">
@@ -242,7 +247,6 @@ export default function Sidebar() {
                 </div>
               </Link>
             </div> */}
-
           </div>
         </div>
       </div>

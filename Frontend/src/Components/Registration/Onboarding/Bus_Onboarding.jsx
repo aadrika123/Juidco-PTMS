@@ -96,7 +96,7 @@ export default function Bus_Onboarding() {
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
-  console.log(location);
+  // console.log(location);
   const [openDialog, setOpenDialog] = React.useState(false); // State to control dialog
   const [opeen_error_dialog, set_opeen_error_dialog] = React.useState(false);
   const [uploadedFiles, setUploadedFiles] = React.useState({});
@@ -110,7 +110,7 @@ export default function Bus_Onboarding() {
   const [success, set_success] = React.useState({});
   const [error, set_error] = React.useState({});
 
-  console.log(uploadedFiles);
+  // console.log(uploadedFiles);
 
   const handle_logOut = () => {
     console.log("Log out");
