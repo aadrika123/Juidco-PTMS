@@ -391,7 +391,7 @@ const BusOnboardingTable = () => {
                         >
                           <LiaEdit className="text-2xl text-[#333333]" />
                         </Button>
-
+{/* 
                         <Button
                           onClick={() => {
                             setDeleteItemId(data?.id);
@@ -399,7 +399,7 @@ const BusOnboardingTable = () => {
                           }}
                         >
                           <AiOutlineDelete className="text-2xl text-[#333333]" />
-                        </Button>
+                        </Button> */}
                       </div>
                     </TableCell>
                   </TableRow>
