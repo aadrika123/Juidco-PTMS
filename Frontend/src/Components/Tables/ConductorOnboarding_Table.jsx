@@ -82,6 +82,7 @@ const ConductorOnboarding_Table = () => {
   const [imageId, setImageId] = useState("");
   const [imgBufferData, setImgBufferData] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [dataId, setDataId] = useState("");
 
 
   const navigate = useNavigate();
@@ -241,7 +242,9 @@ const ConductorOnboarding_Table = () => {
         <EditModal
           confirmationHandler={approveHandler}
           handleCancel={handleCancel}
-          page="bus"
+          page="conductor"
+          dataId={dataId}
+          setEditModal={setEditModal}
         />
       </>
     );
@@ -389,7 +392,12 @@ const ConductorOnboarding_Table = () => {
 
                     <TableCell>
                       <div className="flex justify-start items-center">
-                        <Button onClick={() => setEditModal(true)}>
+                        <Button
+                          onClick={() => {
+                            setDataId(data?.id);
+                            setEditModal(true);
+                          }}
+                        >
                           <LiaEdit className="text-2xl text-[#333333]" />
                         </Button>
                         <Button

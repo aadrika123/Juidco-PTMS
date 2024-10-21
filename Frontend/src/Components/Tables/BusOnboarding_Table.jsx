@@ -79,7 +79,7 @@ const BusOnboardingTable = () => {
   const [loading, set_loading] = useState(false);
 
   const [editModal, setEditModal] = useState(false);
-  const [dataId, setDataId] = useState('');
+  const [dataId, setDataId] = useState("");
   const [imageId, setImageId] = useState("");
   const [imgBufferData, setImgBufferData] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -102,7 +102,7 @@ const BusOnboardingTable = () => {
   }, []);
 
   useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/bus/image/${imageId}`, {
         headers: {
@@ -226,31 +226,26 @@ const BusOnboardingTable = () => {
     doc.save("Scheduling.pdf");
   };
 
-  const approveHandler = () => {
-    setEditModal(false);
-  };
+  // const approveHandler = () => {
+  //   setEditModal(false);
+  // };
 
   const handleCancel = () => {
     setEditModal(false);
   };
 
-   
-    
-
   if (editModal) {
     return (
       <>
         <EditModal
-          confirmationHandler={approveHandler}
           handleCancel={handleCancel}
           page="bus"
           dataId={dataId}
+          setEditModal={setEditModal}
         />
       </>
     );
   }
-
-  
 
   return (
     <div className="flex flex-1 flex-col">
@@ -352,16 +347,11 @@ const BusOnboardingTable = () => {
                           setImageId(data?.id);
                         }}
                       >
-                        <ImgModal imageUrl={imgBufferData} type={"pollution"} isLoading={isLoading} />
-                      </button>
-                    </TableCell>
-                    <TableCell>
-                      <button
-                        onClick={() => {
-                          setImageId(data?.id);
-                        }}
-                      >
-                        <ImgModal imageUrl={imgBufferData} type={"taxcopy"} isLoading={isLoading} />
+                        <ImgModal
+                          imageUrl={imgBufferData}
+                          type={"pollution"}
+                          isLoading={isLoading}
+                        />
                       </button>
                     </TableCell>
                     <TableCell>
@@ -372,19 +362,36 @@ const BusOnboardingTable = () => {
                       >
                         <ImgModal
                           imageUrl={imgBufferData}
-                          type={"registration"} isLoading={isLoading}
+                          type={"taxcopy"}
+                          isLoading={isLoading}
+                        />
+                      </button>
+                    </TableCell>
+                    <TableCell>
+                      <button
+                        onClick={() => {
+                          setImageId(data?.id);
+                        }}
+                      >
+                        <ImgModal
+                          imageUrl={imgBufferData}
+                          type={"registration"}
+                          isLoading={isLoading}
                         />
                       </button>
                     </TableCell>
 
                     <TableCell>
                       <div className="flex justify-start items-center">
-                        <Button onClick={() => {
-                          setDataId(data?.id)
-                          setEditModal(true)
-                        }}>
+                        <Button
+                          onClick={() => {
+                            setDataId(data?.id);
+                            setEditModal(true);
+                          }}
+                        >
                           <LiaEdit className="text-2xl text-[#333333]" />
                         </Button>
+
                         <Button
                           onClick={() => {
                             setDeleteItemId(data?.id);

@@ -110,7 +110,7 @@ export default function Bus_Onboarding() {
   const [success, set_success] = React.useState({});
   const [error, set_error] = React.useState({});
 
-  // console.log(uploadedFiles);
+  // console.log(uploading, "uploading------------------>");
 
   const handle_logOut = () => {
     console.log("Log out");
