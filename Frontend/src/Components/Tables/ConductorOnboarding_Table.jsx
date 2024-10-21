@@ -84,7 +84,6 @@ const ConductorOnboarding_Table = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [dataId, setDataId] = useState("");
 
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -400,14 +399,14 @@ const ConductorOnboarding_Table = () => {
                         >
                           <LiaEdit className="text-2xl text-[#333333]" />
                         </Button>
-                        <Button
+                        {/* <Button
                           onClick={() => {
                             setDeleteItemId("row.id");
                             setDeleteDialog(true);
                           }}
                         >
                           <AiOutlineDelete className="text-2xl text-[#333333]" />
-                        </Button>
+                        </Button> */}
                       </div>
                     </TableCell>
                   </TableRow>
