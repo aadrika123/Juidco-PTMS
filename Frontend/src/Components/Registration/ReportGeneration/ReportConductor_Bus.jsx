@@ -143,7 +143,9 @@ export default function ReportConductor_Bus() {
                 <TableCell>{row.bus.register_no}</TableCell>
                 <TableCell>{row.bus.vin_no}</TableCell>
                 <TableCell>
-                  {row.conductor.first_name} {row.conductor.middle_name}{" "}
+                  {row.conductor.first_name}{" "}
+                  {row.conductor.middle_name != "null" &&
+                    row.conductor.middle_name}{" "}
                   {row.conductor.last_name}
                 </TableCell>
                 <TableCell>{row.conductor.mobile_no}</TableCell>
