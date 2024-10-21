@@ -34,6 +34,8 @@ import Conductor_CashValidation from "../Components/Conductor/Conductor_CashVali
 import AccountantViewPage from "../Components/Accountant/AccountantViewPage.jsx";
 import AccountantViews from "../Components/Accountant/AccountantViews.jsx";
 import ValidateTransaction from "../Components/Accountant/ValidateTransaction.jsx";
+import BusOnboarding_View from "../Components/Registration/ViewOnboarding/BusOnboarding_View.jsx";
+import ConductorOnboarding_View from "../Components/Registration/ViewOnboarding/ConductorOnboarding_View.jsx";
 
 
 const AppRoutes = ({ access_token, userType }) => {
@@ -49,8 +51,16 @@ const AppRoutes = ({ access_token, userType }) => {
             element={<PrivateRoute element={Bus_Onboarding} />}
           />
           <Route
+            path="/Bus-onboarding-view"
+            element={<PrivateRoute element={BusOnboarding_View} />}
+          />
+          <Route
             path="/Conductor-onboarding"
             element={<PrivateRoute element={Conductor_Onboarding} />}
+          />
+          <Route
+            path="/Conductor-onboarding-view"
+            element={<PrivateRoute element={ConductorOnboarding_View} />}
           />
           <Route
             path="/ConductorRegistration"
@@ -109,7 +119,7 @@ const AppRoutes = ({ access_token, userType }) => {
           <Route
             path="dashboard"
             element={<PrivateRoute element={Dashboard_data} />}
-          // element={<Dashboard_data/>}
+            // element={<Dashboard_data/>}
           />
           <Route path="/*" element={<No_access />} />
         </>
@@ -139,12 +149,9 @@ const AppRoutes = ({ access_token, userType }) => {
           />
           <Route
             path="/conductor_CashValidation"
-            element={
-              <ProtectedApproute element={Conductor_CashValidation} />
-            }
+            element={<ProtectedApproute element={Conductor_CashValidation} />}
           />
           <Route path="/*" element={<No_access />} />
-
 
           {/* .....................accountant */}
           {/* <Route
@@ -189,7 +196,6 @@ const AppRoutes = ({ access_token, userType }) => {
             path: "/ValidationListView",
           element: <ValidateTransaction />,
     }, */}
-
         </>
       )}
 
@@ -197,28 +203,20 @@ const AppRoutes = ({ access_token, userType }) => {
         <>
           <Route
             path="/accountant-view"
-            element={
-              <ProtectedApproute element={AccountantViewPage} />
-            }
+            element={<ProtectedApproute element={AccountantViewPage} />}
           />
           <Route
             path="/accountantListView"
-            element={
-              <ProtectedApproute element={AccountantViewPage} />
-            }
+            element={<ProtectedApproute element={AccountantViewPage} />}
           />
           <Route
             path="/accountantViews/:id"
-            element={
-              <ProtectedApproute element={AccountantViews} />
-            }
+            element={<ProtectedApproute element={AccountantViews} />}
           />
 
           <Route
             path="/ValidationListView"
-            element={
-              <ProtectedApproute element={ValidateTransaction} />
-            }
+            element={<ProtectedApproute element={ValidateTransaction} />}
           />
         </>
       )}

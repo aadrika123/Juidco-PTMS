@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from "react";
-import bus from "../../../assets/bus 1.png";
-import Avatar from "@mui/material/Avatar";
-import sample_profile from "../../../assets/sample_profile.png";
-
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Scheduled_Table from "../../Tables/Scheduled_Table";
@@ -12,11 +8,11 @@ export default function ChaneScheduling_main() {
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
-  console.log(location);
+  // console.log(location);
   const token = Cookies.get("accesstoken");
 
   const [allScheduled, setAllScheduled] = useState([]);
-  console.log(allScheduled);
+  // console.log(allScheduled);
 
   const [passengers_status, setPassengers_status] = useState([]);
 
