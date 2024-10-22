@@ -353,7 +353,8 @@ const ConductorOnboarding_Table = () => {
                     <TableCell>{data?.cunique_id}</TableCell>
                     <TableCell>
                       {data?.first_name}&nbsp;
-                      {data?.middle_name} &nbsp;
+                      {data?.middle_name == "null" ? "" : data?.middle_name}
+                      &nbsp;
                       {data?.last_name}
                     </TableCell>
                     <TableCell>{data?.mobile_no}</TableCell>

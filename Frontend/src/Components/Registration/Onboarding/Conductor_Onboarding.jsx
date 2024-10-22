@@ -746,7 +746,9 @@ export default function Conductor_Onboarding() {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Close</Button>
+          <Link to="/Conductor-onboarding-view" className="flex flex-1">
+            <Button onClick={() => setOpenDialog(false)}>Close</Button>
+          </Link>
         </DialogActions>
       </Dialog>
 
