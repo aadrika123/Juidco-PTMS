@@ -121,7 +121,7 @@ export default function Bus_Onboarding() {
   };
 
   const onSubmit = async (values) => {
-    console.log(values);
+    // console.log(values);
     set_loading(true);
     try {
       const response = await axios.post(
@@ -573,7 +573,9 @@ export default function Bus_Onboarding() {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Close</Button>
+          <Link to="/Bus-onboarding-view" className="flex flex-1">
+            <Button onClick={() => setOpenDialog(false)}>Close</Button>
+          </Link>
         </DialogActions>
       </Dialog>
 
