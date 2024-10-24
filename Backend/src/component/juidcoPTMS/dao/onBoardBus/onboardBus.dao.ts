@@ -96,13 +96,21 @@ class BusOnboarding {
       };
     }
 
-    query.orderBy = [
-      {
-        receipts: {
-          _count: 'desc'
+    if (req?.query?.view) {
+      query.orderBy = [
+        {
+          created_at:'desc'
         }
-      }
-    ]
+      ]
+    } else {
+      query.orderBy = [
+        {
+          receipts: {
+            _count: 'desc'
+          }
+        }
+      ]
+    }
 
     // const data = await prisma.bus_master.findMany(query);
     const [data, count] = await prisma.$transaction([

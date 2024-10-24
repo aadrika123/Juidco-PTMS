@@ -90,7 +90,7 @@ const BusOnboardingTable = () => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=100&page=1`, {
+      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=100&page=1&view=true`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -391,7 +391,7 @@ const BusOnboardingTable = () => {
                         >
                           <LiaEdit className="text-2xl text-[#333333]" />
                         </Button>
-{/* 
+                        {/* 
                         <Button
                           onClick={() => {
                             setDeleteItemId(data?.id);
