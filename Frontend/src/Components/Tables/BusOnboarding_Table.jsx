@@ -66,40 +66,40 @@ const BusOnboardingTable = () => {
   const [deleteDialog, setDeleteDialog] = useState(false); // State to control delete confirmation dialog
   const [deleteItemId, setDeleteItemId] = useState(null); // State to track the item to be deleted
   const [busoptions, set_busoptions] = useState([]);
-  const [selectedBus, setSelectedBus] = useState([]); // Added state for selected bus
+  // const [selectedBus, setSelectedBus] = useState([]); // Added state for selected bus
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [allScheduled, setAllScheduled] = useState([]);
+  // const [allScheduled, setAllScheduled] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [fromDate, setFromDate] = useState(""); // Added state for date
-  const [toDate, settoDate] = useState(""); // Added state for date
-  const [vi_number, set_vi_number] = useState("");
-  const [loading, set_loading] = useState(false);
+  // const [fromDate, setFromDate] = useState(""); // Added state for date
+  // const [toDate, settoDate] = useState(""); // Added state for date
+  // const [vi_number, set_vi_number] = useState("");
+  // const [loading, set_loading] = useState(false);
 
   const [editModal, setEditModal] = useState(false);
   const [dataId, setDataId] = useState("");
   const [imageId, setImageId] = useState("");
   const [imgBufferData, setImgBufferData] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
   // console.log(dataId, "dataId");
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=100&page=1&view=true`, {
+      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=${rowsPerPage}&page=${page}&view=true`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }) // Replace with your actual API endpoint
       .then((response) => {
         set_busoptions(response?.data?.data?.data);
+        setTotalRecords(response?.data?.data?.count)
       })
       .catch((error) => console.error("Error fetching bus data:", error));
-  }, []);
+  }, [page, rowsPerPage]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -152,7 +152,7 @@ const BusOnboardingTable = () => {
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
-    setPage(0);
+    setPage(1);
   };
 
   const handleDelete = async () => {
@@ -447,7 +447,7 @@ const BusOnboardingTable = () => {
           </div>
         )}
         <TablePagination
-          rowsPerPageOptions={[10]}
+          rowsPerPageOptions={[10, 20, 50, 100]}
           component="div"
           count={totalRecords}
           rowsPerPage={rowsPerPage}

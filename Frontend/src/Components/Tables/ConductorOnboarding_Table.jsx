@@ -64,19 +64,19 @@ const ConductorOnboarding_Table = () => {
   const token = Cookies.get("accesstoken");
   const [openDialog, setOpenDialog] = useState(false); // State to control dialog
   const [deleteDialog, setDeleteDialog] = useState(false); // State to control delete confirmation dialog
-  const [deleteItemId, setDeleteItemId] = useState(null); // State to track the item to be deleted
+  // const [deleteItemId, setDeleteItemId] = useState(null); // State to track the item to be deleted
   const [busoptions, set_busoptions] = useState([]);
-  const [selectedBus, setSelectedBus] = useState([]); // Added state for selected bus
+  // const [selectedBus, setSelectedBus] = useState([]); // Added state for selected bus
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [allScheduled, setAllScheduled] = useState([]);
+  // const [allScheduled, setAllScheduled] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [fromDate, setFromDate] = useState(""); // Added state for date
-  const [toDate, settoDate] = useState(""); // Added state for date
-  const [vi_number, set_vi_number] = useState("");
-  const [loading, set_loading] = useState(false);
+  // const [fromDate, setFromDate] = useState(""); // Added state for date
+  // const [toDate, settoDate] = useState(""); // Added state for date
+  // const [vi_number, set_vi_number] = useState("");
+  // const [loading, set_loading] = useState(false);
 
   const [editModal, setEditModal] = useState(false);
   const [imageId, setImageId] = useState("");
@@ -89,7 +89,7 @@ const ConductorOnboarding_Table = () => {
   useEffect(() => {
     axios
       .get(
-        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=100&page=1&view=true`,
+        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=${rowsPerPage}&page=${page}&view=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -98,9 +98,10 @@ const ConductorOnboarding_Table = () => {
       ) // Replace with your actual API endpoint
       .then((response) => {
         set_busoptions(response?.data?.data?.data);
+        setTotalRecords(response?.data?.data?.count)
       })
       .catch((error) => console.error("Error fetching bus data:", error));
-  }, []);
+  }, [page, rowsPerPage]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -153,7 +154,7 @@ const ConductorOnboarding_Table = () => {
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
-    setPage(0);
+    setPage(1);
   };
 
   // const handleDelete = async () => {
