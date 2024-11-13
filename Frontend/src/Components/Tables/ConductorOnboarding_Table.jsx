@@ -89,7 +89,7 @@ const ConductorOnboarding_Table = () => {
   useEffect(() => {
     axios
       .get(
-        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=100&page=1`,
+        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=100&page=1&view=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -455,7 +455,7 @@ const ConductorOnboarding_Table = () => {
           </div>
         )}
         <TablePagination
-          rowsPerPageOptions={[10]}
+          rowsPerPageOptions={[10, 20, 50, 100]}
           component="div"
           count={totalRecords}
           rowsPerPage={rowsPerPage}

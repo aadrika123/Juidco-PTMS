@@ -132,13 +132,21 @@ class ConductorOnBoarding {
       ulb_id: ulb_id
     }
 
-    query.orderBy = [
-      {
-        receipts: {
-          _count: 'desc'
+    if (req?.query?.view) {
+      query.orderBy = [
+        {
+          created_at: 'desc'
         }
-      }
-    ]
+      ]
+    } else {
+      query.orderBy = [
+        {
+          receipts: {
+            _count: 'desc'
+          }
+        }
+      ]
+    }
 
     const [data, count] = await prisma.$transaction([
       prisma.conductor_master.findMany(query) as any,
