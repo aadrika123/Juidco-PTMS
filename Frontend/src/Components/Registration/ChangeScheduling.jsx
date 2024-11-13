@@ -65,7 +65,7 @@ export default function ChangeScheduling() {
     setScheID(id);
   }, [Error]);
 
-  console.log(scheID, "<======== ID");
+  // console.log(scheID, "<======== ID");
 
   function generateTimeOptions(intervalMinutes) {
     const timeOptions = [];
@@ -113,6 +113,7 @@ export default function ChangeScheduling() {
         set_success(response.data?.data);
         sessionStorage.clear("id");
         setScheID(null);
+        navigate("/ChangeScheduling-Main");
       }
       set_loading(false);
     } catch (error) {
@@ -146,6 +147,7 @@ export default function ChangeScheduling() {
 
       sessionStorage.clear("id");
       setScheID(null);
+       navigate("/ChangeScheduling-Main");
     } catch (error) {
       set_loading(false);
       set_Error(error.response.data);
