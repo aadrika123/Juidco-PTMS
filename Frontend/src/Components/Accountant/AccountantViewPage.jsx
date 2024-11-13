@@ -199,7 +199,7 @@ const AccountantViewPage = () => {
         </div>
       </div>
 
-      <div className="border border-gray-300 rounded-xl bg-slate-100 m-3 cursor-pointer hover:border hover:border-blue-500 flex justify-between">
+      {/* <div className="border border-gray-300 rounded-xl bg-slate-100 m-3 cursor-pointer hover:border hover:border-blue-500 flex justify-between">
         <div className="flex m-4 justify-start">
           <div className="form-group flex-shrink max-w-full px-4 mb-4">
             <label className="inline-block mb-2 flex flex-row">
@@ -250,7 +250,6 @@ const AccountantViewPage = () => {
 
         <div className="flex mr-8 mt-4 justify-end ml-20">
           <div className="flex items-center ">
-            {/* Export Functionality */}
             <div
               className="flex justify-between gap-4 py-2"
               onMouseEnter={() => setIsHovered(true)}
@@ -274,7 +273,7 @@ const AccountantViewPage = () => {
                   }`}
               >
                 <button
-                  onClick={() => toPDF()}// Trigger PDF download
+                  onClick={() => toPDF()}
                   className="bg-[#4338CA] text-white px-2 rounded-md flex items-center gap-1 hover:bg-[#4338CA] font-semibold text-xs"
                 >
                   PDF
@@ -306,7 +305,7 @@ const AccountantViewPage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="container mx-auto w-full bg-white rounded border mt-6 shadow-xl">
         <div className="flex items-center mr-3 m-4 pb-1 w-20 justify-center border-b border-black">
