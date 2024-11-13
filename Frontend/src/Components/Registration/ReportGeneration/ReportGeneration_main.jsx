@@ -83,6 +83,17 @@ export default function ReportGeneration_main() {
   //   console.log(report_all)
   // }
 
+
+  // console.log(conductor_details?.data, "==============>");
+  
+  conductor_details?.data.sort((a, b) => {
+    const collectionA = a.receipt_data.total_bus_collection ?? 0; // Use 0 if null
+    const collectionB = b.receipt_data.total_bus_collection ?? 0; // Use 0 if null
+    return collectionB - collectionA; // Sort in descending order
+  });
+
+
+
   const onSubmit = async (values, rest) => {
     set_filterValues(values);
     setFromDate(values.fromDate);
@@ -102,7 +113,7 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          console.log(response.data.data);
+          // console.log(response.data.data);
           set_conductor_details(response.data.data);
           setToalCount(Math.ceil(response?.data?.data?.count / 10))
           setIsLoading(false)
@@ -129,7 +140,7 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          console.log("Total >>>>>>  ", response.data.data);
+          // console.log("Total >>>>>>  ", response.data.data);
           set_total_collection(response.data.data);
         })
         .catch((error) => {
