@@ -84,7 +84,7 @@ export default function ReportGeneration_main() {
   // }
 
 
-  console.log(conductor_details?.data, "==============>");
+  // console.log(conductor_details?.data, "==============>");
   
   conductor_details?.data.sort((a, b) => {
     const collectionA = a.receipt_data.total_bus_collection ?? 0; // Use 0 if null
