@@ -57,6 +57,7 @@ export default function ReportGeneration_main() {
   const [bus_total_collection, set_bus_total_collection] = useState();
 
   const [conductor_details, set_conductor_details] = useState();
+  const [total, setTotal] = useState();
   const [bus_details, set_bus_details] = useState();
   const [openDialog, setOpenDialog] = React.useState(false); // State to control dialog
   const [total_amount, set_total_amount] = useState([]);
@@ -119,8 +120,8 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          // console.log(response.data.data);
-          set_conductor_details(response.data.data);
+          setTotal(response?.data?.data?.totalAmount)
+          set_conductor_details(response?.data?.data);
           setToalCount(Math.ceil(response?.data?.data?.count / 10));
           setIsLoading(false);
         })
@@ -636,7 +637,7 @@ export default function ReportGeneration_main() {
               !isLoading &&
               conductor_details.data[0]?.first_name ? (
                 <>
-                  <h1 className="mt-0 pt-0">Total Collection: </h1>
+                  <h1 className="mt-0 pt-0">Total Collection: {total} </h1>
                   {conductor_details?.data.map((item, index) => (
                     <ReportCard
                       key={index}

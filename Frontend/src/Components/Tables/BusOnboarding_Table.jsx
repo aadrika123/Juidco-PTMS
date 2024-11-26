@@ -86,24 +86,36 @@ const BusOnboardingTable = () => {
   const [imgBufferData, setImgBufferData] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
   // console.log(dataId, "dataId");
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery); 
+    }, 1200);
+
+    return () => {
+      clearTimeout(timer); 
+    };
+  }, [searchQuery]); 
+
+  useEffect(() => {
     setIsLoading(true);
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=100&page=1&view=true`, {
+      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?search=${searchQuery}&limit=100&page=1&view=true`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }) // Replace with your actual API endpoint
+      }) 
       .then((response) => {
         setIsLoading(false);
         set_busoptions(response?.data?.data?.data);
       })
       .catch((error) => console.error("Error fetching bus data:", error));
-  }, []);
+  }, [debouncedSearchQuery]);
 
   useEffect(() => {
     setIsLoading(true);

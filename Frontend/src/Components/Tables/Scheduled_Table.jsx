@@ -75,6 +75,20 @@ const ScheduledTable = () => {
   const [vi_number, set_vi_number] = useState("");
   const [loading, set_loading] = useState(false);
 
+  
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery); 
+    }, 1200);
+
+    return () => {
+      clearTimeout(timer); 
+    };
+  }, [searchQuery]);
+
   useEffect(() => {
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=100&page=1`, {
@@ -88,7 +102,7 @@ const ScheduledTable = () => {
       .catch((error) => console.error("Error fetching bus data:", error));
 
     fetchScheduledData();
-  }, [page, rowsPerPage]);
+  }, [page, rowsPerPage,debouncedSearchQuery]);
 
   const fetchScheduledData = async () => {
     set_loading(true);
@@ -97,7 +111,7 @@ const ScheduledTable = () => {
         .get(
           `${
             process.env.REACT_APP_BASE_URL
-          }/schedule/getAll?limit=${rowsPerPage}&page=${
+          }/schedule/getAll?search=${searchQuery}&limit=${rowsPerPage}&page=${
             page + 1
           }&bus_no=${selectedBus}&from_date=${fromDate}&to_date=${toDate}`,
           {

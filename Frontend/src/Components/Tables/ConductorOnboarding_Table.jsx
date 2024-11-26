@@ -85,13 +85,27 @@ const ConductorOnboarding_Table = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [dataId, setDataId] = useState("");
 
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
   const navigate = useNavigate();
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery); 
+    }, 1200);
+
+    return () => {
+      clearTimeout(timer); 
+    };
+  }, [searchQuery]); 
+
 
   useEffect(() => {
     setIsLoading(true);
     axios
       .get(
-        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=100&page=1&view=true`,
+        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?search=${searchQuery}&limit=100&page=1&view=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -103,7 +117,7 @@ const ConductorOnboarding_Table = () => {
         setIsLoading(false);
       })
       .catch((error) => console.error("Error fetching bus data:", error));
-  }, []);
+  }, [debouncedSearchQuery]);
 
   useEffect(() => {
     setIsLoading(true);
