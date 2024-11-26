@@ -37,7 +37,6 @@ import ValidateTransaction from "../Components/Accountant/ValidateTransaction.js
 import BusOnboarding_View from "../Components/Registration/ViewOnboarding/BusOnboarding_View.jsx";
 import ConductorOnboarding_View from "../Components/Registration/ViewOnboarding/ConductorOnboarding_View.jsx";
 
-
 const AppRoutes = ({ access_token, userType }) => {
   console.log("AppRoutes with token >>> ", access_token, userType);
 

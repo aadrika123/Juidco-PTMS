@@ -21,9 +21,13 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
+  console.log("123")
+
+  const token = localStorage.getItem("token");
+  
+
   useEffect(() => {
     //const token = Cookies.get("accesstoken");
-    const token = localStorage.getItem("token");
     if (token && token !== "undefined") {
       const userDetails = Cookies.get("user_details");
       const userType = localStorage.getItem("userType");

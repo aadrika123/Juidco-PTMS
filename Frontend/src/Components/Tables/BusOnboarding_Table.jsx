@@ -29,6 +29,8 @@ import { LiaEdit } from "react-icons/lia";
 import { AiOutlineDelete } from "react-icons/ai";
 import ImgModal from "../../assets/common/ImageDisplay/ImgModal";
 import EditModal from "../Registration/ViewOnboarding/EditModal";
+import CircularIndeterminate from "../../assets/common/loader/Loader";
+import ListLoader from "../../assets/common/loader/ListLoader";
 
 const formatDate = (dateString) => {
   const options = {
@@ -89,6 +91,7 @@ const BusOnboardingTable = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    setIsLoading(true);
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=100&page=1&view=true`, {
         headers: {
@@ -96,6 +99,7 @@ const BusOnboardingTable = () => {
         },
       }) // Replace with your actual API endpoint
       .then((response) => {
+        setIsLoading(false);
         set_busoptions(response?.data?.data?.data);
       })
       .catch((error) => console.error("Error fetching bus data:", error));
@@ -314,139 +318,127 @@ const BusOnboardingTable = () => {
       </div>
 
       <TableContainer component={Paper} className="shadow-lg rounded-lg">
-        {busoptions?.length > 0 ? (
-          <Table id="data-table" stickyHeader>
-            <TableHead>
-              <TableRow className="bg-blue-600">
-                <TableCell className="text-white font-bold">
-                  Registratiin No
-                </TableCell>
-                <TableCell className="text-white font-bold">
-                  Vin/Chessis No.
-                </TableCell>
-                <TableCell className="text-white font-bold">
-                  Pollution Certificate
-                </TableCell>
-                <TableCell className="text-white font-bold">Tax Copy</TableCell>
-                <TableCell className="text-white font-bold">
-                  Registration Certificate
-                </TableCell>
-
-                <TableCell className="text-white font-bold">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {busoptions?.map((data, index) => (
-                <>
-                  <TableRow className={"bg-white"} key={index}>
-                    <TableCell>{data?.register_no}</TableCell>
-                    <TableCell>{data?.vin_no}</TableCell>
-                    <TableCell>
-                      <button
-                        onClick={() => {
-                          setImageId(data?.id);
-                        }}
-                      >
-                        <ImgModal
-                          imageUrl={imgBufferData}
-                          type={"pollution"}
-                          isLoading={isLoading}
-                        />
-                      </button>
+        {isLoading ? (
+          <div className="flex justify-center items-center m-4">
+            <ListLoader />
+          </div>
+        ) : (
+          <>
+            {busoptions?.length > 0 ? (
+              <Table id="data-table" stickyHeader>
+                <TableHead>
+                  <TableRow className="bg-blue-600">
+                    <TableCell className="text-white font-bold">
+                      Registration No
                     </TableCell>
-                    <TableCell>
-                      <button
-                        onClick={() => {
-                          setImageId(data?.id);
-                        }}
-                      >
-                        <ImgModal
-                          imageUrl={imgBufferData}
-                          type={"taxcopy"}
-                          isLoading={isLoading}
-                        />
-                      </button>
+                    <TableCell className="text-white font-bold">
+                      Vin/Chassis No.
                     </TableCell>
-                    <TableCell>
-                      <button
-                        onClick={() => {
-                          setImageId(data?.id);
-                        }}
-                      >
-                        <ImgModal
-                          imageUrl={imgBufferData}
-                          type={"registration"}
-                          isLoading={isLoading}
-                        />
-                      </button>
+                    <TableCell className="text-white font-bold">
+                      Pollution Certificate
                     </TableCell>
-
-                    <TableCell>
-                      <div className="flex justify-start items-center">
-                        <Button
-                          onClick={() => {
-                            setDataId(data?.id);
-                            setEditModal(true);
-                          }}
-                        >
-                          <LiaEdit className="text-2xl text-[#333333]" />
-                        </Button>
-                        {/* 
-                        <Button
-                          onClick={() => {
-                            setDeleteItemId(data?.id);
-                            setDeleteDialog(true);
-                          }}
-                        >
-                          <AiOutlineDelete className="text-2xl text-[#333333]" />
-                        </Button> */}
-                      </div>
+                    <TableCell className="text-white font-bold">
+                      Tax Copy
+                    </TableCell>
+                    <TableCell className="text-white font-bold">
+                      Registration Certificate
+                    </TableCell>
+                    <TableCell className="text-white font-bold">
+                      Actions
                     </TableCell>
                   </TableRow>
-                </>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <div className="flex flex-1 m-4 flex-col justify-center items-center font-bold text-2xl text-slate-700">
-            No Data Found
-            <svg
-              width="200px"
-              height="200px"
-              viewBox="0 0 512 512"
-              id="Layer_1"
-              version="1.1"
-            >
-              <g>
-                <path
-                  fill="#333333"
-                  d="M378.8,87.3H133.2c-17.4,0-31.5,14.1-31.5,31.5v272.1c0,17.4,14.1,31.5,31.5,31.5h245.6   c17.4,0,31.5-14.1,31.5-31.5V118.8C410.3,101.4,396.2,87.3,378.8,87.3z M139.5,176h101.1v150H139.5V176z M174.2,391.3   c-9.8,0-17.8-8-17.8-17.8c0-9.8,8-17.8,17.8-17.8c9.8,0,17.8,8,17.8,17.8C192,383.4,184,391.3,174.2,391.3z M228,386.7   c-7.3,0-13.1-5.9-13.1-13.1s5.9-13.1,13.1-13.1s13.1,5.9,13.1,13.1S235.3,386.7,228,386.7z M284,386.7c-7.3,0-13.1-5.9-13.1-13.1   s5.9-13.1,13.1-13.1s13.1,5.9,13.1,13.1S291.3,386.7,284,386.7z M337.8,391.3c-9.8,0-17.8-8-17.8-17.8c0-9.8,8-17.8,17.8-17.8   c9.8,0,17.8,8,17.8,17.8C355.7,383.4,347.7,391.3,337.8,391.3z M372.5,326.1H271.5V176h101.1V326.1z M372.5,147H139.5v-30.4h233.1   V147z"
-                />
-                <polygon
-                  fill="#333333"
-                  points="318.3,53 193.7,53 188.3,73.3 323.7,73.3  "
-                />
-                <path
-                  fill="#333333"
-                  d="M158.5,452.3c0,3.7,3,6.7,6.7,6.7H198c3.7,0,6.7-3,6.7-6.7v-15.9h-46.1V452.3z"
-                />
-                <path
-                  fill="#333333"
-                  d="M307.4,452.3c0,3.7,3,6.7,6.7,6.7h32.8c3.7,0,6.7-3,6.7-6.7v-15.9h-46.1V452.3z"
-                />
-                <path
-                  fill="#333333"
-                  d="M37.8,167.8v70.7v0H22.2V297h44.6v-58.4h-15v0v-63.7h35.9v-14H44.8C40.9,160.8,37.8,164,37.8,167.8z"
-                />
-                <path
-                  fill="#333333"
-                  d="M474.2,238.6L474.2,238.6v-70.7c0-3.9-3.1-7-7-7h-42.9v14h35.9v63.7v0h-15V297h44.6v-58.4H474.2z"
-                />
-              </g>
-            </svg>
-          </div>
+                </TableHead>
+                <TableBody>
+                  {busoptions?.map((data, index) => (
+                    <TableRow className={"bg-white"} key={index}>
+                      <TableCell>{data?.register_no}</TableCell>
+                      <TableCell>{data?.vin_no}</TableCell>
+                      <TableCell>
+                        <button onClick={() => setImageId(data?.id)}>
+                          <ImgModal
+                            imageUrl={imgBufferData}
+                            type={"pollution"}
+                            isLoading={isLoading}
+                          />
+                        </button>
+                      </TableCell>
+                      <TableCell>
+                        <button onClick={() => setImageId(data?.id)}>
+                          <ImgModal
+                            imageUrl={imgBufferData}
+                            type={"taxcopy"}
+                            isLoading={isLoading}
+                          />
+                        </button>
+                      </TableCell>
+                      <TableCell>
+                        <button onClick={() => setImageId(data?.id)}>
+                          <ImgModal
+                            imageUrl={imgBufferData}
+                            type={"registration"}
+                            isLoading={isLoading}
+                          />
+                        </button>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-start items-center">
+                          <Button
+                            onClick={() => {
+                              setDataId(data?.id);
+                              setEditModal(true);
+                            }}
+                          >
+                            <LiaEdit className="text-2xl text-[#333333]" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="flex flex-1 m-4 flex-col justify-center items-center font-bold text-2xl text-slate-700">
+                No Data Found
+                <svg
+                  width="200px"
+                  height="200px"
+                  viewBox="0 0 512 512"
+                  id="Layer_1"
+                  version="1.1"
+                >
+                  <g>
+                    <path
+                      fill="#333333"
+                      d="M378.8,87.3H133.2c-17.4,0-31.5,14.1-31.5,31.5v272.1c0,17.4,14.1,31.5,31.5,31.5h245.6   c17.4,0,31.5-14.1,31.5-31.5V118.8C410.3,101.4,396.2,87.3,378.8,87.3z M139.5,176h101.1v150H139.5V176z M174.2,391.3   c-9.8,0-17.8-8-17.8-17.8c0-9.8,8-17.8,17.8-17.8c9.8,0,17.8,8,17.8,17.8C192,383.4,184,391.3,174.2,391.3z M228,386.7   c-7.3,0-13.1-5.9-13.1-13.1s5.9-13.1,13.1-13.1s13.1,5.9,13.1,13.1S235.3,386.7,228,386.7z M284,386.7c-7.3,0-13.1-5.9-13.1-13.1   s5.9-13.1,13.1-13.1s13.1,5.9,13.1,13.1S291.3,386.7,284,386.7z M337.8,391.3c-9.8,0-17.8-8-17.8-17.8c0-9.8,8-17.8,17.8-17.8   c9.8,0,17.8,8,17.8,17.8C355.7,383.4,347.7,391.3,337.8,391.3z M372.5,326.1H271.5V176h101.1V326.1z M372.5,147H139.5v-30.4h233.1   V147z"
+                    />
+                    <polygon
+                      fill="#333333"
+                      points="318.3,53 193.7,53 188.3,73.3 323.7,73.3  "
+                    />
+                    <path
+                      fill="#333333"
+                      d="M158.5,452.3c0,3.7,3,6.7,6.7,6.7H198c3.7,0,6.7-3,6.7-6.7v-15.9h-46.1V452.3z"
+                    />
+                    <path
+                      fill="#333333"
+                      d="M307.4,452.3c0,3.7,3,6.7,6.7,6.7h32.8c3.7,0,6.7-3,6.7-6.7v-15.9h-46.1V452.3z"
+                    />
+                    <path
+                      fill="#333333"
+                      d="M37.8,167.8v70.7v0H22.2V297h44.6v-58.4h-15v0v-63.7h35.9v-14H44.8C40.9,160.8,37.8,164,37.8,167.8z"
+                    />
+                    <path
+                      fill="#333333"
+                      d="M474.2,238.6L474.2,238.6v-70.7c0-3.9-3.1-7-7-7h-42.9v14h35.9v63.7v0h-15V297h44.6v-58.4H474.2z"
+                    />
+                  </g>
+                </svg>
+              </div>
+            )}
+          </>
         )}
-        <TablePagination
+
+        {/* <TablePagination
           rowsPerPageOptions={[10]}
           component="div"
           count={totalRecords}
@@ -454,7 +446,7 @@ const BusOnboardingTable = () => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        /> */}
       </TableContainer>
 
       <Dialog

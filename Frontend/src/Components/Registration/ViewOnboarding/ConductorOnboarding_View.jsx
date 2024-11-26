@@ -14,25 +14,6 @@ export default function ConductorOnboarding_View() {
   const path = location.pathname;
   const token = Cookies.get("accesstoken");
 
-  // const [allScheduled, setAllScheduled] = useState([]);
-
-  // const [passengers_status, setPassengers_status] = useState([]);
-
-  // useEffect(() => {
-  //   axios
-  //     .get(`${process.env.REACT_APP_BASE_URL}/passenger/day-wise`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     })
-  //     .then((res) => {
-  //       console.log(res.data?.data?.data);
-  //       setPassengers_status(res.data?.data?.data);
-  //     });
-  // }, []);
-  // console.log(passengers_status);
-
-
 
   return (
     <div className="flex flex-1 ">
