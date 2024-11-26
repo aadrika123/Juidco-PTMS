@@ -204,7 +204,7 @@ export default function ReportGeneration_main() {
 
       await axios
         .get(
-          `${process.env.REACT_APP_BASE_URL}/getAllBusList?id=${values.id}&limit=10&page=1&from_date=${values.fromDate}&to_date=${values.toDate}`,
+          `${process.env.REACT_APP_BASE_URL}/getAllBusList?id=${values.id}&limit=10&page=${page}&from_date=${values.fromDate}&to_date=${values.toDate}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1012,6 +1012,7 @@ export default function ReportGeneration_main() {
             )} */}
           </div>
           {/* <Pagination count={10} /> */}
+      
           <Paginator page={page} setPage={setPage} totalCount={totalCount} />
         </div>
       </div>
