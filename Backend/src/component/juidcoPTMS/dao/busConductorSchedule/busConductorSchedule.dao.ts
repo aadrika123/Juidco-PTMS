@@ -262,7 +262,7 @@ class BusConductorScheduleDao {
 
   getBusScheduleConductor = async (req: Request) => {
     const { conductor_id, date, from_time, to_time } = req.body;
-    const { ulb_id } = req.body.auth
+    const { ulb_id } = req.body.auth;
 
     const query: string = `
 	    select conductor_id, bus_id, created_at, updated_at, from_time, to_time from scheduler
