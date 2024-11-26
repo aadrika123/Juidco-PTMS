@@ -52,7 +52,7 @@ const ReportCard = ({
           <div className="flex flex-row justify-end item-center bg-[#6366F1] w-full h-[20%]" >
             <p className="text-2xl pr-4 text-white">₹{total_bus_collection || 0}</p>
           </div>
-          <div className="flex flex items-center gap-10 p-4 rounded-md w-full">
+          <div className="flex items-center gap-10 p-4 rounded-md w-full">
             <div className="flex flex-1 flex-col justify-between h-full ">
               <p><b>Conductor Name </b>: <span className="font-normal">{`${first_name} ${last_name}`}</span></p>
               <p><b>Conductor ID</b> : <span className="font-normal">{conductor_id}</span></p>
@@ -184,7 +184,7 @@ const ReportCard = ({
           <div className="flex flex-row justify-end item-center bg-[#6366F1] w-full h-[20%]" >
             <p className="text-2xl pr-4 text-white">₹{total_bus_collection || 0}</p>
           </div>
-          <div className="flex flex items-center gap-10 p-4 rounded-md w-full h-full">
+          <div className="flex items-center gap-10 p-4 rounded-md w-full h-full">
             <div className="flex flex-1 flex-col justify-start h-full ">
               <p><b>Registration No. </b>: <span className="font-normal">{register_no}</span></p>
               <p><b>VIN/Chassis No.</b> : <span className="font-normal">{vin_no}</span></p>
@@ -212,7 +212,7 @@ const ReportCard = ({
               )}
             </div>
 
-            <div className="flex flex-col justify-between h-full items-end h-full">
+            <div className="flex flex-col justify-between items-end h-full">
               <Link
                 to={`/ReportBus_recipt/${register_no}/${fromDate}/${toDate}`}
                 className="font-bold"
