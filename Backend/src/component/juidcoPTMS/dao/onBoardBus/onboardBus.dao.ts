@@ -53,16 +53,19 @@ class BusOnboarding {
   };
 
   getAllBusList = async (req: Request) => {
-    const id = String(req.query.id);
+    const id = String(req.query.id); // cunique_id filter
     const page: number = Number(req.query.page);
     const limit: number = Number(req.query.limit);
-    const search: string = String(req.query.search);
-
-    const { ulb_id } = req.body.auth
-
+    const search: string = String(req.query.search); // Search term
+  
+    console.log("req", req?.query);
+  
+    const { ulb_id } = req.body.auth; // Getting ulb_id from the request body
+  
     const from_date: string | undefined = req.query.from_date && String(req.query.from_date);
-    const to_date: string | undefined = req.query.from_date && String(req.query.to_date);
-
+    const to_date: string | undefined = req.query.to_date && String(req.query.to_date);
+  
+    // Prepare the base query
     const query: Prisma.bus_masterFindManyArgs = {
       skip: (page - 1) * limit,
       take: limit,
@@ -71,98 +74,97 @@ class BusOnboarding {
         register_no: true,
         vin_no: true,
       },
+      where: {
+        ulb_id, // Filter by ulb_id
+      },
+      orderBy: req?.query?.view
+        ? [{ created_at: "desc" }]
+        : [{ receipts: { _count: "desc" } }],
     };
-
-    query.where = {
-      ulb_id: ulb_id
-    }
-
+  
+    // Apply filters for 'id' and 'search'
     if (id !== "" && id !== "undefined") {
+      // If id is provided, filter by register_no
       query.where = {
+        ...query.where,
         register_no: id,
       };
     }
-
-    if (search !== "" && typeof search === "string" && search !== "undefined") {
+  
+    if (search !== "" && search !== "undefined") {
+      // If search term is provided, filter by register_no and vin_no
       query.where = {
+        ...query.where,
         OR: [
-          {
-            register_no: { contains: search, mode: "insensitive" },
-          },
-          {
-            vin_no: { contains: search, mode: "insensitive" },
-          },
+          { register_no: { contains: search, mode: "insensitive" } },
+          { vin_no: { contains: search, mode: "insensitive" } },
         ],
       };
     }
-
-    if (req?.query?.view) {
-      query.orderBy = [
-        {
-          created_at:'desc'
-        }
-      ]
-    } else {
-      query.orderBy = [
-        {
-          receipts: {
-            _count: 'desc'
-          }
-        }
-      ]
+  
+    // Fetch data and count from the database
+    try {
+      const [data, count] = await prisma.$transaction([
+        prisma.bus_master.findMany(query) as any,
+        prisma.bus_master.count({
+          where: query.where, // Count based on the same where clause
+        }),
+      ]);
+  
+      // Enrich data with bus receipt and collection details
+      await Promise.all(
+        data.map(async (item: any) => {
+          const busData: any[] = await prisma.$queryRawUnsafe(`
+            SELECT bus_id, SUM(amount)::INT AS total_collection, date, bm.status, receipts.conductor_id
+            FROM receipts
+            LEFT JOIN bus_master AS bm ON receipts.bus_id = bm.register_no
+            LEFT JOIN conductor_master AS cm ON receipts.conductor_id = cm.cunique_id
+            WHERE bus_id = '${item?.register_no}'
+            ${(from_date && to_date) ? `AND date BETWEEN '${from_date}' AND '${to_date}'` : ''}
+            GROUP BY bus_id, date, bm.status, receipts.conductor_id
+            ORDER BY date ASC
+          `);
+  
+          // Fetch detailed breakdown of each bus data entry
+          await Promise.all(
+            busData.map(async (bus: any) => {
+              const date = new Date(bus?.date);
+              const formattedDate = date.toISOString().split('T')[0];
+              const receiptBreakup: any[] = await prisma.$queryRawUnsafe(`
+                SELECT conductor_id, amount::INT, COUNT(amount)::INT, SUM(amount)::INT, date::DATE
+                FROM receipts
+                WHERE bus_id = '${item?.register_no}' 
+                AND conductor_id = '${bus?.conductor_id}' 
+                AND date = '${formattedDate}'
+                GROUP BY conductor_id, amount, date
+                ORDER BY date ASC
+              `);
+  
+              bus.breakup = receiptBreakup;
+            })
+          );
+  
+          // Fetch total collection data for the bus
+          const receiptData: any[] = await prisma.$queryRawUnsafe(`
+            SELECT SUM(amount)::INT AS total_bus_collection
+            FROM receipts
+            WHERE bus_id = '${item?.register_no}'
+            ${(from_date && to_date) ? `AND date BETWEEN '${from_date}' AND '${to_date}'` : ''}
+          `);
+  
+          item.bus_data = busData;
+          item.receipt_data = receiptData[0];
+        })
+      );
+  
+      // Return the response with the data and pagination info
+      return generateRes({ data, count, page, limit });
+    } catch (error) {
+      console.error("Error fetching bus data:", error);
+      throw new Error("Unable to fetch bus data");
     }
-
-    // const data = await prisma.bus_master.findMany(query);
-    const [data, count] = await prisma.$transaction([
-      prisma.bus_master.findMany(query) as any,
-      prisma.bus_master.count(),
-    ]);
-
-    await Promise.all(
-      data.map(async (item: any) => {
-        const busData: any[] = await prisma.$queryRawUnsafe(`
-          select bus_id, sum(amount)::INT as total_collection ,date, bm.status ,receipts.conductor_id 
-          from receipts 
-          LEFT JOIN bus_master as bm ON receipts.bus_id = bm.register_no
-          LEFT JOIN conductor_master as cm ON receipts.conductor_id = cm.cunique_id
-          where bus_id = '${item?.register_no}'
-          ${(from_date && to_date) ? `and date between '${from_date}' and '${to_date}'` : ''}
-          group by bus_id, date, bm.status, receipts.conductor_id 
-          order by date ASC
-        `)
-
-        await Promise.all(
-          busData.map(async (bus: any) => {
-            const date = new Date(bus?.date);
-            const formattedDate = date.toISOString().split('T')[0];
-            const receiptBreakup: any[] = await prisma.$queryRawUnsafe(`
-              select conductor_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts
-              WHERE bus_id = '${item?.register_no}' 
-              and conductor_id = '${bus?.conductor_id}' 
-              AND date = '${formattedDate}'
-              group by conductor_id, amount, date
-              ORDER BY date ASC
-            `)
-
-            bus.breakup = receiptBreakup
-
-          })
-        )
-
-        const receiptData: any[] = await prisma.$queryRawUnsafe(`
-          select sum(amount)::INT as total_bus_collection from receipts
-          where bus_id = '${item?.register_no}'
-          ${(from_date && to_date) ? `and date between '${from_date}' and '${to_date}'` : ''}
-        `)
-
-        item.bus_data = busData
-        item.receipt_data = receiptData[0]
-
-      })
-    )
-
-    return generateRes({ data, count, page, limit });
   };
+  
 
   updateBusDetails = async (req: Request) => {
     const {

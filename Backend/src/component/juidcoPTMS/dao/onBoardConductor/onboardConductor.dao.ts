@@ -85,12 +85,10 @@ class ConductorOnBoarding {
     const page: number = Number(req.query.page);
     const limit: number = Number(req.query.limit);
     const search: string = String(req.query.search);
-
-    const from_date: string | undefined = req.query.from_date && String(req.query.from_date);
-    const to_date: string | undefined = req.query.from_date && String(req.query.to_date);
-
-    const { ulb_id } = req.body.auth
-
+    const from_date: string | undefined = req.query.from_date ? String(req.query.from_date) : undefined;
+    const to_date: string | undefined = req.query.to_date ? String(req.query.to_date) : undefined;
+    const { ulb_id } = req.body.auth;
+  
     const query: Prisma.conductor_masterFindManyArgs = {
       skip: (page - 1) * limit,
       take: limit,
@@ -108,96 +106,122 @@ class ConductorOnBoarding {
         cunique_id: true,
       },
     };
-
-    if (id !== "" && id !== "undefined") {
-      query.where = {
-        cunique_id: id,
-      };
-    }
-
-    if (search !== "" && typeof search === "string" && search !== "undefined") {
+  
+    if (search && search !== "undefined") {
       query.where = {
         OR: [
-          {
-            cunique_id: { contains: search, mode: "insensitive" },
-          },
-          {
-            first_name: { contains: search, mode: "insensitive" },
-          },
+          { cunique_id: { contains: search, mode: "insensitive" } },
+          { first_name: { contains: search, mode: "insensitive" } },
+          { last_name: { contains: search, mode: "insensitive" } },
         ],
       };
     }
-
-    query.where = {
-      ulb_id: ulb_id
+  
+    if (id && id !== "undefined") {
+      query.where = {
+        ...(query.where || {}),
+        cunique_id: id,
+      };
     }
-
+  
+    query.where = {
+      ...(query.where || {}),
+      ulb_id: ulb_id,
+    };
+  
     if (req?.query?.view) {
       query.orderBy = [
         {
-          created_at: 'desc'
-        }
-      ]
+          created_at: "desc",
+        },
+      ];
     } else {
       query.orderBy = [
         {
           receipts: {
-            _count: 'desc'
-          }
-        }
-      ]
+            _count: "desc",
+          },
+        },
+      ];
     }
-
+  
+    console.log("query", query);
+  
+    // Fetch the conductor list and the total count of conductors
     const [data, count] = await prisma.$transaction([
       prisma.conductor_master.findMany(query) as any,
-      prisma.conductor_master.count(),
+      prisma.conductor_master.count({
+        where: query.where || {},
+      }),
     ]);
-
+  
+    // Now, calculate the total sum of the amounts in the `receipts` table based on the search criteria
+    const totalAmountQuery = `
+      SELECT sum(amount)::INT as total_amount
+      FROM receipts
+      LEFT JOIN conductor_master as cm ON receipts.conductor_id = cm.cunique_id
+      WHERE cm.ulb_id = '${ulb_id}'
+      ${(search && search !== "undefined") ? `AND (cm.cunique_id LIKE '%${search}%' OR cm.first_name LIKE '%${search}%' OR cm.last_name LIKE '%${search}%')` : ""}
+      ${(from_date && to_date) ? `AND receipts.date BETWEEN '${from_date}' AND '${to_date}'` : ""}
+    `;
+  
+    // Fetch the total sum of the amounts
+    const totalAmountResult: any[] = await prisma.$queryRawUnsafe(totalAmountQuery);
+    const totalAmount = totalAmountResult[0]?.total_amount || 0;
+  
+    // Process each conductor to fetch additional data like bus collections
     await Promise.all(
       data.map(async (item: any) => {
+        // Fetch bus data for the conductor
         const busData: any[] = await prisma.$queryRawUnsafe(`
-          select bus_id, sum(amount)::INT as total_collection ,date, bm.status ,receipts.conductor_id 
-          from receipts 
+          select bus_id, sum(amount)::INT as total_collection, date, bm.status, receipts.conductor_id
+          from receipts
           LEFT JOIN bus_master as bm ON receipts.bus_id = bm.register_no
-          LEFT JOIN conductor_master as cm ON receipts.conductor_id = cm.cunique_id
-          where conductor_id = '${item?.cunique_id}'
+          WHERE conductor_id = '${item?.cunique_id}'
           ${(from_date && to_date) ? `and date between '${from_date}' and '${to_date}'` : ''}
-          group by bus_id, date, bm.status, receipts.conductor_id 
+          group by bus_id, date, bm.status, receipts.conductor_id
           order by date ASC
-        `)
-
+        `);
+  
+        // Fetch detailed receipt breakup for each bus
         await Promise.all(
           busData.map(async (bus: any) => {
             const date = new Date(bus?.date);
-            const formattedDate = date.toISOString().split('T')[0];
+            const formattedDate = date.toISOString().split("T")[0]; // Format date to YYYY-MM-DD
             const receiptBreakup: any[] = await prisma.$queryRawUnsafe(`
-              select bus_id,amount::INT, count(amount)::INT, sum(amount)::INT,date::DATE from receipts
+              select bus_id, amount::INT, count(amount)::INT, sum(amount)::INT, date::DATE 
+              from receipts
               WHERE bus_id = '${bus?.bus_id}' 
               and conductor_id = '${item?.cunique_id}' 
               AND date = '${formattedDate}'
               group by bus_id, amount, date
               ORDER BY date ASC
-            `)
-
-            bus.breakup = receiptBreakup
-
+            `);
+  
+            bus.breakup = receiptBreakup;
           })
-        )
-
+        );
+  
+        // Fetch total bus collection for the conductor
         const receiptData: any[] = await prisma.$queryRawUnsafe(`
-          select sum(amount)::INT as total_bus_collection from receipts
+          select sum(amount)::INT as total_bus_collection
+          from receipts
           where conductor_id = '${item?.cunique_id}'
           ${(from_date && to_date) ? `and date between '${from_date}' and '${to_date}'` : ''}
-        `)
-
-        item.bus_data = busData
-        item.receipt_data = receiptData[0]
-
+        `);
+  
+        item.bus_data = busData;
+        item.receipt_data = receiptData[0];
+        console.log("receiptDatareceiptDatareceiptDatareceiptData", receiptData);
       })
-    )
-
-    return generateRes({ data, count, page, limit });
+    );
+  
+    // Return the response with total amount and other data
+    return generateRes({ data, count, page, limit, totalAmount });
   };
+  
+  
+  
 
   getConductorStatus = async (req: Request) => {
     const date = new Date().toISOString().split("T")[0];

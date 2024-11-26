@@ -69,9 +69,9 @@ class BusConductorScheduleDao {
     const conductor_name: string = String(req.query.conductor_name);
     const from_date: string = String(req.query.from_date);
     const to_date: string = String(req.query.to_date);
-
-    const { ulb_id } = req.body.auth
-
+  
+    const { ulb_id } = req.body.auth;
+  
     const query: Prisma.schedulerFindManyArgs = {
       skip: (page - 1) * limit,
       take: limit,
@@ -102,19 +102,22 @@ class BusConductorScheduleDao {
           },
         },
       },
+      where: { ulb_id }, // Always filter by ulb_id
     };
-
-
-
-    if (search !== "" && typeof search === "string" && search !== "undefined") {
-      query.where = {
+  
+    // Accumulating the `where` conditions
+    let whereConditions: Prisma.schedulerWhereInput = { ulb_id };
+  
+    // Handling the search filter
+    if (search && search !== "undefined") {
+      whereConditions = {
+        ...whereConditions,
         OR: [
           {
             bus: {
               register_no: { contains: search, mode: "insensitive" },
             },
           },
-
           {
             bus: {
               vin_no: { contains: search, mode: "insensitive" },
@@ -123,88 +126,71 @@ class BusConductorScheduleDao {
         ],
       };
     }
-
-    if (bus_no !== "" && typeof bus_no === "string" && bus_no !== "undefined") {
-      query.where = {
-        OR: [
-          {
-            bus: {
-              register_no: { equals: bus_no, mode: "insensitive" },
-            },
-          },
-        ],
+  
+    // Handling the bus_no filter
+    if (bus_no && bus_no !== "undefined") {
+      whereConditions = {
+        ...whereConditions,
+        bus: {
+          register_no: { equals: bus_no, mode: "insensitive" },
+        },
       };
     }
-
+  
+    // Handling the date range filter for bus_no
     if (
-      bus_no !== "" &&
-      typeof bus_no === "string" &&
+      bus_no &&
+      from_date &&
+      to_date &&
       bus_no !== "undefined" &&
-      from_date !== "" &&
-      typeof from_date === "string" &&
       from_date !== "undefined" &&
-      to_date !== "" &&
-      typeof to_date === "string" &&
       to_date !== "undefined"
     ) {
-      query.where = {
-        OR: [
-          {
-            bus: {
-              register_no: { equals: bus_no, mode: "insensitive" },
-            },
-            date: {
-              gte: new Date(from_date),
-              lte: new Date(to_date),
-            },
-          },
-        ],
+      whereConditions = {
+        ...whereConditions,
+        bus: {
+          register_no: { equals: bus_no, mode: "insensitive" },
+        },
+        date: {
+          gte: new Date(from_date),
+          lte: new Date(to_date),
+        },
       };
     }
-
-    if (
-      conductor_id !== "" &&
-      typeof bus_no === "string" &&
-      conductor_id !== "undefined"
-    ) {
-      query.where = {
-        OR: [
-          {
-            conductor: {
-              cunique_id: { equals: conductor_id, mode: "insensitive" },
-            },
-          },
-        ],
+  
+    // Handling the conductor_id filter
+    if (conductor_id && conductor_id !== "undefined") {
+      whereConditions = {
+        ...whereConditions,
+        conductor: {
+          cunique_id: { equals: conductor_id, mode: "insensitive" },
+        },
       };
     }
-
-    if (
-      conductor_name !== "" &&
-      typeof conductor_name === "string" &&
-      conductor_name !== "undefined"
-    ) {
-      query.where = {
-        OR: [
-          {
-            conductor: {
-              first_name: { equals: conductor_name, mode: "insensitive" },
-            },
-          },
-        ],
+  
+    // Handling the conductor_name filter
+    if (conductor_name && conductor_name !== "undefined") {
+      whereConditions = {
+        ...whereConditions,
+        conductor: {
+          first_name: { contains: conductor_name, mode: "insensitive" },
+        },
       };
     }
-
-    query.where = {
-      ulb_id: ulb_id
-    }
-
+  
+    // Finalizing the query where clause
+    query.where = whereConditions;
+  
+    // Perform the transaction: fetching data and count
     const [data, count] = await prisma.$transaction([
       prisma.scheduler.findMany(query),
-      prisma.scheduler.count({ where: query.where }),
+      prisma.scheduler.count({ where: whereConditions }),
     ]);
-
+  
+    // Return the response
     return generateRes({ data, count, page, limit });
   };
+  
 
   updateScheduleBusConductor = async (req: Request) => {
     const { id, bus_no, conductor_id, date, from_time, to_time, is_scheduled } =
