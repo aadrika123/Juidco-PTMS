@@ -15,6 +15,8 @@ import {
   Button,
 } from "@mui/material";
 
+import toast, { Toaster } from "react-hot-toast";
+
 const FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 const initialValues = {
@@ -121,67 +123,81 @@ export default function Bus_Onboarding() {
   };
 
   const onSubmit = async (values) => {
-    // console.log(values);
-    set_loading(true);
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/onBoardingBus`,
-        {
-          registration_no: values.registration_No,
-          pollution_cert: uploadedFiles?.Pollution,
-          taxCopy_cert: uploadedFiles?.Tax,
-          vin_no: values.VIN_Number,
-          registration_cert: uploadedFiles?.Registration,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+    if (
+      !uploadedFiles?.Tax &&
+      !uploadedFiles?.Pollution &&
+      !uploadedFiles?.Registration
+    ) {
+      toast.error("Certificats were not Uploaded");
+    } else if (!uploadedFiles?.Tax) {
+      toast.error("Tax Copy Certificate is not Uploaded");
+    } else if (!uploadedFiles?.Pollution) {
+      toast.error("Pollution Certificate is not Uploaded");
+    } else if (!uploadedFiles?.Registration) {
+      toast.error("Registration Certificate is not Uploaded");
+    } else {
+      set_loading(true);
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_BASE_URL}/onBoardingBus`,
+          {
+            registration_no: values.registration_No,
+            pollution_cert: uploadedFiles?.Pollution,
+            taxCopy_cert: uploadedFiles?.Tax,
+            vin_no: values.VIN_Number,
+            registration_cert: uploadedFiles?.Registration,
           },
-        }
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      console.log("Response >>>>>> ", response);
+        console.log("Response >>>>>> ", response);
 
-      //
-      if (response?.data?.status == "Error") {
-        console.log("Error Occured");
-        console.log("Client error occurred");
-        const responseData = response?.data?.message;
-        set_loading(false);
-        set_error(responseData);
-        set_opeen_error_dialog(true);
-      } else {
-        const responseData = response?.data?.data;
-        set_loading(false);
-        set_success(responseData);
-        setOpenDialog(true);
-      }
-
-      /* if (typeof responseData === "string") {
-        if (responseData.includes("Client error")) {
+        //
+        if (response?.data?.status == "Error") {
+          console.log("Error Occured");
           console.log("Client error occurred");
+          const responseData = response?.data?.message;
           set_loading(false);
           set_error(responseData);
           set_opeen_error_dialog(true);
         } else {
-         
+          const responseData = response?.data?.data;
+          set_loading(false);
+          set_success(responseData);
+          setOpenDialog(true);
         }
-      } else {
-        // Handle other types of response data here if needed
+
+        /* if (typeof responseData === "string") {
+          if (responseData.includes("Client error")) {
+            console.log("Client error occurred");
+            set_loading(false);
+            set_error(responseData);
+            set_opeen_error_dialog(true);
+          } else {
+           
+          }
+        } else {
+          // Handle other types of response data here if needed
+          set_loading(false);
+          set_success(responseData?.data || responseData);
+          setOpenDialog(true);
+        } */
+      } catch (error) {
+        console.error("Error making POST request:", error);
         set_loading(false);
-        set_success(responseData?.data || responseData);
-        setOpenDialog(true);
-      } */
-    } catch (error) {
-      console.error("Error making POST request:", error);
-      set_loading(false);
-      set_error(error.response?.data || "An error occurred");
-      set_opeen_error_dialog(true);
+        set_error(error.response?.data || "An error occurred");
+        set_opeen_error_dialog(true);
+      }
     }
   };
 
   return (
     <>
+      <Toaster />
       <div className="flex flex-1 ">
         <div className="flex flex-col flex-1 bg-[#F9FAFC]">
           <div className="flex h-10 justify-between items-center">

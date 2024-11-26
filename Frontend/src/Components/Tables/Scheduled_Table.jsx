@@ -24,6 +24,7 @@ import busstop from "../../assets/bus-stop.png";
 
 import autoTable from "jspdf-autotable";
 import { jsPDF } from "jspdf";
+import ListLoader from "../../assets/common/loader/ListLoader";
 
 const formatDate = (dateString) => {
   const options = {
@@ -67,6 +68,7 @@ const ScheduledTable = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [allScheduled, setAllScheduled] = useState([]);
+  const [length, setLength] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
   const [fromDate, setFromDate] = useState(""); // Added state for date
   const [toDate, settoDate] = useState(""); // Added state for date
@@ -106,6 +108,7 @@ const ScheduledTable = () => {
         )
         .then((response) => {
           set_loading(false);
+          setLength(response.data?.data?.data?.length);
           setAllScheduled(response.data?.data?.data);
           setTotalRecords(response.data?.data?.count);
         });
@@ -155,6 +158,8 @@ const ScheduledTable = () => {
     const mobileNo = row.conductor.mobile_no.toLowerCase();
     const search = searchQuery.toLowerCase();
 
+
+    
     return (
       conductorName.includes(search) ||
       busNo.includes(search) ||
@@ -406,7 +411,9 @@ const ScheduledTable = () => {
       </div>
 
       <TableContainer component={Paper} className="shadow-lg rounded-lg">
-        {filteredData?.length > 0 ? (
+        {loading ? ( // Check if the data is loading
+          <ListLoader /> // Render the ListLoader while loading
+        ) : length > 0 && loading == false ? ( // Check if there's filtered data
           <Table id="data-table" stickyHeader>
             <TableHead>
               <TableRow className="bg-blue-600">
@@ -430,7 +437,7 @@ const ScheduledTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredData?.map((row, index) => (
+              {filteredData.map((row, index) => (
                 <TableRow
                   key={index}
                   className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
@@ -443,7 +450,7 @@ const ScheduledTable = () => {
                       <Avatar>{row.conductor.first_name.charAt(0)}</Avatar>
                       <div className="ml-4">
                         <div>{`${row.conductor.first_name} ${
-                          row.conductor.middle_name == "null"
+                          row.conductor.middle_name === "null"
                             ? ""
                             : row.conductor.middle_name
                         } ${row.conductor.last_name}`}</div>
@@ -473,7 +480,7 @@ const ScheduledTable = () => {
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M8.95455 4H13.0455C13.0455 3.50272 12.83 3.02581 12.4464 2.67417C12.0628 2.32254 11.5425 2.125 11 2.125C10.4575 2.125 9.93724 2.32254 9.55365 2.67417C9.17005 3.02581 8.95455 3.50272 8.95455 4ZM7.72727 4C7.72727 3.20435 8.07208 2.44129 8.68583 1.87868C9.29959 1.31607 10.132 1 11 1C11.868 1 12.7004 1.31607 13.3142 1.87868C13.9279 2.44129 14.2727 3.20435 14.2727 4H19.3864C19.5491 4 19.7052 4.05926 19.8203 4.16475C19.9354 4.27024 20 4.41332 20 4.5625C20 4.71168 19.9354 4.85476 19.8203 4.96025C19.7052 5.06574 19.5491 5.125 19.3864 5.125H18.3145L17.3188 16.0773C17.2464 16.874 16.8499 17.6167 16.2081 18.1581C15.5663 18.6994 14.726 18.9999 13.8538 19H8.14618C7.27399 18.9999 6.43368 18.6994 5.79187 18.1581C5.15006 17.6167 4.75362 16.874 4.68118 16.0773L3.68545 5.125H2.61364C2.45089 5.125 2.29481 5.06574 2.17973 4.96025C2.06465 4.85476 2 4.71168 2 4.5625C2 4.41332 2.06465 4.27024 2.17973 4.16475C2.29481 4.05926 2.45089 4 2.61364 4H7.72727ZM5.90436 15.9835C5.95115 16.4991 6.2076 16.9797 6.62285 17.33C7.03809 17.6804 7.58181 17.8749 8.14618 17.875H13.8538C14.4182 17.8749 14.9619 17.6804 15.3772 17.33C15.7924 16.9797 16.0488 16.4991 16.0956 15.9835L17.084 5.125H4.91682L5.90436 15.9835ZM9.15909 7.75C9.32184 7.75 9.47792 7.80926 9.593 7.91475C9.70808 8.02024 9.77273 8.16332 9.77273 8.3125V14.6875C9.77273 14.8367 9.70808 14.9798 9.593 15.0852C9.47792 15.1907 9.32184 15.25 9.15909 15.25C8.99634 15.25 8.84026 15.1907 8.72518 15.0852C8.61011 14.9798 8.54545 14.8367 8.54545 14.6875V8.3125C8.54545 8.16332 8.61011 8.02024 8.72518 7.91475C8.84026 7.80926 8.99634 7.75 9.15909 7.75ZM13.4545 8.3125C13.4545 8.16332 13.3899 8.02024 13.2748 7.91475C13.1597 7.80926 13.0037 7.75 12.8409 7.75C12.6782 7.75 12.5221 7.80926 12.407 7.91475C12.2919 8.02024 12.2273 8.16332 12.2273 8.3125V14.6875C12.2273 14.8367 12.2919 14.9798 12.407 15.0852C12.5221 15.1907 12.6782 15.25 12.8409 15.25C13.0037 15.25 13.1597 15.1907 13.2748 15.0852C13.3899 14.9798 13.4545 14.8367 13.4545 14.6875V8.3125Z"
+                            d="..." // SVG path details
                             fill="#333333"
                           />
                         </svg>
@@ -523,6 +530,7 @@ const ScheduledTable = () => {
             </svg>
           </div>
         )}
+
         <TablePagination
           rowsPerPageOptions={[10]}
           component="div"

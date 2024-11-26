@@ -4,9 +4,18 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { Button, FormControlLabel, Radio, RadioGroup, CircularProgress, Box, Menu, MenuItem } from "@mui/material";
+import {
+  Button,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  CircularProgress,
+  Box,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import { Dialog, DialogContent, DialogActions } from "@mui/material";
-import DownloadIcon from '@mui/icons-material/Download';
+import DownloadIcon from "@mui/icons-material/Download";
 import Cookies from "js-cookie";
 // import { ReportCard, BusCard } from "../../Ui/ReportCard";
 import { ReportCard, BusCard } from "../../Ui/ReportCardV2";
@@ -19,11 +28,11 @@ export default function ReportGeneration_main() {
   const token = Cookies.get("accesstoken");
   const navigate = useNavigate();
 
-  const formikRef = useRef(null)
+  const formikRef = useRef(null);
   const topRef = useRef(null);
 
   const scrollToTop = () => {
-    topRef.current.scrollIntoView({ behavior: 'smooth' });
+    topRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const initialValues = {
@@ -73,7 +82,7 @@ export default function ReportGeneration_main() {
     setAnchorEl(null);
   };
 
-  const currentDate = new Date()
+  const currentDate = new Date();
 
   function filterAllReportData() {
     set_filterAllReport(!filterAllReport);
@@ -83,16 +92,13 @@ export default function ReportGeneration_main() {
   //   console.log(report_all)
   // }
 
-
   // console.log(conductor_details?.data, "==============>");
-  
+
   conductor_details?.data.sort((a, b) => {
     const collectionA = a.receipt_data.total_bus_collection ?? 0; // Use 0 if null
     const collectionB = b.receipt_data.total_bus_collection ?? 0; // Use 0 if null
     return collectionB - collectionA; // Sort in descending order
   });
-
-
 
   const onSubmit = async (values, rest) => {
     set_filterValues(values);
@@ -101,8 +107,8 @@ export default function ReportGeneration_main() {
     set_report_type(values.reportType);
     if (values.reportType === "conductor") {
       set_conductor_id(values.id);
-      setIsLoading(true)
-      scrollToTop()
+      setIsLoading(true);
+      scrollToTop();
       await axios
         .get(
           `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?id=${values.id}&limit=10&page=${page}&from_date=${values.fromDate}&to_date=${values.toDate}`,
@@ -115,14 +121,14 @@ export default function ReportGeneration_main() {
         .then((response) => {
           // console.log(response.data.data);
           set_conductor_details(response.data.data);
-          setToalCount(Math.ceil(response?.data?.data?.count / 10))
-          setIsLoading(false)
+          setToalCount(Math.ceil(response?.data?.data?.count / 10));
+          setIsLoading(false);
         })
         .catch((error) => {
           console.log(error);
         })
         .finally(() => {
-          setIsLoading(false)
+          setIsLoading(false);
         });
 
       await axios
@@ -207,14 +213,14 @@ export default function ReportGeneration_main() {
         .then((response) => {
           console.log("Bus details", response.data.data);
           set_bus_details(response.data.data);
-          setToalCount(Math.ceil(response?.data?.data?.count / 10))
-          setIsLoading(false)
+          setToalCount(Math.ceil(response?.data?.data?.count / 10));
+          setIsLoading(false);
         })
         .catch((error) => {
           console.log(error);
         })
         .finally(() => {
-          setIsLoading(false)
+          setIsLoading(false);
         });
 
       await axios
@@ -247,9 +253,9 @@ export default function ReportGeneration_main() {
 
   useEffect(() => {
     if (conductor_details || bus_details) {
-      formikRef.current.submitForm()
+      formikRef.current.submitForm();
     }
-  }, [page])
+  }, [page]);
 
   // fetch all report data
   // useEffect(() => {
@@ -301,7 +307,9 @@ export default function ReportGeneration_main() {
     if (report_type) {
       await axios
         .get(
-          `${process.env.REACT_APP_BASE_URL}/common/export${report_type === 'conductor' ? '?type=conductor' : '?type=bus'}`,
+          `${process.env.REACT_APP_BASE_URL}/common/export${
+            report_type === "conductor" ? "?type=conductor" : "?type=bus"
+          }`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -309,8 +317,8 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          if (exportType === 'csv') {
-            const exportData = csvGenerator(response?.data?.data)
+          if (exportType === "csv") {
+            const exportData = csvGenerator(response?.data?.data);
             const url = window.URL.createObjectURL(new Blob([exportData]));
             const a = document.createElement("a");
             a.href = url;
@@ -319,18 +327,18 @@ export default function ReportGeneration_main() {
             a.click();
             window.URL.revokeObjectURL(url);
           } else {
-            setDownloadReportPopup(true)
-            setExportData(response?.data?.data)
+            setDownloadReportPopup(true);
+            setExportData(response?.data?.data);
           }
         })
         .catch((error) => {
           console.log(error);
         })
         .finally(() => {
-          setIsLoading(false)
+          setIsLoading(false);
         });
     }
-  }
+  };
 
   return (
     <>
@@ -372,9 +380,7 @@ export default function ReportGeneration_main() {
                 </div>
               </div>
             </div>
-            <div className="flex text-xl font-bold  mr-4">
-              Generate Report
-            </div>
+            <div className="flex text-xl font-bold  mr-4">Generate Report</div>
           </div>
           <div className="flex p-4 mt-5 ml-4 mr-4 rounded-md justify-start items-start shadow-md h-fit bg-white">
             <div className="flex ">
@@ -394,9 +400,9 @@ export default function ReportGeneration_main() {
                   <>
                     <Button
                       id="basic-button"
-                      aria-controls={open ? 'basic-menu' : undefined}
+                      aria-controls={open ? "basic-menu" : undefined}
                       aria-haspopup="true"
-                      aria-expanded={open ? 'true' : undefined}
+                      aria-expanded={open ? "true" : undefined}
                       onClick={handleClick}
                       variant="outlined"
                     >
@@ -408,11 +414,25 @@ export default function ReportGeneration_main() {
                       open={open}
                       onClose={handleClose}
                       MenuListProps={{
-                        'aria-labelledby': 'basic-button',
+                        "aria-labelledby": "basic-button",
                       }}
                     >
-                      <MenuItem onClick={() => { handleClose(); handleExport('csv') }}>CSV</MenuItem>
-                      <MenuItem onClick={() => { handleClose(); handleExport('pdf') }}>PDF</MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          handleClose();
+                          handleExport("csv");
+                        }}
+                      >
+                        CSV
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          handleClose();
+                          handleExport("pdf");
+                        }}
+                      >
+                        PDF
+                      </MenuItem>
                     </Menu>
                   </>
                 )}
@@ -443,7 +463,7 @@ export default function ReportGeneration_main() {
                             value={values.reportType}
                             onChange={(e) => {
                               setFieldValue("reportType", e.target.value);
-                              set_report_type(e.target.value)
+                              set_report_type(e.target.value);
                             }}
                           >
                             <FormControlLabel
@@ -474,8 +494,8 @@ export default function ReportGeneration_main() {
                                     className="border border-gray-300 rounded-md px-3 py-2 mt-1"
                                     style={{ boxShadow: "0 1px 4px #fff" }}
                                     onFocus={(e) =>
-                                    (e.target.style.boxShadow =
-                                      "0 1px 4px #000")
+                                      (e.target.style.boxShadow =
+                                        "0 1px 4px #000")
                                     }
                                     onBlur={(e) =>
                                       (e.target.style.boxShadow = "none")
@@ -500,8 +520,8 @@ export default function ReportGeneration_main() {
                                     className="border border-gray-300 rounded-md px-3 py-2 mt-1"
                                     style={{ boxShadow: "0 1px 4px #fff" }}
                                     onFocus={(e) =>
-                                    (e.target.style.boxShadow =
-                                      "0 1px 4px #000")
+                                      (e.target.style.boxShadow =
+                                        "0 1px 4px #000")
                                     }
                                     onBlur={(e) =>
                                       (e.target.style.boxShadow = "none")
@@ -525,8 +545,8 @@ export default function ReportGeneration_main() {
                                     className="border border-gray-300 rounded-md px-3 py-2 mt-1"
                                     style={{ boxShadow: "0 1px 4px #fff" }}
                                     onFocus={(e) =>
-                                    (e.target.style.boxShadow =
-                                      "0 1px 4px #000")
+                                      (e.target.style.boxShadow =
+                                        "0 1px 4px #000")
                                     }
                                     onBlur={(e) =>
                                       (e.target.style.boxShadow = "none")
@@ -577,27 +597,46 @@ export default function ReportGeneration_main() {
             </div>
           </div>
           <div className="flex flex-1 flex-col md:flex-row   ml-4 mr-4 mt-4 ">
-            <div
-              className={`flex flex-col gap-4 flex-1 m-4  p-8 `}
-            >
+            <div className={`flex flex-col gap-4 flex-1 m-4  p-8 `}>
               {/* <button onClick={() => {
                 console.log('totaaaaa', conductor_details)
               }}>abc</button> */}
               {isLoading && (
-                <Box sx={{ display: 'flex', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
                   <CircularProgress />
                 </Box>
               )}
 
-              {((report_type === 'conductor' && (conductor_details?.data?.length === 0 || !conductor_details)) || (report_type === 'bus' && (bus_details?.data?.length === 0 || !bus_details))) && (
-                <Box sx={{ display: 'flex', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+              {((report_type === "conductor" &&
+                (conductor_details?.data?.length === 0 ||
+                  !conductor_details)) ||
+                (report_type === "bus" &&
+                  (bus_details?.data?.length === 0 || !bus_details))) && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
                   <h1>No Data</h1>
                 </Box>
               )}
 
-              {(conductor_details?.data && report_type === 'conductor' && !isLoading) &&
-                conductor_details.data[0]?.first_name ? (
+              {conductor_details?.data &&
+              report_type === "conductor" &&
+              !isLoading &&
+              conductor_details.data[0]?.first_name ? (
                 <>
+                  <h1 className="mt-0 pt-0">Total Collection: </h1>
                   {conductor_details?.data.map((item, index) => (
                     <ReportCard
                       key={index}
@@ -612,7 +651,9 @@ export default function ReportGeneration_main() {
                       details={item?.bus_data}
                       fromDate={fromDate}
                       toDate={toDate}
-                      total_bus_collection={item?.receipt_data?.total_bus_collection}
+                      total_bus_collection={
+                        item?.receipt_data?.total_bus_collection
+                      }
                     />
                   ))}
                 </>
@@ -620,7 +661,10 @@ export default function ReportGeneration_main() {
                 <></>
               )}
 
-              {(bus_details?.data && bus_details.data[0]?.register_no && report_type === 'bus' && !isLoading) ? (
+              {bus_details?.data &&
+              bus_details.data[0]?.register_no &&
+              report_type === "bus" &&
+              !isLoading ? (
                 <>
                   {bus_details?.data.map((item, index) => (
                     <ReportCard
@@ -632,7 +676,9 @@ export default function ReportGeneration_main() {
                       details={item?.bus_data}
                       fromDate={fromDate}
                       toDate={toDate}
-                      total_bus_collection={item?.receipt_data?.total_bus_collection}
+                      total_bus_collection={
+                        item?.receipt_data?.total_bus_collection
+                      }
                     />
                   ))}
                 </>
@@ -967,7 +1013,7 @@ export default function ReportGeneration_main() {
           {/* <Pagination count={10} /> */}
           <Paginator page={page} setPage={setPage} totalCount={totalCount} />
         </div>
-      </div >
+      </div>
 
       <Dialog
         open={openDialog}

@@ -29,6 +29,7 @@ import { LiaEdit } from "react-icons/lia";
 import { AiOutlineDelete } from "react-icons/ai";
 import ImgModal from "../../assets/common/ImageDisplay/ImgModal";
 import EditModal from "../Registration/ViewOnboarding/EditModal";
+import ListLoader from "../../assets/common/loader/ListLoader";
 
 const formatDate = (dateString) => {
   const options = {
@@ -87,6 +88,7 @@ const ConductorOnboarding_Table = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    setIsLoading(true);
     axios
       .get(
         `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=100&page=1&view=true`,
@@ -98,6 +100,7 @@ const ConductorOnboarding_Table = () => {
       ) // Replace with your actual API endpoint
       .then((response) => {
         set_busoptions(response?.data?.data?.data);
+        setIsLoading(false);
       })
       .catch((error) => console.error("Error fetching bus data:", error));
   }, []);
@@ -314,9 +317,14 @@ const ConductorOnboarding_Table = () => {
           </div>
         </div>
       </div>
+      
 
       <TableContainer component={Paper} className="shadow-lg rounded-lg">
-        {busoptions?.length > 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center items-center">
+            <ListLoader />
+          </div>
+        ) : busoptions?.length > 0 ? (
           <Table id="data-table" stickyHeader>
             <TableHead>
               <TableRow className="bg-blue-600">
@@ -329,7 +337,6 @@ const ConductorOnboarding_Table = () => {
                   Alternate Mob No
                 </TableCell>
                 <TableCell className="text-white font-bold">Email</TableCell>
-
                 <TableCell className="text-white font-bold">
                   Aadhaar Number
                 </TableCell>
@@ -348,70 +355,67 @@ const ConductorOnboarding_Table = () => {
             </TableHead>
             <TableBody>
               {busoptions?.map((data, index) => (
-                <>
-                  <TableRow className={"bg-white"} key={index}>
-                    <TableCell>{data?.cunique_id}</TableCell>
-                    <TableCell>
-                      {data?.first_name}&nbsp;
-                      {data?.middle_name == "null" ? "" : data?.middle_name}
-                      &nbsp;
-                      {data?.last_name}
-                    </TableCell>
-                    <TableCell>{data?.mobile_no}</TableCell>
-                    <TableCell>{data?.emergency_mob_no}</TableCell>
-                    <TableCell>{data?.email_id}</TableCell>
-                    <TableCell>{data?.adhar_no}</TableCell>
-                    <TableCell>{data?.blood_grp}</TableCell>
-                    <TableCell>{data?.age}</TableCell>
-                    <TableCell>
-                      <button
+                <TableRow className={"bg-white"} key={index}>
+                  <TableCell>{data?.cunique_id}</TableCell>
+                  <TableCell>
+                    {data?.first_name}&nbsp;
+                    {data?.middle_name === "null" ? "" : data?.middle_name}
+                    &nbsp;
+                    {data?.last_name}
+                  </TableCell>
+                  <TableCell>{data?.mobile_no}</TableCell>
+                  <TableCell>{data?.emergency_mob_no}</TableCell>
+                  <TableCell>{data?.email_id}</TableCell>
+                  <TableCell>{data?.adhar_no}</TableCell>
+                  <TableCell>{data?.blood_grp}</TableCell>
+                  <TableCell>{data?.age}</TableCell>
+                  <TableCell>
+                    <button
+                      onClick={() => {
+                        setImageId(data?.id);
+                      }}
+                    >
+                      <ImgModal
+                        imageUrl={imgBufferData}
+                        type={"fitness"}
+                        isLoading={isLoading}
+                      />
+                    </button>
+                  </TableCell>
+                  <TableCell>
+                    <button
+                      onClick={() => {
+                        setImageId(data?.id);
+                      }}
+                    >
+                      <ImgModal
+                        imageUrl={imgBufferData}
+                        type={"aadhar"}
+                        isLoading={isLoading}
+                      />
+                    </button>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-start items-center">
+                      <Button
                         onClick={() => {
-                          setImageId(data?.id);
+                          setDataId(data?.id);
+                          setEditModal(true);
                         }}
                       >
-                        <ImgModal
-                          imageUrl={imgBufferData}
-                          type={"fitness"}
-                          isLoading={isLoading}
-                        />
-                      </button>
-                    </TableCell>
-                    <TableCell>
-                      <button
-                        onClick={() => {
-                          setImageId(data?.id);
-                        }}
-                      >
-                        <ImgModal
-                          imageUrl={imgBufferData}
-                          type={"aadhar"}
-                          isLoading={isLoading}
-                        />
-                      </button>
-                    </TableCell>
-
-                    <TableCell>
-                      <div className="flex justify-start items-center">
-                        <Button
-                          onClick={() => {
-                            setDataId(data?.id);
-                            setEditModal(true);
-                          }}
-                        >
-                          <LiaEdit className="text-2xl text-[#333333]" />
-                        </Button>
-                        {/* <Button
-                          onClick={() => {
-                            setDeleteItemId("row.id");
-                            setDeleteDialog(true);
-                          }}
-                        >
-                          <AiOutlineDelete className="text-2xl text-[#333333]" />
-                        </Button> */}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </>
+                        <LiaEdit className="text-2xl text-[#333333]" />
+                      </Button>
+                      {/* <Button
+                onClick={() => {
+                  setDeleteItemId("row.id");
+                  setDeleteDialog(true);
+                }}
+              >
+                <AiOutlineDelete className="text-2xl text-[#333333]" />
+              </Button> */}
+                    </div>
+                  </TableCell>
+                </TableRow>
               ))}
             </TableBody>
           </Table>
@@ -454,7 +458,8 @@ const ConductorOnboarding_Table = () => {
             </svg>
           </div>
         )}
-        <TablePagination
+
+        {/* <TablePagination
           rowsPerPageOptions={[10, 20, 50, 100]}
           component="div"
           count={totalRecords}
@@ -462,7 +467,7 @@ const ConductorOnboarding_Table = () => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        /> */}
       </TableContainer>
 
       <Dialog

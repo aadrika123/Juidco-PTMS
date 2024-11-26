@@ -18,6 +18,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import toast, { Toaster } from "react-hot-toast";
 
 import Cookies from "js-cookie";
 const token = Cookies.get("accesstoken");
@@ -150,61 +151,68 @@ export default function Conductor_Onboarding() {
   console.log("Uploaded Files >>> ", uploadedFiles);
 
   const onSubmit = async (values, reset) => {
-    console.log(values);
-    set_loading(true);
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/onBoardingConductor`,
-        {
-          firstName: values.Name,
-          middleName: values?.Middle_Name || "null",
-          lastName: values?.last_Name,
-          bloodGrp: values.Blood_Group,
-          mobileNo: values.Contact_Number,
-          emailId: values.EmailId,
-          emergencyMobNo: values.Emergency_Contact_Number,
-          age: values.Age,
-          adhar_no: values.Aadhaar_NO,
-          adhar_doc: uploadedFiles?.Aadhaar_card,
-          fitness_doc: uploadedFiles?.Fitness_Certificate,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+    if (!uploadedFiles?.Fitness_Certificate && !uploadedFiles?.Aadhaar_card) {
+      toast.error("Certificats were not Uploaded");
+    } else if (!uploadedFiles?.Fitness_Certificate) {
+      toast.error("Fitness Certificate is not Uploaded");
+    } else if (!uploadedFiles?.Aadhaar_card) {
+      toast.error("Aadhaar Card is not Uploaded");
+    } else {
+      set_loading(true);
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_BASE_URL}/onBoardingConductor`,
+          {
+            firstName: values.Name,
+            middleName: values?.Middle_Name || "null",
+            lastName: values?.last_Name,
+            bloodGrp: values.Blood_Group,
+            mobileNo: values.Contact_Number,
+            emailId: values.EmailId,
+            emergencyMobNo: values.Emergency_Contact_Number,
+            age: values.Age,
+            adhar_no: values.Aadhaar_NO,
+            adhar_doc: uploadedFiles?.Aadhaar_card,
+            fitness_doc: uploadedFiles?.Fitness_Certificate,
           },
-        }
-      );
-      set_loading(false);
-      console.log(response);
-      if (response.data?.data) {
-        console.log(response);
-        console.log("Api status >>>", response?.status);
-        setOpenDialog(true);
-        set_success(response?.data?.data?.cunique_id);
-        console.log("Success Data", success);
-      } else {
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         set_loading(false);
         console.log(response);
-        console.log(response?.data);
-        set_error(response?.data);
+        if (response.data?.data) {
+          console.log(response);
+          console.log("Api status >>>", response?.status);
+          setOpenDialog(true);
+          set_success(response?.data?.data?.cunique_id);
+          console.log("Success Data", success);
+        } else {
+          set_loading(false);
+          console.log(response);
+          console.log(response?.data);
+          set_error(response?.data);
+          set_opeen_error_dialog(true);
+        }
+      } catch (error) {
+        console.error("Error making POST request:", error);
+        set_loading(false);
+        const errorMessage = error?.response?.data?.message;
+        set_error(errorMessage);
+        console.log(errorMessage);
+
+        if (
+          typeof errorMessage === "string" &&
+          errorMessage.includes("Conductor Already Registered")
+        ) {
+          console.log("Conductor Already Registered");
+        }
         set_opeen_error_dialog(true);
       }
-    } catch (error) {
-      console.error("Error making POST request:", error);
-      set_loading(false);
-      const errorMessage = error?.response?.data?.message;
-      set_error(errorMessage);
-      console.log(errorMessage);
-
-      if (
-        typeof errorMessage === "string" &&
-        errorMessage.includes("Conductor Already Registered")
-      ) {
-        console.log("Conductor Already Registered");
-      }
-      set_opeen_error_dialog(true);
+      reset.resetForm();
     }
-    reset.resetForm();
   };
 
   const validateDob = (e) => {
@@ -222,6 +230,7 @@ export default function Conductor_Onboarding() {
 
   return (
     <>
+      <Toaster />
       <div className="flex flex-1 ">
         <div className="flex flex-col flex-1 bg-[#F9FAFC]">
           <div className="flex h-10 justify-between items-center">
