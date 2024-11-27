@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import CommonRes from "../../../../util/helper/commonResponse";
 import { resMessage } from "../../../../util/common";
 import { resObj } from "../../../../util/types";
+import { imageUploaderV2 } from "../../../../util/imageUploaderV2";
 
 export class UploadImgServices {
-  // public prisma = new PrismaClient();
   constructor() {}
 
   imageUpload = async (
@@ -13,28 +13,67 @@ export class UploadImgServices {
     next: NextFunction,
     apiId: string
   ) => {
-    const imageData = req.file;
-    const resObj: resObj = {
-      apiId,
-      action: "GET",
-      version: "1.0",
-    };
+    try {
+      const imageData = req.file;
 
-    console.log(req.file, "file============>img folder");
+      if (!imageData) {
+        return CommonRes.SERVER_ERROR(
+          resMessage("No file uploaded"),
+          {
+            apiId,
+            action: "UPLOAD",
+            version: "1.0",
+          },
+          res
+        );
+      }
 
-    const data = {
-      name: imageData?.originalname,
-      mimeType: imageData?.mimetype,
-      buffer: imageData?.buffer,
-      size: String(imageData?.size),
-    };
+      const resObj: resObj = {
+        apiId,
+        action: "UPLOAD", 
+        version: "1.0",
+      };
 
-    console.log(data, "data =====>>");
-    return CommonRes.SUCCESS(
-      resMessage("Image uploaded successfully").FOUND,
-      data,
-      resObj,
-      res
-    );
+      console.log(req.file, "file============>img folder");
+
+      const data = {
+        originalname: imageData.originalname,
+        mimetype: imageData.mimetype,
+        buffer: imageData.buffer,
+        size: String(imageData.size),
+      };
+
+      console.log(data, "data =====>>");
+
+      const uploadedImageUrls = await imageUploaderV2([data]); 
+      console.log("uploadedImageUrls",uploadedImageUrls)
+
+      if (!uploadedImageUrls || uploadedImageUrls.length === 0) {
+        return CommonRes.SERVER_ERROR(
+          resMessage("Image upload failed"),
+          resObj,
+          res
+        );
+      }
+
+      const imageUrl = uploadedImageUrls[0];
+      return CommonRes.SUCCESS(
+        resMessage("Image uploaded successfully").FOUND,
+        { imageUrl },
+        resObj,
+        res
+      );
+    } catch (err) {
+      console.error("Error uploading image:", err);
+      return CommonRes.SERVER_ERROR(
+        resMessage("Error uploading image"),
+        {
+          apiId,
+          action: "UPLOAD",
+          version: "1.0",
+        },
+        res
+      );
+    }
   };
 }
