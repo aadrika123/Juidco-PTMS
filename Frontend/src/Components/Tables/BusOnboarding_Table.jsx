@@ -128,9 +128,13 @@ const BusOnboardingTable = () => {
       .then((response) => {
         setIsLoading(false);
         setImgBufferData(response?.data?.data);
+      
+        
       })
       .catch((error) => console.error("Error fetching bus data:", error));
   }, [imageId]);
+
+  // console.log("img-data", imgBufferData);
 
   // const fetchScheduledData = async () => {
   //   set_loading(true);
@@ -372,13 +376,14 @@ const BusOnboardingTable = () => {
                             type={"pollution"}
                             isLoading={isLoading}
                           />
+                          
                         </button>
                       </TableCell>
                       <TableCell>
                         <button onClick={() => setImageId(data?.id)}>
                           <ImgModal
                             imageUrl={imgBufferData}
-                            type={"taxcopy"}
+                            type={"taxCopy"}
                             isLoading={isLoading}
                           />
                         </button>
@@ -387,7 +392,7 @@ const BusOnboardingTable = () => {
                         <button onClick={() => setImageId(data?.id)}>
                           <ImgModal
                             imageUrl={imgBufferData}
-                            type={"registration"}
+                            type={"registrationCert"}
                             isLoading={isLoading}
                           />
                         </button>

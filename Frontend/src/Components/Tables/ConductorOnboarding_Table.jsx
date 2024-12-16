@@ -405,7 +405,7 @@ const ConductorOnboarding_Table = () => {
                     >
                       <ImgModal
                         imageUrl={imgBufferData}
-                        type={"aadhar"}
+                        type={"adhar"}
                         isLoading={isLoading}
                       />
                     </button>

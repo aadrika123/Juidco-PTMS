@@ -4,71 +4,82 @@ import CircularIndeterminate from "../loader/Loader";
 
 const ImgModal = ({ imageUrl, type, isLoading }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [imageBuffer, setImageBuffer] = useState(false);
+  const [imageSrc, setImageSrc] = useState(null);
 
-  let buffer = [];
-  let mime = "";
+  useEffect(() => {
+    const processImage = () => {
+      let buffer, mime;
 
-  switch (type) {
-    case "pollution":
-      buffer = imageUrl?.pollution_doc?.buffer?.data;
-      mime = imageUrl?.pollution_doc?.mimeType;
-      break;
-    case "registration":
-      buffer = imageUrl?.registrationCert_doc?.buffer?.data;
-      mime = imageUrl?.registrationCert_doc?.mimeType;
-      break;
-    case "taxcopy":
-      buffer = imageUrl?.taxCopy_doc?.buffer?.data;
-      mime = imageUrl?.taxCopy_doc?.mimeType;
-      break;
-    case "fitness":
-      buffer = imageUrl?.fitness_doc?.buffer?.data;
-      mime = imageUrl?.fitness_doc?.mimeType;
-      break;
-    case "aadhar":
-      buffer = imageUrl?.adhar_doc?.buffer?.data;
-      mime = imageUrl?.adhar_doc?.mimeType;
-      break;
-    default:
-      break;
-  }
+      switch (type) {
+        case "pollution":
+          buffer = imageUrl?.pollution_doc?.buffer?.data;
+          mime = imageUrl?.pollution_doc?.mimeType;
+          break;
+        case "registrationCert":
+          buffer = imageUrl?.registrationCert_doc?.buffer?.data;
+          mime = imageUrl?.registrationCert_doc?.mimeType;
+          break;
+        case "taxCopy":
+          buffer = imageUrl?.taxCopy_doc?.buffer?.data;
+          mime = imageUrl?.taxCopy_doc?.mimeType;
+          break;
+        case "fitness":
+          buffer = imageUrl?.fitness_doc?.buffer?.data;
+          mime = imageUrl?.fitness_doc?.mimeType;
+          break;
+        case "adhar":
+          buffer = imageUrl?.adhar_doc?.buffer?.data;
+          mime = imageUrl?.adhar_doc?.mimeType;
+          break;
+        default:
+          break;
+      }
+      console.log("buffer && mime", buffer, mime)
+
+      if (buffer && mime) {
+        const view = new Uint8Array(buffer);
+        const blob = new Blob([view], { type: mime });
+        const urlObject = URL.createObjectURL(blob);
+        setImageSrc(urlObject);
+      } else if (imageUrl?.[`${type}_doc`]?.imageUrl) {
+        setImageSrc(imageUrl[`${type}_doc`].imageUrl);
+      }
+      else 
+      console.log("msg")
+    };
+
+    processImage();
+
+    return () => {
+      if (imageSrc && imageSrc.startsWith('blob:')) {
+        URL.revokeObjectURL(imageSrc);
+      }
+    };
+  }, [imageUrl, type, isLoading]);
 
   const toggleModal = () => {
     setIsOpen(!isOpen);
+
+    console.log("imageUrl", imageUrl);
+    console.log("type", type);
+    console.log("imageSrc", imageSrc);
+    
   };
-
-  const formatting = () => {
-    const view = new Uint8Array(buffer);
-
-    // Convert ArrayBuffer to a Blob
-    const blob = new Blob([view], {
-      type: mime,
-    });
-
-    const urlObject = URL.createObjectURL(blob);
-    setImageBuffer(urlObject);
-  };
-
-  useEffect(() => {
-    formatting();
-  }, [isLoading]);
-
 
   return (
     <div className="relative">
       <img
         src={docspng}
         alt="Gallery Image"
-        className="cursor-pointer rounded-lg w-8 h-8"
+        className="cursor-pointer rounded-lg w-8 h-8 hover:opacity-80 transition-opacity duration-200"
         onClick={toggleModal}
       />
 
       {isOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
-          <div className="relative bg-white p-6 rounded-lg shadow-lg ">
+          <div className="relative bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full mx-4">
             <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200"
               onClick={toggleModal}
             >
               <svg
@@ -91,12 +102,14 @@ const ImgModal = ({ imageUrl, type, isLoading }) => {
                 <div className="p-10">
                   <CircularIndeterminate />
                 </div>
-              ) : (
+              ) : imageSrc ? (
                 <img
-                  src={imageBuffer}
-                  alt="No Image"
-                  className="max-h-[80vh] max-w-full rounded-lg"
+                  src={imageSrc}
+                  alt={`${type} Document`}
+                  className="max-h-[80vh] max-w-full rounded-lg object-contain"
                 />
+              ) : (
+                <p className="text-gray-500 text-center">No image available</p>
               )}
             </div>
           </div>
@@ -107,3 +120,4 @@ const ImgModal = ({ imageUrl, type, isLoading }) => {
 };
 
 export default ImgModal;
+
