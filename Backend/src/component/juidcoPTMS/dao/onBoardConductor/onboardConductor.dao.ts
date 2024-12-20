@@ -104,6 +104,9 @@ class ConductorOnBoarding {
         emergency_mob_no: true,
         adhar_no: true,
         cunique_id: true,
+        adhar_doc: true,
+        fitness_doc: true,
+
       },
     };
   
