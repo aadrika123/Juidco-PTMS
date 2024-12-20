@@ -73,6 +73,9 @@ class BusOnboarding {
         id: true,
         register_no: true,
         vin_no: true,
+        pollution_doc: true,
+        taxCopy_doc: true,
+        registrationCert_doc: true,
       },
       where: {
         ulb_id, // Filter by ulb_id
