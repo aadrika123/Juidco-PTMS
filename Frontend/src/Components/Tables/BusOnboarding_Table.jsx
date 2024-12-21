@@ -94,13 +94,13 @@ const BusOnboardingTable = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery); 
+      setDebouncedSearchQuery(searchQuery);
     }, 1200);
 
     return () => {
-      clearTimeout(timer); 
+      clearTimeout(timer);
     };
-  }, [searchQuery]); 
+  }, [searchQuery]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -109,10 +109,12 @@ const BusOnboardingTable = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }) 
+      })
       .then((response) => {
         setIsLoading(false);
         set_busoptions(response?.data?.data?.data);
+        console.log("getAllBusList", response?.data?.data?.data);
+        
       })
       .catch((error) => console.error("Error fetching bus data:", error));
   }, [debouncedSearchQuery]);
@@ -128,13 +130,14 @@ const BusOnboardingTable = () => {
       .then((response) => {
         setIsLoading(false);
         setImgBufferData(response?.data?.data);
-      
-        
+        console.log("img-data", response?.data?.data);
+
+
       })
       .catch((error) => console.error("Error fetching bus data:", error));
   }, [imageId]);
 
-  // console.log("img-data", imgBufferData);
+
 
   // const fetchScheduledData = async () => {
   //   set_loading(true);
@@ -370,32 +373,26 @@ const BusOnboardingTable = () => {
                       <TableCell>{data?.register_no}</TableCell>
                       <TableCell>{data?.vin_no}</TableCell>
                       <TableCell>
-                        <button onClick={() => setImageId(data?.id)}>
                           <ImgModal
-                            imageUrl={imgBufferData}
+                            imageUrl={data}
                             type={"pollution"}
                             isLoading={isLoading}
                           />
-                          
-                        </button>
+
                       </TableCell>
                       <TableCell>
-                        <button onClick={() => setImageId(data?.id)}>
                           <ImgModal
-                            imageUrl={imgBufferData}
+                            imageUrl={data}
                             type={"taxCopy"}
                             isLoading={isLoading}
                           />
-                        </button>
                       </TableCell>
                       <TableCell>
-                        <button onClick={() => setImageId(data?.id)}>
                           <ImgModal
-                            imageUrl={imgBufferData}
+                            imageUrl={data}
                             type={"registrationCert"}
                             isLoading={isLoading}
                           />
-                        </button>
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-start items-center">

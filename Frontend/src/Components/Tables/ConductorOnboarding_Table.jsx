@@ -92,13 +92,13 @@ const ConductorOnboarding_Table = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery); 
+      setDebouncedSearchQuery(searchQuery);
     }, 1200);
 
     return () => {
-      clearTimeout(timer); 
+      clearTimeout(timer);
     };
-  }, [searchQuery]); 
+  }, [searchQuery]);
 
 
   useEffect(() => {
@@ -114,10 +114,15 @@ const ConductorOnboarding_Table = () => {
       ) // Replace with your actual API endpoint
       .then((response) => {
         set_busoptions(response?.data?.data?.data);
+        console.log("busoptions", response?.data?.data?.data);
         setIsLoading(false);
       })
       .catch((error) => console.error("Error fetching bus data:", error));
   }, [debouncedSearchQuery]);
+
+  console.log("imgBufferData", imgBufferData);
+
+
 
   useEffect(() => {
     setIsLoading(true);
@@ -251,7 +256,7 @@ const ConductorOnboarding_Table = () => {
   const handleCancel = () => {
     setEditModal(false);
   };
-  
+
 
   if (editModal) {
     return (
@@ -332,7 +337,7 @@ const ConductorOnboarding_Table = () => {
           </div>
         </div>
       </div>
-      
+
 
       <TableContainer component={Paper} className="shadow-lg rounded-lg">
         {isLoading ? (
@@ -384,31 +389,22 @@ const ConductorOnboarding_Table = () => {
                   <TableCell>{data?.adhar_no}</TableCell>
                   <TableCell>{data?.blood_grp}</TableCell>
                   <TableCell>{data?.age}</TableCell>
+
                   <TableCell>
-                    <button
-                      onClick={() => {
-                        setImageId(data?.id);
-                      }}
-                    >
-                      <ImgModal
-                        imageUrl={imgBufferData}
-                        type={"fitness"}
-                        isLoading={isLoading}
-                      />
-                    </button>
+
+                    <ImgModal
+                      imageUrl={data}
+                      type={"fitness"}
+                      isLoading={isLoading}
+                    />
                   </TableCell>
                   <TableCell>
-                    <button
-                      onClick={() => {
-                        setImageId(data?.id);
-                      }}
-                    >
-                      <ImgModal
-                        imageUrl={imgBufferData}
-                        type={"adhar"}
-                        isLoading={isLoading}
-                      />
-                    </button>
+
+                    <ImgModal
+                      imageUrl={data}
+                      type={"adhar"}
+                      isLoading={isLoading}
+                    />
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-start items-center">

@@ -8,69 +8,42 @@ const ImgModal = ({ imageUrl, type, isLoading }) => {
 
   useEffect(() => {
     const processImage = () => {
-      let buffer, mime;
-
-      switch (type) {
-        case "pollution":
-          buffer = imageUrl?.pollution_doc?.buffer?.data;
-          mime = imageUrl?.pollution_doc?.mimeType;
-          break;
-        case "registrationCert":
-          buffer = imageUrl?.registrationCert_doc?.buffer?.data;
-          mime = imageUrl?.registrationCert_doc?.mimeType;
-          break;
-        case "taxCopy":
-          buffer = imageUrl?.taxCopy_doc?.buffer?.data;
-          mime = imageUrl?.taxCopy_doc?.mimeType;
-          break;
-        case "fitness":
-          buffer = imageUrl?.fitness_doc?.buffer?.data;
-          mime = imageUrl?.fitness_doc?.mimeType;
-          break;
-        case "adhar":
-          buffer = imageUrl?.adhar_doc?.buffer?.data;
-          mime = imageUrl?.adhar_doc?.mimeType;
-          break;
-        default:
-          break;
-      }
-      console.log("buffer && mime", buffer, mime)
+      const doc = imageUrl?.[`${type}_doc`];
+      let buffer = doc?.buffer?.data;
+      let mime = doc?.mimeType;
 
       if (buffer && mime) {
-        const view = new Uint8Array(buffer);
-        const blob = new Blob([view], { type: mime });
-        const urlObject = URL.createObjectURL(blob);
-        setImageSrc(urlObject);
-      } else if (imageUrl?.[`${type}_doc`]?.imageUrl) {
-        setImageSrc(imageUrl[`${type}_doc`].imageUrl);
+        const blob = new Blob([new Uint8Array(buffer)], { type: mime });
+        setImageSrc(URL.createObjectURL(blob));
+      } else if (doc?.imageUrl) {
+        setImageSrc(doc.imageUrl);
+      } else {
+        console.log(`No valid image source for ${type}`);
+        setImageSrc(null);
       }
-      else 
-      console.log("msg")
     };
 
     processImage();
 
+    // Clean up blob URLs on unmount or change
     return () => {
-      if (imageSrc && imageSrc.startsWith('blob:')) {
+      if (imageSrc && imageSrc.startsWith("blob:")) {
         URL.revokeObjectURL(imageSrc);
       }
     };
-  }, [imageUrl, type, isLoading]);
+  }, [imageUrl, type]);
 
   const toggleModal = () => {
-    setIsOpen(!isOpen);
-
-    console.log("imageUrl", imageUrl);
-    console.log("type", type);
-    console.log("imageSrc", imageSrc);
-    
+    if (!isLoading) {
+      setIsOpen((prev) => !prev);
+    }
   };
 
   return (
     <div className="relative">
       <img
         src={docspng}
-        alt="Gallery Image"
+        alt="Gallery Thumbnail"
         className="cursor-pointer rounded-lg w-8 h-8 hover:opacity-80 transition-opacity duration-200"
         onClick={toggleModal}
       />
@@ -120,4 +93,3 @@ const ImgModal = ({ imageUrl, type, isLoading }) => {
 };
 
 export default ImgModal;
-
