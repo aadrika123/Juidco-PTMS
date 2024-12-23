@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -12,49 +12,49 @@ import {
   DialogContent,
   DialogActions,
   Avatar,
-} from "@mui/material";
-import * as Yup from "yup";
+} from '@mui/material';
+import * as Yup from 'yup';
 
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import Button from "@mui/material/Button";
-import Cookies from "js-cookie";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import busstop from "../../assets/bus-stop.png";
-import docspng from "../../assets/docs.png";
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Button from '@mui/material/Button';
+import Cookies from 'js-cookie';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import busstop from '../../assets/bus-stop.png';
+import docspng from '../../assets/docs.png';
 
-import autoTable from "jspdf-autotable";
-import { jsPDF } from "jspdf";
-import { LiaEdit } from "react-icons/lia";
-import { AiOutlineDelete } from "react-icons/ai";
-import ImgModal from "../../assets/common/ImageDisplay/ImgModal";
-import EditModal from "../Registration/ViewOnboarding/EditModal";
-import CircularIndeterminate from "../../assets/common/loader/Loader";
-import ListLoader from "../../assets/common/loader/ListLoader";
+import autoTable from 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import { LiaEdit } from 'react-icons/lia';
+import { AiOutlineDelete } from 'react-icons/ai';
+import ImgModal from '../../assets/common/ImageDisplay/ImgModal';
+import EditModal from '../Registration/ViewOnboarding/EditModal';
+import CircularIndeterminate from '../../assets/common/loader/Loader';
+import ListLoader from '../../assets/common/loader/ListLoader';
 
 const formatDate = (dateString) => {
   const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   };
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
 const formatTime = (time) => {
-  const timeString = time.toString().padStart(4, "0");
+  const timeString = time.toString().padStart(4, '0');
   const hours = timeString.slice(0, 2);
   const minutes = timeString.slice(2, 4);
   return `${hours}:${minutes}`;
 };
 
 const validationSchema = Yup.object({
-  fromDate: Yup.string().required("From Date is required"),
+  fromDate: Yup.string().required('From Date is required'),
   toDate: Yup.string()
-    .required("To Date is required")
+    .required('To Date is required')
     .test(
-      "is-greater",
-      "To Date should be greater than From Date",
+      'is-greater',
+      'To Date should be greater than From Date',
       function (value) {
         const { fromDate } = this.parent;
         return fromDate && value ? new Date(value) > new Date(fromDate) : true;
@@ -63,30 +63,31 @@ const validationSchema = Yup.object({
 });
 
 const BusOnboardingTable = () => {
-  const token = Cookies.get("accesstoken");
+  const token = Cookies.get('accesstoken');
   const [openDialog, setOpenDialog] = useState(false); // State to control dialog
   const [deleteDialog, setDeleteDialog] = useState(false); // State to control delete confirmation dialog
   const [deleteItemId, setDeleteItemId] = useState(null); // State to track the item to be deleted
   const [busoptions, set_busoptions] = useState([]);
   const [selectedBus, setSelectedBus] = useState([]); // Added state for selected bus
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [allScheduled, setAllScheduled] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [fromDate, setFromDate] = useState(""); // Added state for date
-  const [toDate, settoDate] = useState(""); // Added state for date
-  const [vi_number, set_vi_number] = useState("");
+  const [fromDate, setFromDate] = useState(''); // Added state for date
+  const [toDate, settoDate] = useState(''); // Added state for date
+  const [vi_number, set_vi_number] = useState('');
   const [loading, set_loading] = useState(false);
 
   const [editModal, setEditModal] = useState(false);
-  const [dataId, setDataId] = useState("");
-  const [imageId, setImageId] = useState("");
-  const [imgBufferData, setImgBufferData] = useState("");
+  const [dataId, setDataId] = useState('');
+  const [imageId, setImageId] = useState('');
+  const [imgBufferData, setImgBufferData] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingState, setLoadingState] = useState('noData'); // 'noData', 'loading', 'loaded'
 
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
 
   // console.log(dataId, "dataId");
 
@@ -103,21 +104,32 @@ const BusOnboardingTable = () => {
   }, [searchQuery]);
 
   useEffect(() => {
-    setIsLoading(true);
-    axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?search=${searchQuery}&limit=100&page=1&view=true`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        setIsLoading(false);
-        set_busoptions(response?.data?.data?.data);
-        console.log("getAllBusList", response?.data?.data?.data);
-        
-      })
-      .catch((error) => console.error("Error fetching bus data:", error));
-  }, [debouncedSearchQuery]);
+    const fetchData = async () => {
+      setLoadingState('loading');
+      try {
+        const response = await axios.get(
+          `${
+            process.env.REACT_APP_BASE_URL
+          }/getAllBusList?search=${debouncedSearchQuery}&limit=${rowsPerPage}&page=${
+            page + 1
+          }&view=true`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        set_busoptions(response?.data?.data?.data || []);
+        setTotalRecords(response?.data?.data?.count || 0);
+        setLoadingState('loaded');
+      } catch (error) {
+        console.error('Error fetching bus data:', error);
+        setLoadingState('noData');
+      }
+    };
+
+    fetchData();
+  }, [debouncedSearchQuery, page, rowsPerPage]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -130,14 +142,10 @@ const BusOnboardingTable = () => {
       .then((response) => {
         setIsLoading(false);
         setImgBufferData(response?.data?.data);
-        console.log("img-data", response?.data?.data);
-
-
+        console.log('img-data', response?.data?.data);
       })
-      .catch((error) => console.error("Error fetching bus data:", error));
+      .catch((error) => console.error('Error fetching bus data:', error));
   }, [imageId]);
-
-
 
   // const fetchScheduledData = async () => {
   //   set_loading(true);
@@ -194,7 +202,7 @@ const BusOnboardingTable = () => {
       setDeleteDialog(false);
       fetchScheduledData();
     } catch (error) {
-      console.error("Failed to delete scheduled data:", error);
+      console.error('Failed to delete scheduled data:', error);
     }
   };
 
@@ -218,24 +226,24 @@ const BusOnboardingTable = () => {
     const doc = new jsPDF();
 
     const columns = [
-      { header: "ID" },
-      { header: "Bus No." },
-      { header: "Conductor Id" },
-      { header: "Conductor Name" },
-      { header: "Mobile No." },
-      { header: "Date" },
-      { header: "From Time" },
-      { header: "To Time" },
+      { header: 'ID' },
+      { header: 'Bus No.' },
+      { header: 'Conductor Id' },
+      { header: 'Conductor Name' },
+      { header: 'Mobile No.' },
+      { header: 'Date' },
+      { header: 'From Time' },
+      { header: 'To Time' },
     ];
 
     const data = [];
-    const table = document.getElementById("data-table");
+    const table = document.getElementById('data-table');
 
-    const rows = table?.querySelectorAll("tbody tr") || [];
+    const rows = table?.querySelectorAll('tbody tr') || [];
     rows.forEach((row) => {
       const rowData = [];
-      row.querySelectorAll("td").forEach((cell) => {
-        const cellData = cell?.textContent?.trim() || "";
+      row.querySelectorAll('td').forEach((cell) => {
+        const cellData = cell?.textContent?.trim() || '';
         rowData.push(cellData);
       });
       data.push(rowData);
@@ -246,7 +254,7 @@ const BusOnboardingTable = () => {
       body: data,
     });
 
-    doc.save("Scheduling.pdf");
+    doc.save('Scheduling.pdf');
   };
 
   // const approveHandler = () => {
@@ -294,7 +302,7 @@ const BusOnboardingTable = () => {
           <div className="flex flex-1 mr-4">
             <Button
               variant="contained"
-              sx={{ width: "100%", background: "#6366F1" }}
+              sx={{ width: '100%', background: '#6366F1' }}
               onClick={handleDownload}
             >
               <div className="flex flex-1 justify-center items-center flex-row">
@@ -327,7 +335,7 @@ const BusOnboardingTable = () => {
             <Link to="/Bus-onboarding" className="flex flex-1">
               <Button
                 variant="contained"
-                sx={{ width: "100%", background: "#6366F1" }}
+                sx={{ width: '100%', background: '#6366F1' }}
               >
                 + Register New Bus
               </Button>
@@ -337,130 +345,126 @@ const BusOnboardingTable = () => {
       </div>
 
       <TableContainer component={Paper} className="shadow-lg rounded-lg">
-        {isLoading ? (
-          <div className="flex justify-center items-center m-4">
+        {loadingState === 'noData' ? (
+          <div className="flex flex-1 m-4 flex-col justify-center items-center font-bold text-2xl text-slate-700">
+            No Data Found
+            <svg
+              width="200px"
+              height="200px"
+              viewBox="0 0 512 512"
+              id="Layer_1"
+              version="1.1"
+            >
+              <g>
+                <path
+                  fill="#333333"
+                  d="M378.8,87.3H133.2c-17.4,0-31.5,14.1-31.5,31.5v272.1c0,17.4,14.1,31.5,31.5,31.5h245.6   c17.4,0,31.5-14.1,31.5-31.5V118.8C410.3,101.4,396.2,87.3,378.8,87.3z M139.5,176h101.1v150H139.5V176z M174.2,391.3   c-9.8,0-17.8-8-17.8-17.8c0-9.8,8-17.8,17.8-17.8c9.8,0,17.8,8,17.8,17.8C192,383.4,184,391.3,174.2,391.3z M228,386.7   c-7.3,0-13.1-5.9-13.1-13.1s5.9-13.1,13.1-13.1s13.1,5.9,13.1,13.1S235.3,386.7,228,386.7z M284,386.7c-7.3,0-13.1-5.9-13.1-13.1   s5.9-13.1,13.1-13.1s13.1,5.9,13.1,13.1S291.3,386.7,284,386.7z M337.8,391.3c-9.8,0-17.8-8-17.8-17.8c0-9.8,8-17.8,17.8-17.8   c9.8,0,17.8,8,17.8,17.8C355.7,383.4,347.7,391.3,337.8,391.3z M372.5,326.1H271.5V176h101.1V326.1z M372.5,147H139.5v-30.4h233.1   V147z"
+                />
+                <polygon
+                  fill="#333333"
+                  points="318.3,53 193.7,53 188.3,73.3 323.7,73.3  "
+                />
+                <path
+                  fill="#333333"
+                  d="M158.5,452.3c0,3.7,3,6.7,6.7,6.7H198c3.7,0,6.7-3,6.7-6.7v-15.9h-46.1V452.3z"
+                />
+                <path
+                  fill="#333333"
+                  d="M307.4,452.3c0,3.7,3,6.7,6.7,6.7h32.8c3.7,0,6.7-3,6.7-6.7v-15.9h-46.1V452.3z"
+                />
+                <path
+                  fill="#333333"
+                  d="M37.8,167.8v70.7v0H22.2V297h44.6v-58.4h-15v0v-63.7h35.9v-14H44.8C40.9,160.8,37.8,164,37.8,167.8z"
+                />
+                <path
+                  fill="#333333"
+                  d="M474.2,238.6L474.2,238.6v-70.7c0-3.9-3.1-7-7-7h-42.9v14h35.9v63.7v0h-15V297h44.6v-58.4H474.2z"
+                />
+              </g>
+            </svg>
+          </div>
+        ) : loadingState === 'loading' ? (
+          <div className="flex justify-center items-center m-4 h-32">
             <ListLoader />
           </div>
         ) : (
           <>
-            {busoptions?.length > 0 ? (
-              <Table id="data-table" stickyHeader>
-                <TableHead>
-                  <TableRow className="bg-blue-600">
-                    <TableCell className="text-white font-bold">
-                      Registration No
+            <Table id="data-table" stickyHeader>
+              <TableHead>
+                <TableRow className="bg-blue-600">
+                  <TableCell className="text-white font-bold">
+                    Registration No
+                  </TableCell>
+                  <TableCell className="text-white font-bold">
+                    Vin/Chassis No.
+                  </TableCell>
+                  <TableCell className="text-white font-bold">
+                    Pollution Certificate
+                  </TableCell>
+                  <TableCell className="text-white font-bold">
+                    Tax Copy
+                  </TableCell>
+                  <TableCell className="text-white font-bold">
+                    Registration Certificate
+                  </TableCell>
+                  <TableCell className="text-white font-bold">
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {busoptions.map((data, index) => (
+                  <TableRow className={'bg-white'} key={index}>
+                    <TableCell>{data?.register_no}</TableCell>
+                    <TableCell>{data?.vin_no}</TableCell>
+                    <TableCell>
+                      <ImgModal
+                        imageUrl={data}
+                        type={'pollution'}
+                        isLoading={false}
+                      />
                     </TableCell>
-                    <TableCell className="text-white font-bold">
-                      Vin/Chassis No.
+                    <TableCell>
+                      <ImgModal
+                        imageUrl={data}
+                        type={'taxCopy'}
+                        isLoading={false}
+                      />
                     </TableCell>
-                    <TableCell className="text-white font-bold">
-                      Pollution Certificate
+                    <TableCell>
+                      <ImgModal
+                        imageUrl={data}
+                        type={'registrationCert'}
+                        isLoading={false}
+                      />
                     </TableCell>
-                    <TableCell className="text-white font-bold">
-                      Tax Copy
-                    </TableCell>
-                    <TableCell className="text-white font-bold">
-                      Registration Certificate
-                    </TableCell>
-                    <TableCell className="text-white font-bold">
-                      Actions
+                    <TableCell>
+                      <div className="flex justify-start items-center">
+                        <Button
+                          onClick={() => {
+                            setDataId(data?.id);
+                            setEditModal(true);
+                          }}
+                        >
+                          <LiaEdit className="text-2xl text-[#333333]" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {busoptions?.map((data, index) => (
-                    <TableRow className={"bg-white"} key={index}>
-                      <TableCell>{data?.register_no}</TableCell>
-                      <TableCell>{data?.vin_no}</TableCell>
-                      <TableCell>
-                          <ImgModal
-                            imageUrl={data}
-                            type={"pollution"}
-                            isLoading={isLoading}
-                          />
-
-                      </TableCell>
-                      <TableCell>
-                          <ImgModal
-                            imageUrl={data}
-                            type={"taxCopy"}
-                            isLoading={isLoading}
-                          />
-                      </TableCell>
-                      <TableCell>
-                          <ImgModal
-                            imageUrl={data}
-                            type={"registrationCert"}
-                            isLoading={isLoading}
-                          />
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex justify-start items-center">
-                          <Button
-                            onClick={() => {
-                              setDataId(data?.id);
-                              setEditModal(true);
-                            }}
-                          >
-                            <LiaEdit className="text-2xl text-[#333333]" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="flex flex-1 m-4 flex-col justify-center items-center font-bold text-2xl text-slate-700">
-                No Data Found
-                <svg
-                  width="200px"
-                  height="200px"
-                  viewBox="0 0 512 512"
-                  id="Layer_1"
-                  version="1.1"
-                >
-                  <g>
-                    <path
-                      fill="#333333"
-                      d="M378.8,87.3H133.2c-17.4,0-31.5,14.1-31.5,31.5v272.1c0,17.4,14.1,31.5,31.5,31.5h245.6   c17.4,0,31.5-14.1,31.5-31.5V118.8C410.3,101.4,396.2,87.3,378.8,87.3z M139.5,176h101.1v150H139.5V176z M174.2,391.3   c-9.8,0-17.8-8-17.8-17.8c0-9.8,8-17.8,17.8-17.8c9.8,0,17.8,8,17.8,17.8C192,383.4,184,391.3,174.2,391.3z M228,386.7   c-7.3,0-13.1-5.9-13.1-13.1s5.9-13.1,13.1-13.1s13.1,5.9,13.1,13.1S235.3,386.7,228,386.7z M284,386.7c-7.3,0-13.1-5.9-13.1-13.1   s5.9-13.1,13.1-13.1s13.1,5.9,13.1,13.1S291.3,386.7,284,386.7z M337.8,391.3c-9.8,0-17.8-8-17.8-17.8c0-9.8,8-17.8,17.8-17.8   c9.8,0,17.8,8,17.8,17.8C355.7,383.4,347.7,391.3,337.8,391.3z M372.5,326.1H271.5V176h101.1V326.1z M372.5,147H139.5v-30.4h233.1   V147z"
-                    />
-                    <polygon
-                      fill="#333333"
-                      points="318.3,53 193.7,53 188.3,73.3 323.7,73.3  "
-                    />
-                    <path
-                      fill="#333333"
-                      d="M158.5,452.3c0,3.7,3,6.7,6.7,6.7H198c3.7,0,6.7-3,6.7-6.7v-15.9h-46.1V452.3z"
-                    />
-                    <path
-                      fill="#333333"
-                      d="M307.4,452.3c0,3.7,3,6.7,6.7,6.7h32.8c3.7,0,6.7-3,6.7-6.7v-15.9h-46.1V452.3z"
-                    />
-                    <path
-                      fill="#333333"
-                      d="M37.8,167.8v70.7v0H22.2V297h44.6v-58.4h-15v0v-63.7h35.9v-14H44.8C40.9,160.8,37.8,164,37.8,167.8z"
-                    />
-                    <path
-                      fill="#333333"
-                      d="M474.2,238.6L474.2,238.6v-70.7c0-3.9-3.1-7-7-7h-42.9v14h35.9v63.7v0h-15V297h44.6v-58.4H474.2z"
-                    />
-                  </g>
-                </svg>
-              </div>
-            )}
+                ))}
+              </TableBody>
+            </Table>
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 50]}
+              component="div"
+              count={totalRecords}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
           </>
         )}
-
-        {/* <TablePagination
-          rowsPerPageOptions={[10]}
-          component="div"
-          count={totalRecords}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        /> */}
       </TableContainer>
 
       <Dialog
@@ -484,7 +488,7 @@ const BusOnboardingTable = () => {
       <Dialog
         open={openDialog}
         fullWidth={true}
-        maxWidth={"lg"}
+        maxWidth={'lg'}
         onClose={() => setOpenDialog(false)}
       >
         <DialogContent>

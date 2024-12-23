@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -12,48 +12,48 @@ import {
   DialogContent,
   DialogActions,
   Avatar,
-} from "@mui/material";
-import * as Yup from "yup";
+} from '@mui/material';
+import * as Yup from 'yup';
 
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import Button from "@mui/material/Button";
-import Cookies from "js-cookie";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import busstop from "../../assets/bus-stop.png";
-import docspng from "../../assets/docs.png";
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Button from '@mui/material/Button';
+import Cookies from 'js-cookie';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import busstop from '../../assets/bus-stop.png';
+import docspng from '../../assets/docs.png';
 
-import autoTable from "jspdf-autotable";
-import { jsPDF } from "jspdf";
-import { LiaEdit } from "react-icons/lia";
-import { AiOutlineDelete } from "react-icons/ai";
-import ImgModal from "../../assets/common/ImageDisplay/ImgModal";
-import EditModal from "../Registration/ViewOnboarding/EditModal";
-import ListLoader from "../../assets/common/loader/ListLoader";
+import autoTable from 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import { LiaEdit } from 'react-icons/lia';
+import { AiOutlineDelete } from 'react-icons/ai';
+import ImgModal from '../../assets/common/ImageDisplay/ImgModal';
+import EditModal from '../Registration/ViewOnboarding/EditModal';
+import ListLoader from '../../assets/common/loader/ListLoader';
 
 const formatDate = (dateString) => {
   const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   };
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
 const formatTime = (time) => {
-  const timeString = time.toString().padStart(4, "0");
+  const timeString = time.toString().padStart(4, '0');
   const hours = timeString.slice(0, 2);
   const minutes = timeString.slice(2, 4);
   return `${hours}:${minutes}`;
 };
 
 const validationSchema = Yup.object({
-  fromDate: Yup.string().required("From Date is required"),
+  fromDate: Yup.string().required('From Date is required'),
   toDate: Yup.string()
-    .required("To Date is required")
+    .required('To Date is required')
     .test(
-      "is-greater",
-      "To Date should be greater than From Date",
+      'is-greater',
+      'To Date should be greater than From Date',
       function (value) {
         const { fromDate } = this.parent;
         return fromDate && value ? new Date(value) > new Date(fromDate) : true;
@@ -62,33 +62,33 @@ const validationSchema = Yup.object({
 });
 
 const ConductorOnboarding_Table = () => {
-  const token = Cookies.get("accesstoken");
+  const token = Cookies.get('accesstoken');
   const [openDialog, setOpenDialog] = useState(false); // State to control dialog
   const [deleteDialog, setDeleteDialog] = useState(false); // State to control delete confirmation dialog
   const [deleteItemId, setDeleteItemId] = useState(null); // State to track the item to be deleted
   const [busoptions, set_busoptions] = useState([]);
   const [selectedBus, setSelectedBus] = useState([]); // Added state for selected bus
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [allScheduled, setAllScheduled] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [fromDate, setFromDate] = useState(""); // Added state for date
-  const [toDate, settoDate] = useState(""); // Added state for date
-  const [vi_number, set_vi_number] = useState("");
+  const [fromDate, setFromDate] = useState(''); // Added state for date
+  const [toDate, settoDate] = useState(''); // Added state for date
+  const [vi_number, set_vi_number] = useState('');
   const [loading, set_loading] = useState(false);
 
   const [editModal, setEditModal] = useState(false);
-  const [imageId, setImageId] = useState("");
-  const [imgBufferData, setImgBufferData] = useState("");
+  const [imageId, setImageId] = useState('');
+  const [imgBufferData, setImgBufferData] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [dataId, setDataId] = useState("");
+  const [dataId, setDataId] = useState('');
+  const [loadingState, setLoadingState] = useState('noData'); // 'noData', 'loading', 'loaded'
 
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
 
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -100,29 +100,31 @@ const ConductorOnboarding_Table = () => {
     };
   }, [searchQuery]);
 
-
   useEffect(() => {
-    setIsLoading(true);
-    axios
-      .get(
-        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?search=${searchQuery}&limit=100&page=1&view=true`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      ) // Replace with your actual API endpoint
-      .then((response) => {
-        set_busoptions(response?.data?.data?.data);
-        console.log("busoptions", response?.data?.data?.data);
-        setIsLoading(false);
-      })
-      .catch((error) => console.error("Error fetching bus data:", error));
+    const fetchData = async () => {
+      setLoadingState('loading');
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?search=${searchQuery}&limit=100&page=1&view=true`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        set_busoptions(response?.data?.data?.data || []);
+        setTotalRecords(response?.data?.data?.count || 0);
+        setLoadingState('loaded');
+      } catch (error) {
+        console.error('Error fetching bus data:', error);
+        setLoadingState('noData');
+      }
+    };
+
+    fetchData();
   }, [debouncedSearchQuery]);
 
-  console.log("imgBufferData", imgBufferData);
-
-
+  console.log('imgBufferData', imgBufferData);
 
   useEffect(() => {
     setIsLoading(true);
@@ -136,7 +138,7 @@ const ConductorOnboarding_Table = () => {
         setIsLoading(false);
         setImgBufferData(response?.data?.data);
       })
-      .catch((error) => console.error("Error fetching bus data:", error));
+      .catch((error) => console.error('Error fetching bus data:', error));
   }, [imageId]);
 
   // const fetchScheduledData = async () => {
@@ -218,24 +220,24 @@ const ConductorOnboarding_Table = () => {
     const doc = new jsPDF();
 
     const columns = [
-      { header: "ID" },
-      { header: "Bus No." },
-      { header: "Conductor Id" },
-      { header: "Conductor Name" },
-      { header: "Mobile No." },
-      { header: "Date" },
-      { header: "From Time" },
-      { header: "To Time" },
+      { header: 'ID' },
+      { header: 'Bus No.' },
+      { header: 'Conductor Id' },
+      { header: 'Conductor Name' },
+      { header: 'Mobile No.' },
+      { header: 'Date' },
+      { header: 'From Time' },
+      { header: 'To Time' },
     ];
 
     const data = [];
-    const table = document.getElementById("data-table");
+    const table = document.getElementById('data-table');
 
-    const rows = table?.querySelectorAll("tbody tr") || [];
+    const rows = table?.querySelectorAll('tbody tr') || [];
     rows.forEach((row) => {
       const rowData = [];
-      row.querySelectorAll("td").forEach((cell) => {
-        const cellData = cell?.textContent?.trim() || "";
+      row.querySelectorAll('td').forEach((cell) => {
+        const cellData = cell?.textContent?.trim() || '';
         rowData.push(cellData);
       });
       data.push(rowData);
@@ -246,7 +248,7 @@ const ConductorOnboarding_Table = () => {
       body: data,
     });
 
-    doc.save("Scheduling.pdf");
+    doc.save('Scheduling.pdf');
   };
 
   const approveHandler = () => {
@@ -256,7 +258,6 @@ const ConductorOnboarding_Table = () => {
   const handleCancel = () => {
     setEditModal(false);
   };
-
 
   if (editModal) {
     return (
@@ -296,7 +297,7 @@ const ConductorOnboarding_Table = () => {
           <div className="flex flex-1 mr-4">
             <Button
               variant="contained"
-              sx={{ width: "100%", background: "#6366F1" }}
+              sx={{ width: '100%', background: '#6366F1' }}
               onClick={handleDownload}
             >
               <div className="flex flex-1 justify-center items-center flex-row">
@@ -329,7 +330,7 @@ const ConductorOnboarding_Table = () => {
             <Link to="/Conductor-onboarding" className="flex flex-1">
               <Button
                 variant="contained"
-                sx={{ width: "100%", background: "#6366F1" }}
+                sx={{ width: '100%', background: '#6366F1' }}
               >
                 + Register New Conductor
               </Button>
@@ -338,99 +339,8 @@ const ConductorOnboarding_Table = () => {
         </div>
       </div>
 
-
       <TableContainer component={Paper} className="shadow-lg rounded-lg">
-        {isLoading ? (
-          <div className="flex justify-center items-center">
-            <ListLoader />
-          </div>
-        ) : busoptions?.length > 0 ? (
-          <Table id="data-table" stickyHeader>
-            <TableHead>
-              <TableRow className="bg-blue-600">
-                <TableCell className="text-white font-bold">Id</TableCell>
-                <TableCell className="text-white font-bold">Name</TableCell>
-                <TableCell className="text-white font-bold">
-                  Mobile No
-                </TableCell>
-                <TableCell className="text-white font-bold">
-                  Alternate Mob No
-                </TableCell>
-                <TableCell className="text-white font-bold">Email</TableCell>
-                <TableCell className="text-white font-bold">
-                  Aadhaar Number
-                </TableCell>
-                <TableCell className="text-white font-bold">
-                  Blood Group
-                </TableCell>
-                <TableCell className="text-white font-bold">Age</TableCell>
-                <TableCell className="text-white font-bold">
-                  Fitness Certificate
-                </TableCell>
-                <TableCell className="text-white font-bold">
-                  Aadhaar Card
-                </TableCell>
-                <TableCell className="text-white font-bold">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {busoptions?.map((data, index) => (
-                <TableRow className={"bg-white"} key={index}>
-                  <TableCell>{data?.cunique_id}</TableCell>
-                  <TableCell>
-                    {data?.first_name}&nbsp;
-                    {data?.middle_name === "null" ? "" : data?.middle_name}
-                    &nbsp;
-                    {data?.last_name}
-                  </TableCell>
-                  <TableCell>{data?.mobile_no}</TableCell>
-                  <TableCell>{data?.emergency_mob_no}</TableCell>
-                  <TableCell>{data?.email_id}</TableCell>
-                  <TableCell>{data?.adhar_no}</TableCell>
-                  <TableCell>{data?.blood_grp}</TableCell>
-                  <TableCell>{data?.age}</TableCell>
-
-                  <TableCell>
-
-                    <ImgModal
-                      imageUrl={data}
-                      type={"fitness"}
-                      isLoading={isLoading}
-                    />
-                  </TableCell>
-                  <TableCell>
-
-                    <ImgModal
-                      imageUrl={data}
-                      type={"adhar"}
-                      isLoading={isLoading}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-start items-center">
-                      <Button
-                        onClick={() => {
-                          setDataId(data?.id);
-                          setEditModal(true);
-                        }}
-                      >
-                        <LiaEdit className="text-2xl text-[#333333]" />
-                      </Button>
-                      {/* <Button
-                onClick={() => {
-                  setDeleteItemId("row.id");
-                  setDeleteDialog(true);
-                }}
-              >
-                <AiOutlineDelete className="text-2xl text-[#333333]" />
-              </Button> */}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
+        {loadingState === 'noData' ? (
           <div className="flex flex-1 m-4 flex-col justify-center items-center font-bold text-2xl text-slate-700">
             No Data Found
             <svg
@@ -468,9 +378,99 @@ const ConductorOnboarding_Table = () => {
               </g>
             </svg>
           </div>
-        )}
+        ) : loadingState === 'loading' ? (
+          <div className="flex justify-center items-center m-4 h-32">
+            <ListLoader />
+          </div>
+        ) : (
+          <>
+            <Table id="data-table" stickyHeader>
+              <TableHead>
+                <TableRow className="bg-blue-600">
+                  <TableCell className="text-white font-bold">Id</TableCell>
+                  <TableCell className="text-white font-bold">Name</TableCell>
+                  <TableCell className="text-white font-bold">
+                    Mobile No
+                  </TableCell>
+                  <TableCell className="text-white font-bold">
+                    Alternate Mob No
+                  </TableCell>
+                  <TableCell className="text-white font-bold">Email</TableCell>
+                  <TableCell className="text-white font-bold">
+                    Aadhaar Number
+                  </TableCell>
+                  <TableCell className="text-white font-bold">
+                    Blood Group
+                  </TableCell>
+                  <TableCell className="text-white font-bold">Age</TableCell>
+                  <TableCell className="text-white font-bold">
+                    Fitness Certificate
+                  </TableCell>
+                  <TableCell className="text-white font-bold">
+                    Aadhaar Card
+                  </TableCell>
+                  <TableCell className="text-white font-bold">
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {busoptions?.map((data, index) => (
+                  <TableRow className={'bg-white'} key={index}>
+                    <TableCell>{data?.cunique_id}</TableCell>
+                    <TableCell>
+                      {data?.first_name}&nbsp;
+                      {data?.middle_name === 'null' ? '' : data?.middle_name}
+                      &nbsp;
+                      {data?.last_name}
+                    </TableCell>
+                    <TableCell>{data?.mobile_no}</TableCell>
+                    <TableCell>{data?.emergency_mob_no}</TableCell>
+                    <TableCell>{data?.email_id}</TableCell>
+                    <TableCell>{data?.adhar_no}</TableCell>
+                    <TableCell>{data?.blood_grp}</TableCell>
+                    <TableCell>{data?.age}</TableCell>
 
-        {/* <TablePagination
+                    <TableCell>
+                      <ImgModal
+                        imageUrl={data}
+                        type={'fitness'}
+                        isLoading={isLoading}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <ImgModal
+                        imageUrl={data}
+                        type={'adhar'}
+                        isLoading={isLoading}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-start items-center">
+                        <Button
+                          onClick={() => {
+                            setDataId(data?.id);
+                            setEditModal(true);
+                          }}
+                        >
+                          <LiaEdit className="text-2xl text-[#333333]" />
+                        </Button>
+                        {/* <Button
+                onClick={() => {
+                  setDeleteItemId("row.id");
+                  setDeleteDialog(true);
+                }}
+              >
+                <AiOutlineDelete className="text-2xl text-[#333333]" />
+              </Button> */}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {/* <TablePagination
           rowsPerPageOptions={[10, 20, 50, 100]}
           component="div"
           count={totalRecords}
@@ -479,6 +479,8 @@ const ConductorOnboarding_Table = () => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         /> */}
+          </>
+        )}
       </TableContainer>
 
       <Dialog
@@ -493,7 +495,7 @@ const ConductorOnboarding_Table = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialog(false)}>Cancel</Button>
-          <Button onClick={"handleDelete"} color="primary">
+          <Button onClick={'handleDelete'} color="primary">
             Confirm
           </Button>
         </DialogActions>
@@ -502,7 +504,7 @@ const ConductorOnboarding_Table = () => {
       <Dialog
         open={openDialog}
         fullWidth={true}
-        maxWidth={"lg"}
+        maxWidth={'lg'}
         onClose={() => setOpenDialog(false)}
       >
         <DialogContent>
