@@ -343,7 +343,7 @@ const BusOnboardingTable = () => {
           </div>
         ) : (
           <>
-            {busoptions?.length > 0 ? (
+            { busoptions && busoptions?.length > 0 ? (
               <Table id="data-table" stickyHeader>
                 <TableHead>
                   <TableRow className="bg-blue-600">
@@ -410,7 +410,7 @@ const BusOnboardingTable = () => {
                   ))}
                 </TableBody>
               </Table>
-            ) : (
+            ) :  !isLoading && (
               <div className="flex flex-1 m-4 flex-col justify-center items-center font-bold text-2xl text-slate-700">
                 No Data Found
                 <svg

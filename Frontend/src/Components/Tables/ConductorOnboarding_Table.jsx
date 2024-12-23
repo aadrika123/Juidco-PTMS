@@ -344,7 +344,7 @@ const ConductorOnboarding_Table = () => {
           <div className="flex justify-center items-center">
             <ListLoader />
           </div>
-        ) : busoptions?.length > 0 ? (
+        ) : busoptions && busoptions.length > 0 ? (
           <Table id="data-table" stickyHeader>
             <TableHead>
               <TableRow className="bg-blue-600">
