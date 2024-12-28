@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -12,43 +12,43 @@ import {
   DialogContent,
   DialogActions,
   Avatar,
-} from "@mui/material";
-import * as Yup from "yup";
+} from '@mui/material';
+import * as Yup from 'yup';
 
-import { Link } from "react-router-dom";
-import axios from "axios";
-import Button from "@mui/material/Button";
-import Cookies from "js-cookie";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import busstop from "../../assets/bus-stop.png";
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import Button from '@mui/material/Button';
+import Cookies from 'js-cookie';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import busstop from '../../assets/bus-stop.png';
 
-import autoTable from "jspdf-autotable";
-import { jsPDF } from "jspdf";
-import ListLoader from "../../assets/common/loader/ListLoader";
+import autoTable from 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import ListLoader from '../../assets/common/loader/ListLoader';
 
 const formatDate = (dateString) => {
   const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   };
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
 const formatTime = (time) => {
-  const timeString = time.toString().padStart(4, "0");
+  const timeString = time.toString().padStart(4, '0');
   const hours = timeString.slice(0, 2);
   const minutes = timeString.slice(2, 4);
   return `${hours}:${minutes}`;
 };
 
 const validationSchema = Yup.object({
-  fromDate: Yup.string().required("From Date is required"),
+  fromDate: Yup.string().required('From Date is required'),
   toDate: Yup.string()
-    .required("To Date is required")
+    .required('To Date is required')
     .test(
-      "is-greater",
-      "To Date should be greater than From Date",
+      'is-greater',
+      'To Date should be greater than From Date',
       function (value) {
         const { fromDate } = this.parent;
         return fromDate && value ? new Date(value) > new Date(fromDate) : true;
@@ -57,35 +57,33 @@ const validationSchema = Yup.object({
 });
 
 const ScheduledTable = () => {
-  const token = Cookies.get("accesstoken");
+  const token = Cookies.get('accesstoken');
   const [openDialog, setOpenDialog] = useState(false); // State to control dialog
   const [deleteDialog, setDeleteDialog] = useState(false); // State to control delete confirmation dialog
   const [deleteItemId, setDeleteItemId] = useState(null); // State to track the item to be deleted
   const [busoptions, set_busoptions] = useState([]);
   const [selectedBus, setSelectedBus] = useState([]); // Added state for selected bus
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [allScheduled, setAllScheduled] = useState([]);
   const [length, setLength] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [fromDate, setFromDate] = useState(""); // Added state for date
-  const [toDate, settoDate] = useState(""); // Added state for date
-  const [vi_number, set_vi_number] = useState("");
+  const [fromDate, setFromDate] = useState(''); // Added state for date
+  const [toDate, settoDate] = useState(''); // Added state for date
+  const [vi_number, set_vi_number] = useState('');
   const [loading, set_loading] = useState(false);
 
-  
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery); 
+      setDebouncedSearchQuery(searchQuery);
     }, 1200);
 
     return () => {
-      clearTimeout(timer); 
+      clearTimeout(timer);
     };
   }, [searchQuery]);
 
@@ -99,10 +97,10 @@ const ScheduledTable = () => {
       .then((response) => {
         set_busoptions(response?.data?.data?.data);
       })
-      .catch((error) => console.error("Error fetching bus data:", error));
+      .catch((error) => console.error('Error fetching bus data:', error));
 
     fetchScheduledData();
-  }, [page, rowsPerPage,debouncedSearchQuery]);
+  }, [page, rowsPerPage, debouncedSearchQuery]);
 
   const fetchScheduledData = async () => {
     set_loading(true);
@@ -127,7 +125,7 @@ const ScheduledTable = () => {
           setTotalRecords(response.data?.data?.count);
         });
     } catch (error) {
-      console.error("Failed to fetch scheduled data:", error);
+      console.error('Failed to fetch scheduled data:', error);
     }
   };
 
@@ -160,7 +158,7 @@ const ScheduledTable = () => {
       setDeleteDialog(false);
       fetchScheduledData();
     } catch (error) {
-      console.error("Failed to delete scheduled data:", error);
+      console.error('Failed to delete scheduled data:', error);
     }
   };
 
@@ -172,8 +170,6 @@ const ScheduledTable = () => {
     const mobileNo = row.conductor.mobile_no.toLowerCase();
     const search = searchQuery.toLowerCase();
 
-
-    
     return (
       conductorName.includes(search) ||
       busNo.includes(search) ||
@@ -186,24 +182,24 @@ const ScheduledTable = () => {
     const doc = new jsPDF();
 
     const columns = [
-      { header: "ID" },
-      { header: "Bus No." },
-      { header: "Conductor Id" },
-      { header: "Conductor Name" },
-      { header: "Mobile No." },
-      { header: "Date" },
-      { header: "From Time" },
-      { header: "To Time" },
+      { header: 'ID' },
+      { header: 'Bus No.' },
+      { header: 'Conductor Id' },
+      { header: 'Conductor Name' },
+      { header: 'Mobile No.' },
+      { header: 'Date' },
+      { header: 'From Time' },
+      { header: 'To Time' },
     ];
 
     const data = [];
-    const table = document.getElementById("data-table");
+    const table = document.getElementById('data-table');
 
-    const rows = table?.querySelectorAll("tbody tr") || [];
+    const rows = table?.querySelectorAll('tbody tr') || [];
     rows.forEach((row) => {
       const rowData = [];
-      row.querySelectorAll("td").forEach((cell) => {
-        const cellData = cell?.textContent?.trim() || "";
+      row.querySelectorAll('td').forEach((cell) => {
+        const cellData = cell?.textContent?.trim() || '';
         rowData.push(cellData);
       });
       data.push(rowData);
@@ -214,7 +210,7 @@ const ScheduledTable = () => {
       body: data,
     });
 
-    doc.save("Scheduling.pdf");
+    doc.save('Scheduling.pdf');
   };
 
   return (
@@ -228,11 +224,11 @@ const ScheduledTable = () => {
           <div className="flex justify-between flex-1">
             <Formik
               initialValues={{
-                busNumber: "",
-                vinNumber: "",
-                status: "",
-                fromDate: "",
-                toDate: "",
+                busNumber: '',
+                vinNumber: '',
+                status: '',
+                fromDate: '',
+                toDate: '',
               }}
               validationSchema={validationSchema}
               onSubmit={(values) => {
@@ -271,7 +267,7 @@ const ScheduledTable = () => {
                   </Field>
                   <div className="flex flex-1 justify-start ml-2 items-center flex-row">
                     <div className="flex font-bold ">VIN Number:</div>
-                    <div className="flex ml-2">{vi_number}</div>{" "}
+                    <div className="flex ml-2">{vi_number}</div>{' '}
                     {/* Display VIN number */}
                   </div>
                   <div className="flex   justify-center  items-start flex-col">
@@ -285,19 +281,19 @@ const ScheduledTable = () => {
                       id="fromDate"
                       name="fromDate"
                       className="flex  h-12 border border-gray-300 rounded-md px-3 "
-                      style={{ boxShadow: "0 1px 4px #fff" }}
+                      style={{ boxShadow: '0 1px 4px #fff' }}
                       onFocus={(e) =>
-                        (e.target.style.boxShadow = "0 1px 4px #000")
+                        (e.target.style.boxShadow = '0 1px 4px #000')
                       }
                       onKeyPress={(e) => {
                         if (
-                          (e.key >= "0" || e.key >= "A") &&
-                          (e.key <= "9" || e.key <= "Z")
+                          (e.key >= '0' || e.key >= 'A') &&
+                          (e.key <= '9' || e.key <= 'Z')
                         ) {
                           e.preventDefault();
                         }
                       }}
-                      onBlur={(e) => (e.target.style.boxShadow = "none")}
+                      onBlur={(e) => (e.target.style.boxShadow = 'none')}
                     />
                     <ErrorMessage
                       name="fromDate"
@@ -316,19 +312,19 @@ const ScheduledTable = () => {
                       id="toDate"
                       name="toDate"
                       className="flex h-12 border border-gray-300 rounded-md px-3 "
-                      style={{ boxShadow: "0 1px 4px #fff" }}
+                      style={{ boxShadow: '0 1px 4px #fff' }}
                       onFocus={(e) =>
-                        (e.target.style.boxShadow = "0 1px 4px #000")
+                        (e.target.style.boxShadow = '0 1px 4px #000')
                       }
                       onKeyPress={(e) => {
                         if (
-                          (e.key >= "0" || e.key >= "A") &&
-                          (e.key <= "9" || e.key <= "Z")
+                          (e.key >= '0' || e.key >= 'A') &&
+                          (e.key <= '9' || e.key <= 'Z')
                         ) {
                           e.preventDefault();
                         }
                       }}
-                      onBlur={(e) => (e.target.style.boxShadow = "none")}
+                      onBlur={(e) => (e.target.style.boxShadow = 'none')}
                     />
                     <ErrorMessage
                       name="toDate"
@@ -343,7 +339,7 @@ const ScheduledTable = () => {
                   >
                     <div className="flex w-fit  flex-row justify-center items-center">
                       <div className="flex">
-                        {" "}
+                        {' '}
                         <svg
                           width="20"
                           height="24"
@@ -358,7 +354,7 @@ const ScheduledTable = () => {
                         </svg>
                       </div>
                       <div className="flex flex-1 text-white text-md font-bold">
-                        {`${loading ? "loading... " : "Search Result"}`}
+                        {`${loading ? 'loading... ' : 'Search Result'}`}
                       </div>
                     </div>
                   </button>
@@ -382,7 +378,7 @@ const ScheduledTable = () => {
           <div className="flex flex-1 mr-4">
             <Button
               variant="contained"
-              sx={{ width: "100%", background: "#6366F1" }}
+              sx={{ width: '100%', background: '#6366F1' }}
               onClick={handleDownload}
             >
               <div className="flex flex-1 justify-center items-center flex-row">
@@ -415,7 +411,7 @@ const ScheduledTable = () => {
             <Link to="/chagneScheduling" className="flex flex-1">
               <Button
                 variant="contained"
-                sx={{ width: "100%", background: "#6366F1" }}
+                sx={{ width: '100%', background: '#6366F1' }}
               >
                 + Add New Scheduling
               </Button>
@@ -454,7 +450,7 @@ const ScheduledTable = () => {
               {filteredData.map((row, index) => (
                 <TableRow
                   key={index}
-                  className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
+                  className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
                 >
                   <TableCell>{index + 1 + page * rowsPerPage}</TableCell>
                   <TableCell>{row.bus.register_no}</TableCell>
@@ -464,8 +460,8 @@ const ScheduledTable = () => {
                       <Avatar>{row.conductor.first_name.charAt(0)}</Avatar>
                       <div className="ml-4">
                         <div>{`${row.conductor.first_name} ${
-                          row.conductor.middle_name === "null"
-                            ? ""
+                          row.conductor.middle_name === 'null'
+                            ? ''
                             : row.conductor.middle_name
                         } ${row.conductor.last_name}`}</div>
                         <div className="text-gray-500 text-sm">
@@ -487,16 +483,22 @@ const ScheduledTable = () => {
                         }}
                       >
                         <svg
-                          width="22"
-                          height="22"
-                          viewBox="0 0 22 22"
-                          fill="none"
                           xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="red"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-trash-2"
                         >
-                          <path
-                            d="..." // SVG path details
-                            fill="#333333"
-                          />
+                          <path d="M3 6h18" />
+                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                          <line x1="10" x2="10" y1="11" y2="17" />
+                          <line x1="14" x2="14" y1="11" y2="17" />
                         </svg>
                       </Button>
                     </div>
@@ -577,7 +579,7 @@ const ScheduledTable = () => {
       <Dialog
         open={openDialog}
         fullWidth={true}
-        maxWidth={"lg"}
+        maxWidth={'lg'}
         onClose={() => setOpenDialog(false)}
       >
         <DialogContent>
