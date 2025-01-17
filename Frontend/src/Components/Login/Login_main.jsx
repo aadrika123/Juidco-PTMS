@@ -4,6 +4,10 @@ import Login from "./Login";
 import img from "./loginImage.json";
 //import lock from "./lock.json";
 const Login_main = () => {
+
+  const searchParams = new URLSearchParams(location.search);
+    const message = searchParams.get("msg") || "";
+
   return (
     <>
       <div className="h-screen border-2 border-red-200 flex flex-col justify-between bg-gray-100 darks:bg-gray-900 border-b darks:bg-opacity-40">
@@ -24,6 +28,12 @@ const Login_main = () => {
               </a>
             </nav>
           </div>
+          {message && (
+            <div className="w-full h-8 bg-red-600 flex justify-center items-center text-white text-lg p-3">
+              <span className="font-semibold">⚠️ Permission Denied</span> -{" "}
+              {message}
+            </div>
+          )}
         </header>
 
         <main>
