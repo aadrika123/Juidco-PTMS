@@ -36,6 +36,7 @@ import AccountantViews from "../Components/Accountant/AccountantViews.jsx";
 import ValidateTransaction from "../Components/Accountant/ValidateTransaction.jsx";
 import BusOnboarding_View from "../Components/Registration/ViewOnboarding/BusOnboarding_View.jsx";
 import ConductorOnboarding_View from "../Components/Registration/ViewOnboarding/ConductorOnboarding_View.jsx";
+import ServiceRestrictionLayout from "../Components/pages/error/ServiceRestrictionLayout.jsx";
 
 const AppRoutes = ({ access_token, userType }) => {
   console.log("AppRoutes with token >>> ", access_token, userType);
@@ -43,6 +44,11 @@ const AppRoutes = ({ access_token, userType }) => {
   return (
     <Routes>
       <Route path="/" element={<Login_main />} />
+      <Route
+        path="/service-restriction"
+        // element={<ServiceRestrictionLayout />}
+        element={<PrivateRoute element={ServiceRestrictionLayout} />}
+      />
       {access_token && userType === "Admin" && (
         <>
           <Route
@@ -107,6 +113,10 @@ const AppRoutes = ({ access_token, userType }) => {
               />
             }
           />
+          {/* <Route
+            path="/service-restriction"
+            element={<ServiceRestrictionLayout />}
+          /> */}
           <Route
             path="/ReportBus_recipt/:id/:Selected_Date/:End_Date"
             element={<PrivateRoute element={ReportBus_recipt} />}
@@ -126,6 +136,10 @@ const AppRoutes = ({ access_token, userType }) => {
 
       {access_token && userType === "TC" && (
         <>
+          {/* <Route
+            path="/service-restriction"
+            element={<ServiceRestrictionLayout />}
+          /> */}
           <Route
             path="/conductor_dashboard"
             element={<ProtectedApproute element={Conductor_dashboard} />}
@@ -200,6 +214,10 @@ const AppRoutes = ({ access_token, userType }) => {
 
       {access_token && userType === "Accountant" && (
         <>
+          {/* <Route
+            path="/service-restriction"
+            element={<ServiceRestrictionLayout />}
+          /> */}
           <Route
             path="/accountant-view"
             element={<ProtectedApproute element={AccountantViewPage} />}

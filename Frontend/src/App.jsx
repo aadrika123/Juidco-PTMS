@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Cookies from "js-cookie";
 import AppRoutes from "./Routes/AppRoutes";
 import img from "./assets/loader.json";
@@ -14,17 +14,21 @@ import {
 } from "@mui/material";
 import Jhar from "./assets/jhant.png";
 import { Image } from "@mui/icons-material";
+import useModulePermission from "./Components/common/Hooks/useModulePermission";
+import { UseServiceCheck } from "./Components/common/Hooks/UseServiceCheck";
+import ServiceRestrictionLayout from "./Components/pages/error/ServiceRestrictionLayout";
 
 function App() {
+  UseServiceCheck();
+  useModulePermission();
   const [access_token, set_access_token] = useState("");
   const [userType, set_userType] = useState("");
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
-  console.log("123")
+  // console.log("123");
 
   const token = localStorage.getItem("token");
-  
 
   useEffect(() => {
     //const token = Cookies.get("accesstoken");
@@ -61,9 +65,11 @@ function App() {
 
   return (
     <>
-      <Router basename="/ptms">
-        <AppRoutes access_token={access_token} userType={userType} />
-      </Router>
+      {/* <Routes> */}
+
+      <AppRoutes access_token={access_token} userType={userType} />
+      {/* </Routes> */}
+
       <Dialog
         open={open}
         onClose={handleClose}

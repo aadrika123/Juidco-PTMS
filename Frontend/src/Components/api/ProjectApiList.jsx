@@ -35,13 +35,13 @@ export default function ProjectApiList() {
     // API TO DELETE NOTIFICATION DATA
     api_deleteNotification: `${baseUrl}/api/dashboard/jsk/prop-dashboard`,
     api_deleteNotification: `${baseUrl}/api/dashboard/jsk/prop-dashboard`,
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
-    
+
     api_fetchByStatus: `${baseUrl}/report`,
 
     api_fetchByScheduledconductor: `${baseUrl}/scheduled/receipts`,
@@ -50,13 +50,10 @@ export default function ProjectApiList() {
 
     api_fetchTransactionDetails: `${baseUrl}/transactions/receipts`,
 
-
     api_postUpdateStatus: `${baseUrl}/report/validate`,
 
-
-    
-    
-
+    checkPropertyService: `${baseUrl}/get/services-by-module`,
+    getPermittedServiceList: `${baseUrl}/get/services-b-ulb-id`,
   };
 
   return apiList;
