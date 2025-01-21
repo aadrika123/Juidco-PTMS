@@ -7,25 +7,21 @@ import { useEffect } from "react";
 import ProjectApiList from "../../api/ProjectApiList";
 
 const useModulePermission = () => {
-  const { api_getFreeMenuList } = ProjectApiList();
+  const { getMenuByModule } = ProjectApiList();
   const token = window.localStorage.getItem("token");
-  console.log(token);
+  // console.log(token);
   const fetchMenuList = () => {
     let requestBody = {
       moduleId: 18,
     };
 
     axios
-      .post(
-        "https://aadrikainfomedia.com/auth/api/menu/by-module",
-        requestBody,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        }
-      )
+      .post(getMenuByModule, requestBody, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      })
       .then(function (response) {
         // console.log("fetched menu list.....", response);
         // return

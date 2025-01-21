@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, Box, Button } from "@mui/material";
 import PasswordInput from "./PasswordInput"; // Import the PasswordInput component
 import ApiHeader from "../api/ApiHeader";
+import ProjectApiList from "../api/ProjectApiList";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -16,6 +17,8 @@ const Login = () => {
   const [deviceType, setDeviceType] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const { getMenuByModule } = ProjectApiList();
 
   const searchParams = new URLSearchParams(location.search);
 
@@ -104,13 +107,8 @@ const Login = () => {
 
     try {
       // Make API request
-      const res = await axios.post(
-        "https://aadrikainfomedia.com/auth/api/menu/by-module",
-        requestBody,
-        ApiHeader()
-      );
+      const res = await axios.post(getMenuByModule, requestBody, ApiHeader());
 
-      // console.log(data?.data,"1234");
 
       let data = res?.data;
 
