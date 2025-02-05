@@ -55,6 +55,7 @@ const Login = () => {
 
       if (res) {
         fetchMenuList();
+        // window.location.replace("/ptms/dashboard");
 
         const userDetails = res?.data?.data?.userDetails;
         const { token } = res?.data?.data;
@@ -82,11 +83,16 @@ const Login = () => {
 
         //dispatch(login({ token, userDetails? }));
 
+        // console.log(
+        //   userDetails?.user_type,
+        //   "userDetails?.user_type===========>"
+        // );
+
         if (userDetails?.user_type === "Admin") {
           window.location.replace("/ptms/dashboard");
         } else if (userDetails?.user_type === "TC") {
           window.location.replace("/ptms/conductor_dashboard");
-        } else if (userDetails?.user_type === "Accountant") {
+        } else if (userDetails?.user_type === "Employee") {
           window.location.replace("/ptms/accountant-view");
         } else {
           window.location.replace("/");
@@ -108,7 +114,6 @@ const Login = () => {
     try {
       // Make API request
       const res = await axios.post(getMenuByModule, requestBody, ApiHeader());
-
 
       let data = res?.data;
 
@@ -134,9 +139,7 @@ const Login = () => {
   // console.log(message);
   return (
     <>
-      
       <Container>
-        
         <Box mt={2}>
           <Formik
             initialValues={{ user_id: "", password: "" }}

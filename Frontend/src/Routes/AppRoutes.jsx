@@ -39,7 +39,7 @@ import ConductorOnboarding_View from "../Components/Registration/ViewOnboarding/
 import ServiceRestrictionLayout from "../Components/pages/error/ServiceRestrictionLayout.jsx";
 
 const AppRoutes = ({ access_token, userType }) => {
-  console.log("AppRoutes with token >>> ", access_token, userType);
+  // console.log("AppRoutes with token >>> ", access_token, userType);
 
   return (
     <Routes>
@@ -130,7 +130,15 @@ const AppRoutes = ({ access_token, userType }) => {
             element={<PrivateRoute element={Dashboard_data} />}
             // element={<Dashboard_data/>}
           />
-          <Route path="/*" element={<No_access />} />
+          {/* <Route path="/*" element={<No_access />} /> */}
+          <Route
+            path="/accountant-view"
+            element={<ProtectedApproute element={AccountantViewPage} />}
+          />
+          <Route
+            path="/ValidationListView"
+            element={<ProtectedApproute element={ValidateTransaction} />}
+          />
         </>
       )}
 
@@ -164,7 +172,7 @@ const AppRoutes = ({ access_token, userType }) => {
             path="/conductor_CashValidation"
             element={<ProtectedApproute element={Conductor_CashValidation} />}
           />
-          <Route path="/*" element={<No_access />} />
+          {/* <Route path="/*" element={<No_access />} /> */}
 
           {/* .....................accountant */}
           {/* <Route
@@ -212,7 +220,7 @@ const AppRoutes = ({ access_token, userType }) => {
         </>
       )}
 
-      {access_token && userType === "Accountant" && (
+      {access_token && userType === "Employee" && (
         <>
           {/* <Route
             path="/service-restriction"
