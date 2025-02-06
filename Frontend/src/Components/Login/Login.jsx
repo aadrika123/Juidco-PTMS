@@ -94,6 +94,7 @@ const Login = () => {
           window.location.replace("/ptms/conductor_dashboard");
         } else if (userDetails?.user_type === "Employee") {
           window.location.replace("/ptms/accountant-view");
+          // window.location.replace("/ptms/dashboard");
         } else {
           window.location.replace("/");
         }
