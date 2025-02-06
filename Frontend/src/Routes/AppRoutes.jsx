@@ -39,135 +39,144 @@ import ConductorOnboarding_View from "../Components/Registration/ViewOnboarding/
 import ServiceRestrictionLayout from "../Components/pages/error/ServiceRestrictionLayout.jsx";
 
 const AppRoutes = ({ access_token, userType }) => {
-  console.log("AppRoutes with token >>> ", access_token, userType);
+  // console.log("AppRoutes with token >>> ", access_token, userType);
 
   return (
     <Routes>
       <Route path="/" element={<Login_main />} />
       <Route
         path="/service-restriction"
-        // element={<ServiceRestrictionLayout />}
         element={<PrivateRoute element={ServiceRestrictionLayout} />}
       />
-      {access_token && userType === "Admin" && (
-        <>
-          <Route
-            path="/Bus-onboarding"
-            element={<PrivateRoute element={Bus_Onboarding} />}
-          />
-          <Route
-            path="/Bus-onboarding-view"
-            element={<PrivateRoute element={BusOnboarding_View} />}
-          />
-          <Route
-            path="/Conductor-onboarding"
-            element={<PrivateRoute element={Conductor_Onboarding} />}
-          />
-          <Route
-            path="/Conductor-onboarding-view"
-            element={<PrivateRoute element={ConductorOnboarding_View} />}
-          />
-          <Route
-            path="/ConductorRegistration"
-            element={<PrivateRoute element={ConductorRegistration} />}
-          />
-          <Route
-            path="/ChangeScheduling-Main"
-            element={<PrivateRoute element={ChaneScheduling_main} />}
-          />
-          <Route
-            path="/chagneScheduling"
-            element={<PrivateRoute element={ChangeScheduling} />}
-          />
-          <Route
-            path="/reportGeneration"
-            element={<PrivateRoute element={Report_Generation} />}
-          />
-          <Route
-            path="/BusreportGeneration"
-            element={<PrivateRoute element={Bus_Report_Generation} />}
-          />
-          <Route
-            path="/Conductor_report_page"
-            element={<PrivateRoute element={Conductor_report_page} />}
-          />
-          <Route
-            path="/Bus_report_page"
-            element={<PrivateRoute element={Bus_report_page} />}
-          />
-          <Route
-            path="/ReportGeneration-main"
-            element={<PrivateRoute element={ReportGeneration_main} />}
-          />
+      {/* {access_token && userType === "Admin" && ( */}
+      <>
+        <Route
+          path="/Bus-onboarding"
+          element={<PrivateRoute element={Bus_Onboarding} />}
+        />
+        <Route
+          path="/Bus-onboarding-view"
+          element={<PrivateRoute element={BusOnboarding_View} />}
+        />
+        <Route
+          path="/Conductor-onboarding"
+          element={<PrivateRoute element={Conductor_Onboarding} />}
+        />
+        <Route
+          path="/Conductor-onboarding-view"
+          element={<PrivateRoute element={ConductorOnboarding_View} />}
+        />
+        <Route
+          path="/ConductorRegistration"
+          element={<PrivateRoute element={ConductorRegistration} />}
+        />
+        <Route
+          path="/ChangeScheduling-Main"
+          element={<PrivateRoute element={ChaneScheduling_main} />}
+        />
+        <Route
+          path="/chagneScheduling"
+          element={<PrivateRoute element={ChangeScheduling} />}
+        />
+        <Route
+          path="/reportGeneration"
+          element={<PrivateRoute element={Report_Generation} />}
+        />
+        <Route
+          path="/BusreportGeneration"
+          element={<PrivateRoute element={Bus_Report_Generation} />}
+        />
+        <Route
+          path="/Conductor_report_page"
+          element={<PrivateRoute element={Conductor_report_page} />}
+        />
+        <Route
+          path="/Bus_report_page"
+          element={<PrivateRoute element={Bus_report_page} />}
+        />
+        <Route
+          path="/ReportGeneration-main"
+          element={<PrivateRoute element={ReportGeneration_main} />}
+        />
 
-          <Route
-            path="/Collection-report"
-            element={<PrivateRoute element={Collection_Report} />}
-          />
+        <Route
+          path="/Collection-report"
+          element={<PrivateRoute element={Collection_Report} />}
+        />
 
-          <Route
-            path="registerBus"
-            element={
-              <PrivateRoute
-                element={<PrivateRoute element={BusRegistration} />}
-              />
-            }
-          />
-          {/* <Route
+        <Route
+          path="registerBus"
+          element={
+            <PrivateRoute
+              element={<PrivateRoute element={BusRegistration} />}
+            />
+          }
+        />
+        <Route
+          path="/ReportBus_recipt/:id/:Selected_Date/:End_Date"
+          element={<PrivateRoute element={ReportBus_recipt} />}
+        />
+        <Route
+          path="/ReportConductor_recipt/:Cid/:Selected_Date?/:End_Date?"
+          element={<PrivateRoute element={ReportConductor_Bus} />}
+        />
+        <Route
+          path="dashboard"
+          element={<PrivateRoute element={Dashboard_data} />}
+          // element={<Dashboard_data/>}
+        />
+        <Route
+          path="/accountant-view"
+          element={<ProtectedApproute element={AccountantViewPage} />}
+        />
+        <Route
+          path="/ValidationListView"
+          element={<ProtectedApproute element={ValidateTransaction} />}
+        />
+        {/* <Route path="/*" element={<No_access />} /> */}
+        {/* <Route
+          path="/accountant-view"
+          element={<ProtectedApproute element={AccountantViewPage} />}
+        />
+        <Route
+          path="/ValidationListView"
+          element={<ProtectedApproute element={ValidateTransaction} />}
+        /> */}
+      </>
+      {/* )} */}
+
+      {/* {access_token && userType === "TC" && ( */}
+      <>
+        {/* <Route
             path="/service-restriction"
             element={<ServiceRestrictionLayout />}
           /> */}
-          <Route
-            path="/ReportBus_recipt/:id/:Selected_Date/:End_Date"
-            element={<PrivateRoute element={ReportBus_recipt} />}
-          />
-          <Route
-            path="/ReportConductor_recipt/:Cid/:Selected_Date?/:End_Date?"
-            element={<PrivateRoute element={ReportConductor_Bus} />}
-          />
-          <Route
-            path="dashboard"
-            element={<PrivateRoute element={Dashboard_data} />}
-            // element={<Dashboard_data/>}
-          />
-          <Route path="/*" element={<No_access />} />
-        </>
-      )}
+        <Route
+          path="/conductor_dashboard"
+          element={<ProtectedApproute element={Conductor_dashboard} />}
+        />
+        <Route path="/main" element={<ProtectedApproute element={Main} />} />
+        <Route path="/recipt" element={<PrivateRoute element={Recipt} />} />
+        <Route
+          path="/ticket_check"
+          element={<ProtectedApproute element={Main} />}
+        />
+        <Route
+          path="/ReportConductor_recipt"
+          element={<All_report_conductor />}
+        />
+        <Route
+          path="/conductor_Report"
+          element={<ProtectedApproute element={Conductor_Report_Generation} />}
+        />
+        <Route
+          path="/conductor_CashValidation"
+          element={<ProtectedApproute element={Conductor_CashValidation} />}
+        />
+        {/* <Route path="/*" element={<No_access />} /> */}
 
-      {access_token && userType === "TC" && (
-        <>
-          {/* <Route
-            path="/service-restriction"
-            element={<ServiceRestrictionLayout />}
-          /> */}
-          <Route
-            path="/conductor_dashboard"
-            element={<ProtectedApproute element={Conductor_dashboard} />}
-          />
-          <Route path="/main" element={<ProtectedApproute element={Main} />} />
-          <Route path="/recipt" element={<PrivateRoute element={Recipt} />} />
-          <Route
-            path="/ticket_check"
-            element={<ProtectedApproute element={Main} />}
-          />
-          <Route
-            path="/ReportConductor_recipt"
-            element={<All_report_conductor />}
-          />
-          <Route
-            path="/conductor_Report"
-            element={
-              <ProtectedApproute element={Conductor_Report_Generation} />
-            }
-          />
-          <Route
-            path="/conductor_CashValidation"
-            element={<ProtectedApproute element={Conductor_CashValidation} />}
-          />
-          <Route path="/*" element={<No_access />} />
-
-          {/* .....................accountant */}
-          {/* <Route
+        {/* .....................accountant */}
+        {/* <Route
             path="/accountant-view"
             element={
               <ProtectedApproute element={AccountantViewPage} />
@@ -192,7 +201,7 @@ const AppRoutes = ({ access_token, userType }) => {
               <ProtectedApproute element={ValidateTransaction} />
             }
           /> */}
-          {/* {path: "/accountant-view", element: <AccountantViewPage /> },,
+        {/* {path: "/accountant-view", element: <AccountantViewPage /> },,
 
 
 
@@ -209,34 +218,31 @@ const AppRoutes = ({ access_token, userType }) => {
             path: "/ValidationListView",
           element: <ValidateTransaction />,
     }, */}
-        </>
-      )}
+      </>
+      {/* )} */}
 
-      {access_token && userType === "Accountant" && (
-        <>
-          {/* <Route
-            path="/service-restriction"
-            element={<ServiceRestrictionLayout />}
-          /> */}
-          <Route
-            path="/accountant-view"
-            element={<ProtectedApproute element={AccountantViewPage} />}
-          />
-          <Route
-            path="/accountantListView"
-            element={<ProtectedApproute element={AccountantViewPage} />}
-          />
-          <Route
-            path="/accountantViews/:id"
-            element={<ProtectedApproute element={AccountantViews} />}
-          />
+      {/* {access_token && userType === "Employee" && ( */}
+      <>
+       
+        {/* <Route
+          path="/accountant-view"
+          element={<ProtectedApproute element={AccountantViewPage} />}
+        /> */}
+        <Route
+          path="/accountantListView"
+          element={<ProtectedApproute element={AccountantViewPage} />}
+        />
+        <Route
+          path="/accountantViews/:id"
+          element={<ProtectedApproute element={AccountantViews} />}
+        />
 
-          <Route
-            path="/ValidationListView"
-            element={<ProtectedApproute element={ValidateTransaction} />}
-          />
-        </>
-      )}
+        {/* <Route
+          path="/ValidationListView"
+          element={<ProtectedApproute element={ValidateTransaction} />}
+        /> */}
+      </>
+      {/* )} */}
     </Routes>
   );
 };

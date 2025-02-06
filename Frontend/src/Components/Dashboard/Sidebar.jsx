@@ -18,21 +18,20 @@ import Cookies from "js-cookie";
 
 import icon from "../../assets/jhant.png";
 
-
 import { BsGrid1X2 } from "react-icons/bs";
 import { BsGrid1X2Fill } from "react-icons/bs";
 import { Link } from "react-router-dom";
+import ProjectApiList from "../api/ProjectApiList";
 // 👉 Type Definitions 👈
 
-
 const SideBar = (props) => {
-
   // 👉 State constants 👈
   const [dropDown, setdropDown] = useState(false);
   const [toggleBar, settoggleBar] = useState(false);
   const [dropName, setdropName] = useState("");
   const [userdetails, setUserDetails] = useState();
   const [userPermission, setuserPermission] = useState();
+  const { getMenuByModule } = ProjectApiList();
 
   let bg = "slate"; // background color
   let mcolor = "blue"; // menu color
@@ -63,15 +62,11 @@ const SideBar = (props) => {
 
     try {
       // Make API request
-      const res = await axios.post(
-        "https://aadrikainfomedia.com/auth/api/menu/by-module",
-        requestBody,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axios.post(getMenuByModule, requestBody, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       let data = res?.data;
 
@@ -107,9 +102,7 @@ const SideBar = (props) => {
       <header>
         {
           <div
-            className={
-              (toggleBar ? open3 : close3) + ` w-full inset-0 `
-            }
+            className={(toggleBar ? open3 : close3) + ` w-full inset-0 `}
             id="mobile-menu"
           >
             <nav
@@ -136,7 +129,7 @@ const SideBar = (props) => {
                     <span className="flex justify-center font-semibold w-full">
                       {userdetails?.userName}
                     </span>
-                    <span className='flex justify-center w-full uppercase text-sm font-semibold'>
+                    <span className="flex justify-center w-full uppercase text-sm font-semibold">
                       {userdetails?.roles[0]}
                     </span>
                   </div>
@@ -168,7 +161,9 @@ function SidebarChild({ items }) {
   return (
     <div className="w-64 min-h-screen ">
       <nav className="space-y-4 ">
-        {items?.map((item) => <SidebarItem key={item.id} item={item} />)}
+        {items?.map((item) => (
+          <SidebarItem key={item.id} item={item} />
+        ))}
       </nav>
     </div>
   );

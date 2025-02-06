@@ -79,7 +79,7 @@ export default function Conductor_dashboard() {
       }
     }
   }, []);
-  console.log("bus data >>> ", busData?.bus_id);
+  // console.log("bus data >>> ", busData?.bus_id);
 
   return (
     <div className="flex items-center justify-between h-screen w-screen">
