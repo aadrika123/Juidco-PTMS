@@ -5,14 +5,12 @@ import {
   HiInformationCircle,
 } from "react-icons/hi";
 import { useLocation } from "react-router-dom";
-// import { useLocation } from "react-router-dom";
 
 const ServiceRestrictionLayout = () => {
   const useQuery = () => new URLSearchParams(useLocation().search);
   const query = useQuery();
   const services = query.get("service");
 
-//   console.log("objectservice", services);
 
   return (
     <div className="min-h-screen bg-white w-full flex justify-center px-4 sm:px-6 lg:px-8">

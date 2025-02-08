@@ -46,10 +46,7 @@ export default function CollectionReport() {
       if (response.data?.data == null) {
         console.log("data is null");
       } else {
-        console.log(response?.data?.data?.data)
         setData(response?.data?.data?.data);
-        console.log("Report Response", response);
-        console.log("Report data ", response?.data?.data?.data);
         setfinalFromDate(fromDate)
         setfinalToDate(toDate)
       }
@@ -63,7 +60,6 @@ export default function CollectionReport() {
   }, [fromDate, toDate]);
  */
   const downloadReport = () => {
-    console.log("Download report function ");
     const doc = new jsPDF();
     const columns = [
       { header: "ID" },
@@ -75,7 +71,6 @@ export default function CollectionReport() {
     ];
     const data = [];
     const table = document.getElementById("data-table");
-    console.log(table);
     const rows = table?.querySelectorAll("tbody tr") || [];
     rows.forEach((row) => {
       const rowData = [];
@@ -84,7 +79,7 @@ export default function CollectionReport() {
         rowData.push(cellData);
       });
       data.push(rowData);
-      console.log('the raw data is..', rowData)
+      
     });
 
     autoTable(doc, {

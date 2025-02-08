@@ -50,18 +50,9 @@ export default function Conductor_Report_Generation() {
 
   const userName = localStorage.getItem("conductorId");
 
-  console.log("Total Amount Array >>> ", total_amount);
-  console.log("report state >>> ", report);
-  console.log("Total state >>", total_collection);
-  console.log(conductor_details);
 
-  /* const handle_logOut = () => {
-    console.log("Log out");
-    Cookies.remove("accesstoken", { path: "/" });
-    sessionStorage.clear();
-    navigate("/");
-    window.location.reload();
-  }; */
+
+
 
   const onSubmit = async (values) => {
     set_filterValues(values);
@@ -78,7 +69,6 @@ export default function Conductor_Report_Generation() {
         }
       )
       .then((response) => {
-        console.log(response.data.data);
         set_conductor_details(response.data.data);
       })
       .catch((error) => {
@@ -100,7 +90,6 @@ export default function Conductor_Report_Generation() {
         }
       )
       .then((response) => {
-        console.log("Total >>>>>>  ", response.data.data);
         set_total_collection(response.data.data);
       })
       .catch((error) => {
@@ -122,10 +111,9 @@ export default function Conductor_Report_Generation() {
         }
       )
       .then((response) => {
-        console.log("Report data >>>", response.data);
-        console.log("report data state >>>", response.data.data);
+       
         set_report(response?.data?.data);
-        console.log(response?.data?.data?.amounts);
+       
         set_total_amount(response.data.data.result.amounts);
       })
       .catch((error) => {
@@ -153,7 +141,6 @@ export default function Conductor_Report_Generation() {
     setOpenDialog(true);
   };
 
-  console.log("Dialog Data >>>>>>   ", dialog_busUid, Dialogdate, DialogAmount);
 
   return (
     <>

@@ -81,7 +81,6 @@ const handle_Image_upload = async (
   const formData = new FormData();
   const MAX_SIZE = 2 * 1024 * 1024;
   formData.append("img", file);
-  console.log("File Size", file.size);
   if (file.size > MAX_SIZE) {
     console.error("Error: File size exceeds 2MB.");
     alert("Error: File size exceeds 2MB.");
@@ -117,9 +116,7 @@ export default function ConductorRegistration() {
   const [success, set_success] = React.useState({});
   const [opeen_error_dialog, set_open_error_dialog] = React.useState(false);
 
-  console.log(uploadedFiles);
   const onSubmit = async (values) => {
-    console.log(values);
     set_loading(true);
     const token = Cookies.get("accesstoken");
 

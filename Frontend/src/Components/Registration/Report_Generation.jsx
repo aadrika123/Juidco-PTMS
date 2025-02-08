@@ -41,9 +41,7 @@ export default function Report_Generation() {
   const [openDialog, setOpenDialog] = React.useState(false); // State to control dialog
 
   const onSubmit = async (values, { setSubmitting }) => {
-    // Handle form submission here
-    console.log("Values function started ");
-    console.log("Values >> ", values);
+
     set_loading(true);
 
     if (!values.Date && !values.Month) {
@@ -71,7 +69,6 @@ export default function Report_Generation() {
           }
         );
         set_loading(false);
-        console.log(response.data.data);
         set_report(response.data.data);
         setOpenDialog(true);
       } catch (error) {
@@ -87,7 +84,6 @@ export default function Report_Generation() {
     }
   };
 
-  console.log("Daily Report", report);
   const [ConductorOptions, setConductorOptions] = React.useState([]);
   const [conductor_details, set_conductor_details] = React.useState({
     name: "",

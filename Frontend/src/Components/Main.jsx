@@ -1,16 +1,14 @@
 import React from "react";
-// import background_image from "background_image.png";
 import RMC_logo from "../assets/RMC_LOGO.png";
 import bus from "../assets/bus 1.png";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
-// import { OverLayLoader } from "../Common/loaders";
-// import Confirm from "../Common/confirm-box/CreateConfirmation";
+
 import axios from "axios";
 import Cookies from "js-cookie";
 
 export default function Main() {
-  const navigate = useNavigate();
+ 
 
   const getFormatDate = () => {
     const date = new Date();
@@ -18,7 +16,6 @@ export default function Main() {
     const formattedDate = new Intl.DateTimeFormat("en-US", options).format(
       date
     );
-    //const formattedDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
     return formattedDate;
   };
 
@@ -32,7 +29,6 @@ export default function Main() {
 
   const printTextData = (data) => {
     const date = moment(data?.created_at).format("DD-MM-YYYY");
-    // const time = moment(data?.date).format('hh:mm'); am pm formate
     const time = moment(data?.created_at).format("HH:mm");
     const printTxt =
       "[C]" +
@@ -88,15 +84,9 @@ export default function Main() {
       const conductorID = localStorage.getItem("conductorId");
 
       const currentDate = new Date();
-      const formattedDate = currentDate.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
-      /*  const formattedTime = currentDate
-        .toTimeString()
-        .split(" ")[0]
-        .replace(/:/g, ":")
-        .slice(0, 4); // Format time as HHMM */
-      const hours = String(currentDate.getHours()).padStart(2, "0"); // Get hours with leading zero if needed
-      const minutes = String(currentDate.getMinutes()).padStart(2, "0"); // Get minutes with leading zero if needed
-      //const seconds = String(currentDate.getSeconds()).padStart(2, "0"); // Get seconds with leading zero if needed
+      const formattedDate = currentDate.toISOString().split("T")[0]; 
+      const hours = String(currentDate.getHours()).padStart(2, "0"); 
+      const minutes = String(currentDate.getMinutes()).padStart(2, "0"); 
       const formattedTime = `${hours}:${minutes}`;
       const uniqueReceiptNo = `${formattedDate}-${formattedTime}-${Math.floor(
         Math.random() * 10000
@@ -122,7 +112,6 @@ export default function Main() {
             },
           }
         );
-        console.log(res?.data?.data);
         if (res?.data?.status) {
           printToBTPrinter(res?.data?.data);
         }
@@ -365,11 +354,7 @@ export default function Main() {
             </div>
           </div>
           <div className="flex flex-1 overflow-hidden justify-center items-center">
-            {/* <img
-              src="/background_image.png"
-              alt="Background Image"
-              className="h-fit justify-center items-center object-scale-down"
-            /> */}
+            
           </div>
         </div>
       </div>

@@ -53,7 +53,6 @@ const SideBar = (props) => {
   };
 
   const token = Cookies.get("accesstoken");
-  // console.log(token,"tokentokentoken")
 
   const fetchMenuList = async () => {
     let requestBody = {
@@ -90,7 +89,6 @@ const SideBar = (props) => {
     }
   };
 
-  // console.log(userPermission, "userPermission");
 
   useEffect(() => {
     fetchMenuList();

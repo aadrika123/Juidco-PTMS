@@ -1,8 +1,4 @@
 import { useEffect, useState } from "react";
-// import { useLocation, useNavigate, useParams } from "react-router-dom"/;
-// import AxiosInterceptors from "../../Components/GlobalData/AxiosInterceptors";
-// import ApiHeader from "../../Components/ApiList/ApiHeader";
-// import PropertyApiList from "../../Components/ApiList/PropertyApiList";
 import axios from "axios";
 import ProjectApiList from "../../api/ProjectApiList";
 import ApiHeader from "../../api/ApiHeader";
@@ -55,7 +51,6 @@ export function UseServiceCheck() {
         ApiHeader()
       )
         .then(function (response) {
-          console.log(response);
           if (!response?.data?.status) {
             navigate(
               `/service-restriction?service=${encodeURIComponent(

@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Cookies from "js-cookie";
 import AppRoutes from "./Routes/AppRoutes";
-import img from "./assets/loader.json";
-import Lottie from "lottie-react";
 import {
   Dialog,
   DialogActions,
@@ -13,10 +10,8 @@ import {
   Button,
 } from "@mui/material";
 import Jhar from "./assets/jhant.png";
-import { Image } from "@mui/icons-material";
 import useModulePermission from "./Components/common/Hooks/useModulePermission";
 import { UseServiceCheck } from "./Components/common/Hooks/UseServiceCheck";
-import ServiceRestrictionLayout from "./Components/pages/error/ServiceRestrictionLayout";
 
 function App() {
   UseServiceCheck();
@@ -26,12 +21,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
-  // console.log("123");
-
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    //const token = Cookies.get("accesstoken");
     if (token && token !== "undefined") {
       const userDetails = Cookies.get("user_details");
       const userType = localStorage.getItem("userType");
@@ -42,8 +34,6 @@ function App() {
     } else if (token && token == "undefined") {
       setOpen(true);
       localStorage.clear();
-      //Cookies.remove("accesstoken");
-      //Cookies.remove("user_details");
     }
 
     setLoading(false);
@@ -51,7 +41,7 @@ function App() {
 
   const handleClose = () => {
     setOpen(false);
-    window.location.href = "/ptms"; // Assuming there's a login route
+    window.location.href = "/ptms";
   };
 
   if (loading) {
@@ -65,10 +55,7 @@ function App() {
 
   return (
     <>
-      {/* <Routes> */}
-
       <AppRoutes access_token={access_token} userType={userType} />
-      {/* </Routes> */}
 
       <Dialog
         open={open}

@@ -232,7 +232,6 @@ const ScheduledTable = () => {
               }}
               validationSchema={validationSchema}
               onSubmit={(values) => {
-                console.log(values);
                 setSelectedBus(values.busNumber);
                 setFromDate(values.fromDate);
                 fetchScheduledData();

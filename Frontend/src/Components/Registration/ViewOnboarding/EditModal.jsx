@@ -14,17 +14,11 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log(dataId, "dataId==================>>");
 
-  // console.log(uploading, "uploading");
-
-  // const [firstInput, setFirstInput] = useState("");
-  // const [secondInput, setSecondInput] = useState("");
   const [pollutionDoc, setPollutionDoc] = useState("");
   const [taxCopyDoc, setTaxCopyDoc] = useState("");
   const [fetchedData, setFetchedData] = useState("");
 
-  console.log(fetchedData, "fetchedData");
   //Image Data
   const [firstInput, setFirstInput] = useState(null);
   const [secondInput, setSecondInput] = useState(null);
@@ -33,10 +27,7 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
   const [firstBuffer, setFirstBuffer] = useState(null);
   const [secondBuffer, setSecondBuffer] = useState(null);
 
-  // console.log(firstInput, "firstInput");
-  // console.log(secondInput, "secondInput");
-  // console.log(firstBuffer, "firstBuffer");
-  // console.log(secondBuffer, "secondBuffer");
+
 
   // const handleFileChange = (e, setBuffer) => {
   //   const file = e.target.files[0];
@@ -61,7 +52,6 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
   //   const formData = new FormData();
   //   const MAX_SIZE = 2 * 1024 * 1024;
   //   formData.append("img", file);
-  //   console.log("File Size", file.size);
   //   if (file.size > MAX_SIZE) {
   //     console.error("Error: File size exceeds 2MB.");
   //     alert("Error: File size exceeds 2MB.");
@@ -111,7 +101,6 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
         console.log("Error Occured");
       } else {
         const responseData = response?.data?.data;
-        console.log(responseData, "responseData");
         setIsLoading(false);
         setEditModal(false);
       }
@@ -141,7 +130,6 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
         console.log("Error Occured");
       } else {
         const responseData = response?.data?.data;
-        console.log(responseData, "responseData");
         setIsLoading(false);
         setEditModal(false);
       }
@@ -169,7 +157,7 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
         console.log("Error Occured");
       } else {
         const responseData = response?.data?.data;
-        console.log(responseData, "responseData");
+ 
         if (field == "pollution") {
           setFirstBuffer(responseData);
         }
@@ -195,7 +183,6 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
         }
       )
       .then((res) => {
-        console.log(res.data?.data);
         setFetchedData(res.data?.data);
         setPollutionDoc(res.data?.data?.pollution_doc?.buffer);
         setTaxCopyDoc(res.data?.data?.taxCopy_doc?.buffer);
@@ -227,50 +214,8 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
               {fetchedData?.cunique_id}
             </h1>
           </div>
-          <div className="flex mt-10">
-            {/*  */}
-            {/* <div className="flex flex-1 flex-col mt-4">
-              <label className="mb-2 ml-4" htmlFor="Pollution_selectedFile">
-                Pollution Certificate
-                <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="file"
-                id="Pollution_selectedFile"
-                name="Pollution_selectedFile"
-                accept="image/*"
-                className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
-                style={{ boxShadow: "0 1px 4px #fff" }}
-                onFocus={(e) => (e.target.style.boxShadow = "0 1px 4px #000")}
-                onBlur={(e) => (e.target.style.boxShadow = "none")}
-                onChange={(e) => setFirstInput(e.target.files[0])}
-              />
-             
-              {firstInput && (
-                <div className="flex flex-1 justify-end mr-8 ml-8 mt-2">
-                  {uploadedFiles.Pollution && (
-                    <div className="text-green-500 ml-4 mt-2">
-                      Pollution Certificate Uploaded
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    className="flex justify-end items-end  ml-4 px-4 w-fit h-[40px] py-2 bg-[#4245D9] text-white rounded"
-                    onClick={() =>
-                      handle_Image_upload(
-                        firstInput,
-                        setUploadedFiles,
-                        setUploading
-                      )
-                    }
-                  >
-                    {uploading ? "Upload" : "Uploading..."}
-                  </button>
-                </div>
-              )}
-            </div> */}
-            {/*  */}
-
+          <div className="flex mt-10">   
+            
             <div className="flex flex-col">
               <label className="mb-2 ml-4">
                 {page === "bus"
