@@ -101,7 +101,9 @@ const ValidateTransaction = () => {
                           {transaction?.conductor_id}
                         </td>
                         <td className="border border-gray-200 px-4 py-2">
-                          {transaction?.conductor_name}
+                          {transaction?.conductor_name
+                            .replace("null", "")
+                            .trim()}
                         </td>
                         <td className="border border-gray-200 px-4 py-2">
                           {new Date(transaction.date).toLocaleDateString()}
