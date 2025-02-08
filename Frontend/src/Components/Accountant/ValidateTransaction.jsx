@@ -20,8 +20,8 @@ const ValidateTransaction = () => {
 
         const fetchConductorDetails = async () => {
             try {
-                // const response = await fetch("http://localhost:5006/api/ptms/v1/Cash/validate/status?status=1");
-                const response = await fetch(`${api_getValidationTrans}/status?status=1`, ApiHeader());
+                // const response = await fetch(`${api_getValidationTrans}/status?status=1`, ApiHeader());
+                const response = await fetch(`${process.env.REACT_APP_BASE_URL}/Cash/validate/status?status=1`, ApiHeader());
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

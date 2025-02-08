@@ -18,7 +18,7 @@ const ImgModal = ({ imageUrl, type, isLoading }) => {
       } else if (doc?.imageUrl) {
         setImageSrc(doc.imageUrl);
       } else {
-        console.log(`No valid image source for ${type}`);
+        // console.log(`No valid image source for ${type}`);
         setImageSrc(null);
       }
     };

@@ -126,7 +126,8 @@ const AccountantViewPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${api_fetchByStatus}/status?status=0`, ApiHeader());
+      // const response = await fetch(`${api_fetchByStatus}/status?status=0`, ApiHeader());
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/report/status?status=0`, ApiHeader());
       // const data = response.data?.data
       const data = await response.json();
       const submittedCash = data?.data?.Submitted_Cash

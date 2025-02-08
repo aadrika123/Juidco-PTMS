@@ -22,36 +22,37 @@ export default function Dashboard_data() {
   const categories = realTimeData?.map((item) => item.day);
   const seriesData = realTimeData?.map((item) => item.sum);
   const totalValue = seriesData?.reduce((acc, val) => acc + val, 0);
-  console.log('the nan data is..', realTimeData)
+  console.log("the nan data is..", realTimeData);
   const receiptTotalCount = realTimeData?.reduce(
     (acc, val) => acc + val.receipts,
     0
   );
   const realTimeReceipt = realTimeData?.map((item) => item.receipts);
 
-  const realTimeReceiptSum = realTimeReceipt.reduce((sum, item) => (sum + item), 0)
-
+  const realTimeReceiptSum = realTimeReceipt.reduce(
+    (sum, item) => sum + item,
+    0
+  );
 
   //hourly real time data
   const [hourlyRealTimeData, setHourlyRealTimeData] = useState([]);
   const [timeIntervalTrigger, setTimeIntervalTrigger] = useState(false);
 
-  const hourlyReceipts = hourlyRealTimeData.map(item => item?.customer_count)
-  let buffer = 0
-  const cumulativeReceipts = hourlyReceipts.map(item => {
-    buffer = buffer + item
-    return buffer
-  })
-  const hourlyReceiptsSum = hourlyReceipts.reduce((sum, item) => sum + item, 0)
+  const hourlyReceipts = hourlyRealTimeData.map((item) => item?.customer_count);
+  let buffer = 0;
+  const cumulativeReceipts = hourlyReceipts.map((item) => {
+    buffer = buffer + item;
+    return buffer;
+  });
+  const hourlyReceiptsSum = hourlyReceipts.reduce((sum, item) => sum + item, 0);
 
-  const hourlyAmounts = hourlyRealTimeData.map(item => item?.total_amount)
-  let amountBuffer = 0
-  const cumulativeAmounts = hourlyAmounts.map(item => {
-    amountBuffer = amountBuffer + item
-    return amountBuffer
-  })
-  const hourlyAmountsSum = hourlyAmounts.reduce((sum, item) => sum + item, 0)
-
+  const hourlyAmounts = hourlyRealTimeData.map((item) => item?.total_amount);
+  let amountBuffer = 0;
+  const cumulativeAmounts = hourlyAmounts.map((item) => {
+    amountBuffer = amountBuffer + item;
+    return amountBuffer;
+  });
+  const hourlyAmountsSum = hourlyAmounts.reduce((sum, item) => sum + item, 0);
 
   // Conductor Status Table
   const [conductorStatus, setConductorStatus] = useState([]);
@@ -74,7 +75,7 @@ export default function Dashboard_data() {
 
   // Schedule data Table
   const [scheduled_bus, set_scheduled_bus] = useState([]);
-  console.log("Bus Data >>> ", scheduled_bus);
+  // console.log("Bus Data >>> ", scheduled_bus);
 
   // demographic count
   const [demographicCounts, setDemographicCounts] = useState([]);
@@ -85,7 +86,7 @@ export default function Dashboard_data() {
 
   const uniqueDatess = [...new Set(datess)];
 
-  console.log(demographicCounts, "demographicCounts");
+  // console.log(demographicCounts, "demographicCounts");
 
   useEffect(() => {
     axios
@@ -124,7 +125,6 @@ export default function Dashboard_data() {
         console.log(err);
       });
 
-
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/getConductorStatus`, {
         headers: {
@@ -162,7 +162,6 @@ export default function Dashboard_data() {
         console.log(err);
       });
 
-
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/passenger/day-wise`, {
         headers: {
@@ -178,19 +177,14 @@ export default function Dashboard_data() {
       });
   }, []);
 
-
-
   useEffect(() => {
     //hourly real time data
     axios
-      .get(
-        `${process.env.REACT_APP_BASE_URL}/report/hourly-real-time`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .get(`${process.env.REACT_APP_BASE_URL}/report/hourly-real-time`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         console.log("hourly real time data", res.data?.data);
         if (res.data?.data) {
@@ -200,8 +194,7 @@ export default function Dashboard_data() {
       .catch((err) => {
         console.log(err);
       });
-  }, [timeIntervalTrigger])
-
+  }, [timeIntervalTrigger]);
 
   const chartOptions = {
     chart: {
@@ -279,11 +272,11 @@ export default function Dashboard_data() {
     // },
     legend: {
       show: true,
-      position: 'bottom',
-      horizontalAlign: 'center',
+      position: "bottom",
+      horizontalAlign: "center",
       labels: {
-        useSeriesColors: true // Use the colors defined in the series
-      }
+        useSeriesColors: true, // Use the colors defined in the series
+      },
     },
     dataLabels: {
       enabled: false,
@@ -332,11 +325,11 @@ export default function Dashboard_data() {
     },
     legend: {
       show: true,
-      position: 'bottom',
-      horizontalAlign: 'center',
+      position: "bottom",
+      horizontalAlign: "center",
       labels: {
-        useSeriesColors: true // Use the colors defined in the series
-      }
+        useSeriesColors: true, // Use the colors defined in the series
+      },
     },
     dataLabels: {
       enabled: false,
@@ -446,6 +439,11 @@ export default function Dashboard_data() {
   const offset = 100 - (value % maxProgress) / (maxProgress / 100);
   const currentDate = formatDate(new Date());
 
+  const currentDateNew = new Date(currentDate);
+  const monthName = currentDateNew.toLocaleString("default", { month: "long" });
+  const year = currentDateNew.getFullYear();
+  // console.log(year,"year");
+
   return (
     <div className="flex h-screen  w-full  overflow-x-auto ">
       <div className="flex flex-1 h-full flex-col ">
@@ -479,7 +477,7 @@ export default function Dashboard_data() {
                     />
                   </svg>
                 </i>
-                Statistics
+                Statistics of <span className="font-bold pl-1"> {monthName} {year}</span>
               </div>
               <div className={`flex`}>
                 <div className="w-full flex flex-col sm:flex-row justify-between ">
@@ -644,9 +642,7 @@ export default function Dashboard_data() {
                       <div
                         className={`w-full md:w-full  mr-4  flex flex-col items-center justify-center relative`}
                       >
-                        <span className="text-sm">
-                          {currentDate}
-                        </span>
+                        <span className="text-sm">{currentDate}</span>
                       </div>
                     </div>
                   </div>

@@ -17,9 +17,9 @@ const Modal = ({ isOpen, onClose }) => {
             setLoading(true);
             try {
                 // Fetch data from the API for the current date
-                const response = await fetch(`${api_fetchByScheduledconductor}/current-date`, ApiHeader());
+                // const response = await fetch(`${api_fetchByScheduledconductor}/current-date`, ApiHeader());
 
-                // const response = await fetch('http://localhost:5006/api/ptms/v1/scheduled/receipts/current-date');
+                const response = await fetch(`${process.env.REACT_APP_BASE_URL}/scheduled/receipts/current-date`, ApiHeader());
                 if (!response.ok) throw new Error('Network response was not ok');
                 const result = await response.json();
 

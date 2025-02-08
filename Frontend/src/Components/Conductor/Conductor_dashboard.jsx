@@ -79,7 +79,6 @@ export default function Conductor_dashboard() {
       }
     }
   }, []);
-  // console.log("bus data >>> ", busData?.bus_id);
 
   return (
     <div className="flex items-center justify-between h-screen w-screen">
@@ -202,7 +201,7 @@ export default function Conductor_dashboard() {
                       d="M8.32844 4.38874L7.8125 3.8728M9.70406 5.76437L9.36 5.42062M11.0797 7.1403L10.7359 6.79624M12.6275 8.6878L12.1116 8.17187"
                       stroke="white"
                       stroke-miterlimit="10"
-                      stroke-linecap="round"
+                      strokeLinecap="round"
                     />
                   </svg>
                 </button>
