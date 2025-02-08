@@ -355,7 +355,7 @@ const AccountantViewPage = () => {
                     <td className="px-4 py-2">{item.date}</td>
                     <td className="px-4 py-2">{item.time}</td>
                     <td className="px-4 py-2">{item.amount}</td>
-                    <td className="px-4 py-2">{item.payee}</td>
+                    <td className="px-4 py-2">{item.payee.replace('null', '').trim()}</td>
                     <td className="px-4 py-2">{item.id}</td>
                     <td className="px-4 py-2">{item.description}</td>
                     <td className="px-4 py-2">{item.referenceNumber}</td>
