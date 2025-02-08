@@ -124,7 +124,6 @@ const ConductorOnboarding_Table = () => {
     fetchData();
   }, [debouncedSearchQuery,editModal]);
 
-  // console.log('imgBufferData', imgBufferData);
 
   useEffect(() => {
     setIsLoading(true);

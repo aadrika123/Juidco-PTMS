@@ -67,7 +67,6 @@ const handle_Image_upload = async (
   const formData = new FormData();
   const MAX_SIZE = 2 * 1024 * 1024;
   formData.append("img", file);
-  console.log("File Size", file.size);
   if (file.size > MAX_SIZE) {
     console.error("Error: File size exceeds 2MB.");
     alert("Error: File size exceeds 2MB.");
@@ -108,10 +107,7 @@ export default function BusRegistration() {
   const [success, set_success] = React.useState({});
   const [error, set_error] = React.useState({});
 
-  console.log(uploadedFiles);
-
   const onSubmit = async (values) => {
-    console.log(values);
     set_loading(true);
     try {
       const response = await axios.post(

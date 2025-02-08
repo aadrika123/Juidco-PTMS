@@ -3,26 +3,19 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-// import { login } from "../../redux/slice/slice";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { Container, Box, Button } from "@mui/material";
-import PasswordInput from "./PasswordInput"; // Import the PasswordInput component
+import PasswordInput from "./PasswordInput"; 
 import ApiHeader from "../api/ApiHeader";
 import ProjectApiList from "../api/ProjectApiList";
 
 const Login = () => {
-  const dispatch = useDispatch();
   const [errorMsg, setErrorMsg] = useState();
   const [deviceType, setDeviceType] = useState(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const { getMenuByModule } = ProjectApiList();
-
-  const searchParams = new URLSearchParams(location.search);
-
-  // const message = searchParams.get("msg") || "";
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -55,7 +48,6 @@ const Login = () => {
 
       if (res) {
         fetchMenuList();
-        // window.location.replace("/ptms/dashboard");
 
         const userDetails = res?.data?.data?.userDetails;
         const { token } = res?.data?.data;
@@ -65,11 +57,9 @@ const Login = () => {
         localStorage.setItem("token", token);
         localStorage.setItem("userType", userDetails?.user_type);
         localStorage.setItem("userName", userDetails?.user_name);
-        // localStorage.setItem("name", userDemodule_idtails?.name);
 
         localStorage.setItem("device", deviceType);
         localStorage.setItem("name", userDetails?.name);
-        // localStorage.setItem("ulbId", userDetails?.ulb_id);
         localStorage.setItem("userUlbName", userDetails?.ulbName);
         localStorage.setItem("roles", JSON.stringify(userDetails?.role));
         localStorage.setItem("isLoggedIn", true);
@@ -77,17 +67,7 @@ const Login = () => {
         localStorage.setItem("ulbIduserMobile", userDetails?.mobile);
         localStorage.setItem("conductorId", userDetails?.user_name);
 
-        /* Cookies.set("user_details", JSON.stringify(userDetails?), {
-          expires: 1,
-        }); */
-
-        //dispatch(login({ token, userDetails? }));
-
-        // console.log(
-        //   userDetails?.user_type,
-        //   "userDetails?.user_type===========>"
-        // );
-
+       
         if (userDetails?.user_type === "Admin") {
           window.location.replace("/ptms/dashboard");
         } else if (userDetails?.user_type === "TC") {
@@ -137,7 +117,6 @@ const Login = () => {
       console.error("Error fetching menu list", error);
     }
   };
-  // console.log(message);
   return (
     <>
       <Container>

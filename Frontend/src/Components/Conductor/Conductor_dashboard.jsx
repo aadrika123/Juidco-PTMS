@@ -15,11 +15,6 @@ export default function Conductor_dashboard() {
   const user_Details = Cookies.get("user_details");
   const token = Cookies.get("accesstoken");
   const [busData, set_busData] = useState(null);
-  console.log(busData);
-
-  /* const userDetailsObj = user_Details ? JSON.parse(user_Details) : null;
-  console.log(userDetailsObj);
-   */
 
   const userName = localStorage.getItem("conductorId");
 
@@ -43,13 +38,7 @@ export default function Conductor_dashboard() {
         .replace(/:/g, "")
         .slice(0, 4); // Format time as HHMM
 
-      console.log(
-        "Format Date >>> ",
-        formattedDate,
-        "Format Time >>>> ",
-        formattedTime
-      );
-
+    
       try {
         axios
           .post(
@@ -67,7 +56,6 @@ export default function Conductor_dashboard() {
             }
           )
           .then((e) => {
-            console.log("Scheduled Conductor", e);
             localStorage.setItem("BusID", e.data?.data?.data[0].bus_id);
             set_busData(e.data?.data?.data[0]);
           })

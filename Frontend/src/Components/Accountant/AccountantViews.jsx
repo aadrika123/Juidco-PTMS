@@ -1,27 +1,24 @@
 import { useContext, useEffect, useState } from "react";
-import TitleBar from "../../Components/Others/TitleBar"; // Adjust path if necessary
+import TitleBar from "../../Components/Others/TitleBar";
 import { contextVar } from "../context/contextVar";
 import { useNavigate, useParams } from "react-router-dom";
-import ProjectApiList from "../../Components/api/ProjectApiList";
 import ApiHeader from "../../Components/api/ApiHeader";
-import AccountantDashboard from "../Accountant1/AccountantDashboard";
 
 const AccountantViews = () => {
   const { titleBarVisibility } = useContext(contextVar);
-  const { api_fetchTransactionDetails, api_postUpdateStatus } = ProjectApiList();
-
-  const { id } = useParams(); // Get transaction_id from URL
-  const [transactionDetails, setTransactionDetails] = useState(null); // State to hold transaction data
-  const [isLoading, setIsLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
+  const { id } = useParams();
+  const [transactionDetails, setTransactionDetails] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showTextarea, setShowTextarea] = useState(false);
 
-  // Fetch data by transaction ID
   useEffect(() => {
     const fetchTransactionDetails = async () => {
       try {
-
-        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/transactions/receipts/${id}`, ApiHeader());
+        const response = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/transactions/receipts/${id}`,
+          ApiHeader()
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -37,26 +34,23 @@ const AccountantViews = () => {
     fetchTransactionDetails();
   }, [id]);
 
-  // Toggle the textarea visibility when the comment button is clicked
   const handleCommentClick = () => {
     setShowTextarea(!showTextarea);
   };
 
-
-  
   const updateStatus = async (status) => {
     try {
-      const token = localStorage.getItem('token'); // Replace with your actual token key
+      const token = localStorage.getItem("token");
       const response = await fetch(
-        `${api_postUpdateStatus}`,
+        `${process.env.REACT_APP_BASE_URL}/report/validate`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : '',
+            Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify({
-            transaction_id: id, // Ensure id is defined
+            transaction_id: id,
             status,
           }),
         }
@@ -73,31 +67,19 @@ const AccountantViews = () => {
     }
   };
 
-
   const navigate = useNavigate();
-  // Event handlers for the buttons
-
 
   const handleVerifyClick = () => {
-
-    const userConfirmed = window.confirm('Are you sure you want to verify?');
+    const userConfirmed = window.confirm("Are you sure you want to verify?");
     if (userConfirmed) {
-      updateStatus(1); // Set status to 1 for Verify
+      updateStatus(1);
 
-      // If the user clicks "OK", redirect to /ValidationListView
-      navigate('/ValidationListView');
+      navigate("/ValidationListView");
     }
   };
-  // const handleVerifyClick = () => {
-  // };
-
-  // const handleDisputeClick = () => {
-  //   updateStatus(2); // Set status to 2 for Disputed
-  // };
-
 
   const handleClose = () => {
-    navigate("/accountant-view"); // Navigate to the desired route
+    navigate("/accountant-view");
   };
 
   const COLUMNS = [
@@ -114,14 +96,14 @@ const AccountantViews = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <AccountantDashboard>
+    <div className="flex flex-col w-full">
       <div>
         <TitleBar
           titleBarVisibility={titleBarVisibility}
           titleText={"Transaction View Details"}
         />
       </div>
-      <div className="bg-white rounded font-sans mb-10 border border-[#4338ca] shadow-lg px-4 mt-1 font-bold">
+      <div className="bg-white rounded font-sans mb-10 border border-[#4338ca] shadow-lg px-4 mt-1 font-bold m-5">
         <div className="m-4 font-bold text-lg">
           Conductor Collection Details
         </div>
@@ -217,14 +199,7 @@ const AccountantViews = () => {
               </button>
             </div>
 
-            {/* Three buttons on the right */}
             <div className="flex space-x-2">
-              {/* <button
-                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-                onClick={handleDisputeClick}
-              >
-                Disputed
-              </button> */}
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                 onClick={handleVerifyClick}
@@ -252,7 +227,7 @@ const AccountantViews = () => {
           )}
         </div>
       </div>
-    </AccountantDashboard>
+    </div>
   );
 };
 export default AccountantViews;

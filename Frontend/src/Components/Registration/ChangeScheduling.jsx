@@ -65,7 +65,6 @@ export default function ChangeScheduling() {
     setScheID(id);
   }, [Error]);
 
-  // console.log(scheID, "<======== ID");
 
   function generateTimeOptions(intervalMinutes) {
     const timeOptions = [];

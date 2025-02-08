@@ -13,21 +13,18 @@ export default function Recipt() {
 
   useEffect(() => {
     axios
-      //.post("http://192.168.100.71:6001/api/ptms/v1/receipt/create", postData)
       .post(`${process.env.REACT_APP_BASE_URL}/receipt/create`, postData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
-        console.log(res.data);
         set_data(res.data.data);
       })
       .catch((error) => {
         console.error("Error making POST request:", error);
       });
   }, [receiptData.Amount]);
-  console.log(data);
 
   return (
     <div className="flex flex-1 flex-col bg-[#F2F2FE] h-screen justify-center items-center">
@@ -105,10 +102,7 @@ export default function Recipt() {
               {data && new Date(data.date).toLocaleString()}
             </div>
           </div>
-          {/* <div className='flex flex-1 w-full mt-2 mb-2 justify-between'>
-            <div className='flex flex-1 justify-start items-center text-[#444242] text-md font-semibold'>Time : </div>
-            <div className='flex flex-1 justify-start items-center text-[#4D4B4B] '>{data && new Date(data.date).toLocaleTimeString()}</div>
-          </div> */}
+    
           <div className="flex flex-1 w-full  mt-2 mb-2 justify-between">
             <div className="flex flex-1 justify-start items-center text-[#444242] text-md font-semibold">
               Amount :{" "}

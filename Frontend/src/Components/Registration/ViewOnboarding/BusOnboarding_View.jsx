@@ -26,7 +26,7 @@ export default function BusOnboarding_View() {
   //       },
   //     })
   //     .then((res) => {
-  //       console.log(res.data?.data?.data);
+  //       
   //       setPassengers_status(res.data?.data?.data);
   //     });
   // }, []);

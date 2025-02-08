@@ -19,7 +19,6 @@ export default function All_report_conductor() {
   const { Cid, Selected_Date, End_Date } = useParams();
   const location = useLocation();
   const receiptData = location.state;
-  console.log("Data from navigation >>> ", receiptData);
   const token = Cookies.get("accesstoken");
   const navigate = useNavigate();
 
@@ -31,10 +30,9 @@ export default function All_report_conductor() {
     if (timeStr.length === 4) {
       const hours = timeStr.substring(0, 2);
       const minutes = timeStr.substring(2, 4);
-      //const seconds = timeStr.substring(4, 6);
       return `${hours}:${minutes}`;
     }
-    return timeStr; // Return the original string if it doesn't match the expected length
+    return timeStr; 
   }
 
   useEffect(() => {

@@ -89,8 +89,6 @@ const BusOnboardingTable = () => {
 
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
 
-  // console.log(dataId, "dataId");
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -142,7 +140,6 @@ const BusOnboardingTable = () => {
       .then((response) => {
         setIsLoading(false);
         setImgBufferData(response?.data?.data);
-        console.log('img-data', response?.data?.data);
       })
       .catch((error) => console.error('Error fetching bus data:', error));
   }, [imageId]);

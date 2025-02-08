@@ -16,7 +16,7 @@ export default function Dashboard({children}) {
         <div className={`${hide ? "hidden" : "flex"} w-3/12`}>
           <Sidebar />
         </div>
-        {/* {children} */}
+        {children}
       </div>
     </>
   );
