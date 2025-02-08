@@ -90,7 +90,7 @@ const SideBar = (props) => {
     }
   };
 
-  console.log(userPermission, "userPermission");
+  // console.log(userPermission, "userPermission");
 
   useEffect(() => {
     fetchMenuList();

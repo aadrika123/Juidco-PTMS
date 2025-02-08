@@ -572,8 +572,8 @@ export default function Bus_Onboarding() {
                   d="M3.39648 10.8436L7.70685 15.154L16.3276 5.91748"
                   stroke="white"
                   stroke-width="1.39091"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>
@@ -614,8 +614,8 @@ export default function Bus_Onboarding() {
                   d="M47.7261 13.0517L12.726 48.0517M12.7261 13.0517L47.7261 48.0517"
                   stroke="white"
                   stroke-width="3.75"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>

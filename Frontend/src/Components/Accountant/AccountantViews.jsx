@@ -20,11 +20,8 @@ const AccountantViews = () => {
   useEffect(() => {
     const fetchTransactionDetails = async () => {
       try {
-        // const response = await fetch(`${api_fetchTransactionDetails}/${id}`, ApiHeader());
 
-        const response = await fetch(
-          `${api_fetchTransactionDetails}/${id}`
-          , ApiHeader());
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/transactions/receipts/${id}`, ApiHeader());
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }

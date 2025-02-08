@@ -306,8 +306,8 @@ export default function Report_Generation() {
                   d="M3.39648 10.8436L7.70685 15.154L16.3276 5.91748"
                   stroke="white"
                   stroke-width="1.39091"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>
