@@ -103,7 +103,6 @@ const handle_Image_upload = async (
   const formData = new FormData();
   const MAX_SIZE = 2 * 1024 * 1024;
   formData.append("img", file);
-  console.log("File Size", file.size);
   if (file.size > MAX_SIZE) {
     console.error("Error: File size exceeds 2MB.");
     alert("Error: File size exceeds 2MB.");
@@ -136,7 +135,6 @@ export default function Conductor_Onboarding() {
   const [uploadedFiles, setUploadedFiles] = React.useState({});
   const location = useLocation();
   const path = location.pathname;
-  console.log(location);
   const [isAdult, setIsAdult] = React.useState(false);
 
   const [uploading, setUploading] = React.useState({
@@ -148,7 +146,6 @@ export default function Conductor_Onboarding() {
   const [success, set_success] = React.useState({});
   const [error, set_error] = React.useState({});
 
-  console.log("Uploaded Files >>> ", uploadedFiles);
 
   const onSubmit = async (values, reset) => {
     if (!uploadedFiles?.Fitness_Certificate && !uploadedFiles?.Aadhaar_card) {
@@ -182,17 +179,15 @@ export default function Conductor_Onboarding() {
           }
         );
         set_loading(false);
-        console.log(response);
+     
         if (response.data?.data) {
-          console.log(response);
-          console.log("Api status >>>", response?.status);
+         
           setOpenDialog(true);
           set_success(response?.data?.data?.cunique_id);
-          console.log("Success Data", success);
+         
         } else {
           set_loading(false);
-          console.log(response);
-          console.log(response?.data);
+          
           set_error(response?.data);
           set_opeen_error_dialog(true);
         }
@@ -201,7 +196,7 @@ export default function Conductor_Onboarding() {
         set_loading(false);
         const errorMessage = error?.response?.data?.message;
         set_error(errorMessage);
-        console.log(errorMessage);
+       
 
         if (
           typeof errorMessage === "string" &&
@@ -738,8 +733,8 @@ export default function Conductor_Onboarding() {
                   d="M3.39648 10.8436L7.70685 15.154L16.3276 5.91748"
                   stroke="white"
                   stroke-width="1.39091"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>
@@ -782,8 +777,8 @@ export default function Conductor_Onboarding() {
                   d="M47.7261 13.0517L12.726 48.0517M12.7261 13.0517L47.7261 48.0517"
                   stroke="white"
                   stroke-width="3.75"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>

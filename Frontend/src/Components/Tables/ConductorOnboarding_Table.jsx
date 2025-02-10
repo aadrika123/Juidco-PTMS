@@ -122,9 +122,8 @@ const ConductorOnboarding_Table = () => {
     };
 
     fetchData();
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery,editModal]);
 
-  console.log('imgBufferData', imgBufferData);
 
   useEffect(() => {
     setIsLoading(true);
@@ -273,6 +272,7 @@ const ConductorOnboarding_Table = () => {
     );
   }
 
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex p-2 mt-5 ml-4 mr-4  justify-start items-start  h-fit">
@@ -312,13 +312,13 @@ const ConductorOnboarding_Table = () => {
                     <path
                       d="M11.4987 7.1875H6.70703C6.32578 7.1875 5.96015 7.33895 5.69057 7.60853C5.42098 7.87812 5.26953 8.24375 5.26953 8.625V16.2917C5.26953 16.6729 5.42098 17.0385 5.69057 17.3081C5.96015 17.5777 6.32578 17.7292 6.70703 17.7292H14.3737C14.7549 17.7292 15.1206 17.5777 15.3902 17.3081C15.6597 17.0385 15.8112 16.6729 15.8112 16.2917V11.5"
                       stroke="#fff"
-                      stroke-linecap="round"
+                      strokeLinecap="round"
                     />
                     <path
                       d="M11.9766 11.0208L18.0754 4.922M13.8932 4.3125H18.6849V9.10417"
                       stroke="#fff"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
                   </svg>
                 </div>
@@ -431,16 +431,16 @@ const ConductorOnboarding_Table = () => {
                     <TableCell>{data?.blood_grp}</TableCell>
                     <TableCell>{data?.age}</TableCell>
 
-                    <TableCell>
+                    <TableCell onClick={()=>{setImageId(data?.id)}}>
                       <ImgModal
-                        imageUrl={data}
+                        imageUrl={imgBufferData}
                         type={'fitness'}
                         isLoading={isLoading}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={()=>{setImageId(data?.id)}}>
                       <ImgModal
-                        imageUrl={data}
+                        imageUrl={imgBufferData}
                         type={'adhar'}
                         isLoading={isLoading}
                       />

@@ -14,9 +14,7 @@ export default function Bus_report_page() {
   const location = useLocation();
   const receiptData = location.state;
   const navigate = useNavigate();
-  console.log("Report Page >>", receiptData);
   const hasReports = receiptData?.report?.length > 0;
-  console.log("sjahdsa", hasReports);
 
   return (
     <div className="flex items-center justify-center h-screen w-screen">

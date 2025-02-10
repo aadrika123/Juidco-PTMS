@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import ApexChart from "react-apexcharts";
-import DatePicker from "react-datepicker";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import { FaCalendarAlt } from "react-icons/fa";
 
 export default function Dashboard_data() {
   const Navigate = useNavigate();
@@ -22,36 +20,36 @@ export default function Dashboard_data() {
   const categories = realTimeData?.map((item) => item.day);
   const seriesData = realTimeData?.map((item) => item.sum);
   const totalValue = seriesData?.reduce((acc, val) => acc + val, 0);
-  console.log('the nan data is..', realTimeData)
   const receiptTotalCount = realTimeData?.reduce(
     (acc, val) => acc + val.receipts,
     0
   );
   const realTimeReceipt = realTimeData?.map((item) => item.receipts);
 
-  const realTimeReceiptSum = realTimeReceipt.reduce((sum, item) => (sum + item), 0)
-
+  const realTimeReceiptSum = realTimeReceipt.reduce(
+    (sum, item) => sum + item,
+    0
+  );
 
   //hourly real time data
   const [hourlyRealTimeData, setHourlyRealTimeData] = useState([]);
   const [timeIntervalTrigger, setTimeIntervalTrigger] = useState(false);
 
-  const hourlyReceipts = hourlyRealTimeData.map(item => item?.customer_count)
-  let buffer = 0
-  const cumulativeReceipts = hourlyReceipts.map(item => {
-    buffer = buffer + item
-    return buffer
-  })
-  const hourlyReceiptsSum = hourlyReceipts.reduce((sum, item) => sum + item, 0)
+  const hourlyReceipts = hourlyRealTimeData.map((item) => item?.customer_count);
+  let buffer = 0;
+  const cumulativeReceipts = hourlyReceipts.map((item) => {
+    buffer = buffer + item;
+    return buffer;
+  });
+  const hourlyReceiptsSum = hourlyReceipts.reduce((sum, item) => sum + item, 0);
 
-  const hourlyAmounts = hourlyRealTimeData.map(item => item?.total_amount)
-  let amountBuffer = 0
-  const cumulativeAmounts = hourlyAmounts.map(item => {
-    amountBuffer = amountBuffer + item
-    return amountBuffer
-  })
-  const hourlyAmountsSum = hourlyAmounts.reduce((sum, item) => sum + item, 0)
-
+  const hourlyAmounts = hourlyRealTimeData.map((item) => item?.total_amount);
+  let amountBuffer = 0;
+  const cumulativeAmounts = hourlyAmounts.map((item) => {
+    amountBuffer = amountBuffer + item;
+    return amountBuffer;
+  });
+  const hourlyAmountsSum = hourlyAmounts.reduce((sum, item) => sum + item, 0);
 
   // Conductor Status Table
   const [conductorStatus, setConductorStatus] = useState([]);
@@ -70,11 +68,9 @@ export default function Dashboard_data() {
 
   //passenger details
   const [passenger_details, set_passenger_details] = useState([]);
-  console.log("Passengers details >>>> ", passenger_details);
 
   // Schedule data Table
   const [scheduled_bus, set_scheduled_bus] = useState([]);
-  console.log("Bus Data >>> ", scheduled_bus);
 
   // demographic count
   const [demographicCounts, setDemographicCounts] = useState([]);
@@ -85,7 +81,6 @@ export default function Dashboard_data() {
 
   const uniqueDatess = [...new Set(datess)];
 
-  console.log(demographicCounts, "demographicCounts");
 
   useEffect(() => {
     axios
@@ -117,13 +112,11 @@ export default function Dashboard_data() {
         },
       })
       .then((res) => {
-        console.log(res.data?.data.data);
         setRealTimeData(res.data?.data.data);
       })
       .catch((err) => {
         console.log(err);
       });
-
 
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/getConductorStatus`, {
@@ -132,7 +125,6 @@ export default function Dashboard_data() {
         },
       })
       .then((res) => {
-        console.log(res, "demographic");
         if (res.data?.data) {
           setConductorStatus(res.data?.data);
         }
@@ -155,13 +147,11 @@ export default function Dashboard_data() {
         }
       )
       .then((res) => {
-        console.log("Scheduled Bus >>>>>> ", res.data?.data.data);
         set_scheduled_bus(res.data?.data.data[0]);
       })
       .catch((err) => {
         console.log(err);
       });
-
 
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/passenger/day-wise`, {
@@ -170,7 +160,6 @@ export default function Dashboard_data() {
         },
       })
       .then((res) => {
-        console.log("Passenger Data >>> ", res.data);
         set_passenger_details(res.data?.data?.data[0].count);
       })
       .catch((err) => {
@@ -178,21 +167,15 @@ export default function Dashboard_data() {
       });
   }, []);
 
-
-
   useEffect(() => {
     //hourly real time data
     axios
-      .get(
-        `${process.env.REACT_APP_BASE_URL}/report/hourly-real-time`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .get(`${process.env.REACT_APP_BASE_URL}/report/hourly-real-time`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
-        console.log("hourly real time data", res.data?.data);
         if (res.data?.data) {
           setHourlyRealTimeData(res.data?.data);
         }
@@ -200,8 +183,7 @@ export default function Dashboard_data() {
       .catch((err) => {
         console.log(err);
       });
-  }, [timeIntervalTrigger])
-
+  }, [timeIntervalTrigger]);
 
   const chartOptions = {
     chart: {
@@ -217,44 +199,6 @@ export default function Dashboard_data() {
       show: true,
     },
   };
-
-  // const chartOptions = {
-  //   series: [
-  //     {
-  //       name: "Total Customer",
-  //       data: counts?.two_wheeler?.map((item) => item?.customer_count),
-  //     },
-  //     {
-  //       name: "Total Amount",
-  //       data: counts?.three_wheeler?.map((item) => item?.total_amount),
-  //     },
-  //   ],
-  //   options: {
-  //     chart: {
-  //       height: 350,
-  //       type: "bar",
-  //       zoom: {
-  //         enabled: true,
-  //       },
-  //     },
-  //     colors: ["#4A3AFF", "#C893FD"],
-  //     dataLabels: {
-  //       enabled: true,
-  //     },
-  //     stroke: {
-  //       curve: "smooth",
-  //     },
-  //     grid: {
-  //       row: {
-  //         colors: ["transparent"],
-  //         opacity: 0.5,
-  //       },
-  //     },
-  //     xaxis: {
-  //       categories: uniqueDatess,
-  //     },
-  //   },
-  // };
 
   const realTimeCollectionOptions = {
     chart: {
@@ -274,16 +218,14 @@ export default function Dashboard_data() {
     xaxis: {
       categories: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22],
     },
-    // legend: {
-    //   show: false,
-    // },
+  
     legend: {
       show: true,
-      position: 'bottom',
-      horizontalAlign: 'center',
+      position: "bottom",
+      horizontalAlign: "center",
       labels: {
-        useSeriesColors: true // Use the colors defined in the series
-      }
+        useSeriesColors: true, // Use the colors defined in the series
+      },
     },
     dataLabels: {
       enabled: false,
@@ -332,11 +274,11 @@ export default function Dashboard_data() {
     },
     legend: {
       show: true,
-      position: 'bottom',
-      horizontalAlign: 'center',
+      position: "bottom",
+      horizontalAlign: "center",
       labels: {
-        useSeriesColors: true // Use the colors defined in the series
-      }
+        useSeriesColors: true, // Use the colors defined in the series
+      },
     },
     dataLabels: {
       enabled: false,
@@ -446,6 +388,10 @@ export default function Dashboard_data() {
   const offset = 100 - (value % maxProgress) / (maxProgress / 100);
   const currentDate = formatDate(new Date());
 
+  const currentDateNew = new Date(currentDate);
+  const monthName = currentDateNew.toLocaleString("default", { month: "long" });
+  const year = currentDateNew.getFullYear();
+
   return (
     <div className="flex h-screen  w-full  overflow-x-auto ">
       <div className="flex flex-1 h-full flex-col ">
@@ -479,7 +425,7 @@ export default function Dashboard_data() {
                     />
                   </svg>
                 </i>
-                Statistics
+                Statistics of <span className="font-bold pl-1"> {monthName} {year}</span>
               </div>
               <div className={`flex`}>
                 <div className="w-full flex flex-col sm:flex-row justify-between ">
@@ -562,8 +508,8 @@ export default function Dashboard_data() {
                     scheduled_bus.absent_buses || 0,
                   ]}
                   type="donut"
-                  height={400} // Adjusted height for better visualization
-                  width={400} // Adjusted width for better visualization
+                  height={400} 
+                  width={400} 
                 />
               </div>
 
@@ -628,25 +574,12 @@ export default function Dashboard_data() {
                     Real time collection
                   </div>
                   <div className={`flex`}>
-                    {/* <div className="w-full flex flex-col sm:flex-row justify-between ">
-                      <div
-                        className={`w-full md:w-full  mr-4  flex flex-col items-center justify-center relative`}
-                      >
-                        <span className="text-[#095ea4] text-2xl font-bold">
-                          ₹{formatNumber(totalValue)}
-                        </span>
-                        <h4 className="text-center text-xs whitespace-nowrap">
-                          Total Amount
-                        </h4>
-                      </div>
-                    </div> */}
+                 
                     <div className="w-full flex flex-col sm:flex-row justify-between ">
                       <div
                         className={`w-full md:w-full  mr-4  flex flex-col items-center justify-center relative`}
                       >
-                        <span className="text-sm">
-                          {currentDate}
-                        </span>
+                        <span className="text-sm">{currentDate}</span>
                       </div>
                     </div>
                   </div>
@@ -687,44 +620,7 @@ export default function Dashboard_data() {
                 </div>
               </div>
 
-              {/* <div
-                className={`flex flex-1 flex-col justify-center items-center mt-10 `}
-              >
-                <div className="flex w-[15rem] h-[15rem]">
-                  <svg
-                    className="w-full h-full"
-                    viewBox="0 0 36 36"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="16"
-                      fill="none"
-                      className="stroke-current text-gray-200 dark:text-neutral-700"
-                      strokeWidth="4"
-                    ></circle>
-                    <g className="origin-center transform -rotate-90">
-                      <circle
-                        cx="18"
-                        cy="18"
-                        r="16"
-                        fill="none"
-                        className="stroke-current text-blue-600 dark:text-blue-500"
-                        strokeWidth="2"
-                        strokeDasharray="100"
-                        strokeDashoffset={offset}
-                      ></circle>
-                    </g>
-                  </svg>
-                  <div className="absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 ">
-                    <span className="flex flex-col flex-1 justify-center items-center text-center text-2xl font-bold text-gray-800 dark:text-white">
-                      <div className="flex">{formatNumber(value)}</div>
-                      <div className="flex text-sm ">Total Passenger Count</div>
-                    </span>
-                  </div>
-                </div>
-              </div> */}
+              
             </div>
           </div>
 

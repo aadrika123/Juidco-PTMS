@@ -31,7 +31,6 @@ const Header = ({ heading, set_hide, hide }) => {
         }
       )
       .then((response) => {
-        console.log(response.data, 'ulb');
         setUlbData(response.data)
       })
       .catch((error) => {

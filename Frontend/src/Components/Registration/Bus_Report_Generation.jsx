@@ -10,7 +10,6 @@ import axios from "axios";
 
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Button,
@@ -32,9 +31,7 @@ export default function Report_Generation() {
   });
   const navigate = useNavigate();
   const onSubmit = (values, { setSubmitting }) => {
-    // Handle form submission here
-    console.log("Values function started ");
-    console.log("Values >> ", values);
+
     setSubmitting(false);
     set_open_dialog(true);
   };
@@ -51,7 +48,7 @@ export default function Report_Generation() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }) // Replace with ygetAllBusListur actual API endpoint
+      }) 
       .then((response) => set_BusOptions(response.data.data?.data))
       .catch((error) => console.error("Error fetching conductor data:", error));
   }, []);
@@ -306,8 +303,8 @@ export default function Report_Generation() {
                   d="M3.39648 10.8436L7.70685 15.154L16.3276 5.91748"
                   stroke="white"
                   stroke-width="1.39091"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>

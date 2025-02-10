@@ -7,48 +7,39 @@ const Conductor_CashValidation = () => {
     const [isModalOpen, setIsModalOpen] = useState(true);
     const [amount, setAmount] = useState(null);
     const [conductorId, setConductorId] = useState('');
-    // const [busId, setBusId] = useState('');
     const [ulbId, setulbId] = useState('');
 
 
     useEffect(() => {
-        // Retrieve conductorId and ulbId from localStorage
         const storedConductorId = localStorage.getItem('conductorId');
         const storedUlbId = localStorage.getItem('ulbId');
-        const token = localStorage.getItem('token'); // Retrieve the token for authorization
+        const token = localStorage.getItem('token'); 
 
-        // Set state with the retrieved values
         setConductorId(storedConductorId || '');
         setulbId(storedUlbId || '');
 
-        // Get current date in YYYY-MM-DD format
         const currentDate = new Date().toISOString().split('T')[0];
 
-        // Construct API URL with base URL from environment variables
         const apiUrl = `${process.env.REACT_APP_BASE_URL}/report/total_amount?conductor_id=${storedConductorId}&date=${currentDate}`;
 
-        // Debugging: Log the API URL
-        console.log("API URL:", apiUrl);
-
-        // Fetch the amount if the modal is open
         if (isModalOpen) {
             axios.get(apiUrl, {
                 headers: {
-                    Authorization: `Bearer ${token}`, // Add Authorization header with Bearer token
+                    Authorization: `Bearer ${token}`, 
                 },
             })
                 .then(response => {
-                    // Debugging: Log the entire response
+                   
                     console.log("API Response:", response);
 
-                    // Set the fetched amount
+                   
                     setAmount(response.data.data.total_amount || 0);
                 })
                 .catch(error => {
                     console.error('Error fetching amount:', error);
                 });
         }
-    }, [isModalOpen]); // Ensure dependencies are correct
+    }, [isModalOpen]); 
 
 
     const handleCancel = () => {
@@ -57,28 +48,27 @@ const Conductor_CashValidation = () => {
     };
 
     const handleSubmit = () => {
-        // Check if conductorId and busId are available
+       
         if (!conductorId || !ulbId) {
             console.error('Conductor ID  or Ulb Id is missing from local storage.');
             return;
         }
 
-        // Prepare the payload with amount, conductorId, busId, and system date
+       
         const payload = {
             amount,
             conductorId,
-            // busId,
+            
             ulbId,
-            date: new Date().toISOString().split('T')[0], // Format the date as YYYY-MM-DD
+            date: new Date().toISOString().split('T')[0], 
         };
 
         axios.post(`${process.env.REACT_APP_BASE_URL}/report/daywise_data`, payload, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`, // Adding the Authorization header
+                Authorization: `Bearer ${localStorage.getItem('token')}`, 
             },
         })
             .then(response => {
-                console.log('Cash validation successful:', response);
                 window.alert('Cash validation successful!');
                 setIsModalOpen(false);
             })
@@ -94,7 +84,6 @@ const Conductor_CashValidation = () => {
         day: '2-digit',
     });
 
-    console.log(amount,"amount==")
 
     return (
         <>
@@ -133,7 +122,6 @@ const Conductor_CashValidation = () => {
                         <p className="text-sm md:text-base">Amount: {amount || 0}</p>
                         <p className="text-sm md:text-base">Date: {formattedDate}</p>
                         <p className="text-sm md:text-base">Conductor ID: {conductorId}</p> {/* Display Conductor ID */}
-                        {/* <p className="text-sm md:text-base">Bus ID: {busId}</p> Display Bus ID */}
                         <p className="text-sm md:text-base">ULB ID: {ulbId}</p> {/* Display Bus ID */}
 
 

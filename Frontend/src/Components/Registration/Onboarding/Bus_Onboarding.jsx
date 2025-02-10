@@ -68,7 +68,6 @@ const handle_Image_upload = async (
   const formData = new FormData();
   const MAX_SIZE = 2 * 1024 * 1024;
   formData.append("img", file);
-  console.log("File Size", file.size);
   if (file.size > MAX_SIZE) {
     console.error("Error: File size exceeds 2MB.");
     alert("Error: File size exceeds 2MB.");
@@ -98,7 +97,6 @@ export default function Bus_Onboarding() {
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
-  // console.log(location);
   const [openDialog, setOpenDialog] = React.useState(false); // State to control dialog
   const [opeen_error_dialog, set_opeen_error_dialog] = React.useState(false);
   const [uploadedFiles, setUploadedFiles] = React.useState({});
@@ -112,10 +110,7 @@ export default function Bus_Onboarding() {
   const [success, set_success] = React.useState({});
   const [error, set_error] = React.useState({});
 
-  // console.log(uploading, "uploading------------------>");
-
   const handle_logOut = () => {
-    console.log("Log out");
     Cookies.remove("accesstoken", { path: "/" });
     sessionStorage.clear();
     navigate("/");
@@ -154,12 +149,10 @@ export default function Bus_Onboarding() {
           }
         );
 
-        console.log("Response >>>>>> ", response);
 
         //
         if (response?.data?.status == "Error") {
-          console.log("Error Occured");
-          console.log("Client error occurred");
+         
           const responseData = response?.data?.message;
           set_loading(false);
           set_error(responseData);
@@ -173,7 +166,6 @@ export default function Bus_Onboarding() {
 
         /* if (typeof responseData === "string") {
           if (responseData.includes("Client error")) {
-            console.log("Client error occurred");
             set_loading(false);
             set_error(responseData);
             set_opeen_error_dialog(true);
@@ -572,8 +564,8 @@ export default function Bus_Onboarding() {
                   d="M3.39648 10.8436L7.70685 15.154L16.3276 5.91748"
                   stroke="white"
                   stroke-width="1.39091"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>
@@ -614,8 +606,8 @@ export default function Bus_Onboarding() {
                   d="M47.7261 13.0517L12.726 48.0517M12.7261 13.0517L47.7261 48.0517"
                   stroke="white"
                   stroke-width="3.75"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>

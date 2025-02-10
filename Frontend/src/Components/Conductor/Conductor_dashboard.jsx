@@ -15,11 +15,6 @@ export default function Conductor_dashboard() {
   const user_Details = Cookies.get("user_details");
   const token = Cookies.get("accesstoken");
   const [busData, set_busData] = useState(null);
-  console.log(busData);
-
-  /* const userDetailsObj = user_Details ? JSON.parse(user_Details) : null;
-  console.log(userDetailsObj);
-   */
 
   const userName = localStorage.getItem("conductorId");
 
@@ -43,13 +38,7 @@ export default function Conductor_dashboard() {
         .replace(/:/g, "")
         .slice(0, 4); // Format time as HHMM
 
-      console.log(
-        "Format Date >>> ",
-        formattedDate,
-        "Format Time >>>> ",
-        formattedTime
-      );
-
+    
       try {
         axios
           .post(
@@ -67,7 +56,6 @@ export default function Conductor_dashboard() {
             }
           )
           .then((e) => {
-            console.log("Scheduled Conductor", e);
             localStorage.setItem("BusID", e.data?.data?.data[0].bus_id);
             set_busData(e.data?.data?.data[0]);
           })
@@ -79,7 +67,6 @@ export default function Conductor_dashboard() {
       }
     }
   }, []);
-  console.log("bus data >>> ", busData?.bus_id);
 
   return (
     <div className="flex items-center justify-between h-screen w-screen">
@@ -202,7 +189,7 @@ export default function Conductor_dashboard() {
                       d="M8.32844 4.38874L7.8125 3.8728M9.70406 5.76437L9.36 5.42062M11.0797 7.1403L10.7359 6.79624M12.6275 8.6878L12.1116 8.17187"
                       stroke="white"
                       stroke-miterlimit="10"
-                      stroke-linecap="round"
+                      strokeLinecap="round"
                     />
                   </svg>
                 </button>

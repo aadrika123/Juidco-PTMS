@@ -4,5 +4,6 @@
 // const BackendUrl = 'http://192.168.0.240:86' // local server
 
 const BackendUrl = process.env.REACT_APP_AUTH_URL;
+// const BackendUrl = process.env.REACT_APP_BASE_URL;
 
 export default BackendUrl;

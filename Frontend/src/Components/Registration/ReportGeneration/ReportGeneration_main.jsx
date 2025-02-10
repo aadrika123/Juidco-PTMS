@@ -89,11 +89,7 @@ export default function ReportGeneration_main() {
     set_filterAllReport(!filterAllReport);
   }
 
-  // const abc = () => {
-  //   console.log(report_all)
-  // }
-
-  // console.log(conductor_details?.data, "==============>");
+ 
 
   conductor_details?.data.sort((a, b) => {
     const collectionA = a.receipt_data.total_bus_collection ?? 0; // Use 0 if null
@@ -147,7 +143,7 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          // console.log("Total >>>>>>  ", response.data.data);
+          
           set_total_collection(response.data.data);
         })
         .catch((error) => {
@@ -169,9 +165,7 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          console.log("Report data >>>", response.data);
           set_report(response.data.data);
-          console.log(response?.data?.data?.amounts);
           set_total_amount(response.data.data.result.amounts);
         })
         .catch((error) => {
@@ -195,7 +189,6 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          console.log("Bus Total >>>>>>  ", response.data.data);
           set_bus_total_collection(response.data.data);
         })
         .catch((error) => {
@@ -212,7 +205,6 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          console.log("Bus details", response.data.data);
           set_bus_details(response.data.data);
           setToalCount(Math.ceil(response?.data?.data?.count / 10));
           setIsLoading(false);
@@ -239,7 +231,6 @@ export default function ReportGeneration_main() {
           }
         )
         .then((response) => {
-          console.log(response.data);
           set_bus_report(response.data.data);
           set_total_amount(response.data.data.result.amounts);
         })
@@ -599,9 +590,7 @@ export default function ReportGeneration_main() {
           </div>
           <div className="flex flex-1 flex-col md:flex-row   ml-4 mr-4 mt-4 ">
             <div className={`flex flex-col gap-4 flex-1 m-4  p-8 `}>
-              {/* <button onClick={() => {
-                console.log('totaaaaa', conductor_details)
-              }}>abc</button> */}
+              
               {isLoading && (
                 <Box
                   sx={{
@@ -807,13 +796,13 @@ export default function ReportGeneration_main() {
                       <path
                         d="M11.4987 7.1875H6.70703C6.32578 7.1875 5.96015 7.33895 5.69057 7.60853C5.42098 7.87812 5.26953 8.24375 5.26953 8.625V16.2917C5.26953 16.6729 5.42098 17.0385 5.69057 17.3081C5.96015 17.5777 6.32578 17.7292 6.70703 17.7292H14.3737C14.7549 17.7292 15.1206 17.5777 15.3902 17.3081C15.6597 17.0385 15.8112 16.6729 15.8112 16.2917V11.5"
                         stroke="#fff"
-                        stroke-linecap="round"
+                        strokeLinecap="round"
                       />
                       <path
                         d="M11.9766 11.0208L18.0754 4.922M13.8932 4.3125H18.6849V9.10417"
                         stroke="#fff"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       />
                     </svg>
                   </div>
