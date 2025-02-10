@@ -218,6 +218,92 @@ export default class AccountsSummaryController {
 
   // Controller method to get all transactions with status 0 (Not Validated)
 
+  // getUnvalidatedTransactions = async (
+  //   req: Request,
+  //   res: Response
+  // ): Promise<void> => {
+  //   const resObj: resObj = {
+  //     apiId: "0504",
+  //     action: "GET",
+  //     version: "1.0",
+  //   };
+
+  //   try {
+  //     // Fetch transactions with statuses 0, 1, 2, and 3 from the DAO, filtered by today's date
+  //     const transactions =
+  //       await this.accountsSummaryDAO.getUnvalidatedTransactions([0, 1, 2, 3]);
+
+  //     // Get the current date
+  //     const currentDate = new Date().toISOString().split("T")[0];
+
+  //     // Group the transactions based on their status
+  //     const groupedData = {
+  //       Submitted_Cash: transactions
+  //         .filter((t) => t.status === 0)
+  //         .map((t) => ({
+  //           id: t.conductor_id,
+  //           date: t.date.toISOString().split("T")[0],
+  //           time: t.time,
+  //           amount: `₹${t.total_amount}`,
+  //           payee: t.conductor_name,
+  //           description: t.description, // Use the existing description from the database
+  //           referenceNumber: t.transaction_id,
+  //           status: t.status, // Include status
+  //           currentDate: currentDate, // Include current date
+  //         })),
+  //       Validated_Cash: transactions
+  //         .filter((t) => t.status === 1)
+  //         .map((t) => ({
+  //           id: t.conductor_id,
+  //           date: t.date.toISOString().split("T")[0],
+  //           time: t.time,
+  //           amount: `₹${t.total_amount}`,
+  //           payee: t.conductor_name,
+  //           description: t.description, // Use the existing description from the database
+  //           referenceNumber: t.transaction_id,
+  //           status: t.status, // Include status
+  //           currentDate: currentDate, // Include current date
+  //         })),
+  //       Disputed_Cash: transactions
+  //         .filter((t) => t.status === 2)
+  //         .map((t) => ({
+  //           id: t.conductor_id,
+  //           date: t.date.toISOString().split("T")[0],
+  //           time: t.time,
+  //           amount: `₹${t.total_amount}`,
+  //           payee: t.conductor_name,
+  //           description: t.description, // Use the existing description from the database
+  //           referenceNumber: t.transaction_id,
+  //           status: t.status, // Include status
+  //           currentDate: currentDate, // Include current date
+  //         })),
+  //       Suspense_Cash: transactions
+  //         .filter((t) => t.status === 3)
+  //         .map((t) => ({
+  //           id: t.conductor_id,
+  //           date: t.date.toISOString().split("T")[0],
+  //           time: t.time,
+  //           amount: `₹${t.total_amount}`,
+  //           payee: t.conductor_name,
+  //           description: t.description, // Use the existing description from the database
+  //           referenceNumber: t.transaction_id,
+  //           status: t.status, // Include status
+  //           currentDate: currentDate, // Include current date
+  //         })),
+  //     };
+
+  //     // Return the grouped transactions
+  //     CommonRes.SUCCESS(
+  //       "Transactions categorized by status successfully",
+  //       groupedData,
+  //       resObj,
+  //       res
+  //     );
+  //   } catch (error) {
+  //     CommonRes.SERVER_ERROR(error, resObj, res);
+  //   }
+  // };
+
   getUnvalidatedTransactions = async (
     req: Request,
     res: Response
@@ -229,9 +315,19 @@ export default class AccountsSummaryController {
     };
 
     try {
-      // Fetch transactions with statuses 0, 1, 2, and 3 from the DAO, filtered by today's date
-      const transactions =
-        await this.accountsSummaryDAO.getUnvalidatedTransactions([0, 1, 2, 3]);
+      const { conductor_id, startDate, endDate } = req.query;
+
+      // Convert date parameters to Date objects or undefined
+      const start: Date | undefined = startDate ? new Date(startDate as string) : undefined;
+      const end: Date | undefined = endDate ? new Date(endDate as string) : undefined;
+
+      // Fetch transactions with statuses 0, 1, 2, and 3 from the DAO, filtered by optional conductor_id and date range
+      const transactions = await this.accountsSummaryDAO.getUnvalidatedTransactions(
+        [0, 1, 2, 3],
+        conductor_id as string,
+        start,
+        end
+      );
 
       // Get the current date
       const currentDate = new Date().toISOString().split("T")[0];
@@ -246,10 +342,10 @@ export default class AccountsSummaryController {
             time: t.time,
             amount: `₹${t.total_amount}`,
             payee: t.conductor_name,
-            description: t.description, // Use the existing description from the database
+            description: t.description,
             referenceNumber: t.transaction_id,
-            status: t.status, // Include status
-            currentDate: currentDate, // Include current date
+            status: t.status,
+            currentDate: currentDate,
           })),
         Validated_Cash: transactions
           .filter((t) => t.status === 1)
@@ -259,10 +355,10 @@ export default class AccountsSummaryController {
             time: t.time,
             amount: `₹${t.total_amount}`,
             payee: t.conductor_name,
-            description: t.description, // Use the existing description from the database
+            description: t.description,
             referenceNumber: t.transaction_id,
-            status: t.status, // Include status
-            currentDate: currentDate, // Include current date
+            status: t.status,
+            currentDate: currentDate,
           })),
         Disputed_Cash: transactions
           .filter((t) => t.status === 2)
@@ -272,10 +368,10 @@ export default class AccountsSummaryController {
             time: t.time,
             amount: `₹${t.total_amount}`,
             payee: t.conductor_name,
-            description: t.description, // Use the existing description from the database
+            description: t.description,
             referenceNumber: t.transaction_id,
-            status: t.status, // Include status
-            currentDate: currentDate, // Include current date
+            status: t.status,
+            currentDate: currentDate,
           })),
         Suspense_Cash: transactions
           .filter((t) => t.status === 3)
@@ -285,10 +381,10 @@ export default class AccountsSummaryController {
             time: t.time,
             amount: `₹${t.total_amount}`,
             payee: t.conductor_name,
-            description: t.description, // Use the existing description from the database
+            description: t.description,
             referenceNumber: t.transaction_id,
-            status: t.status, // Include status
-            currentDate: currentDate, // Include current date
+            status: t.status,
+            currentDate: currentDate,
           })),
       };
 
@@ -302,7 +398,8 @@ export default class AccountsSummaryController {
     } catch (error) {
       CommonRes.SERVER_ERROR(error, resObj, res);
     }
-  };
+};
+
 
   getScheduledBusesAndConductors = async (
     req: Request,
@@ -510,6 +607,43 @@ export default class AccountsSummaryController {
     }
   };
 
+  // getAccountsByStatus = async (req: Request, res: Response): Promise<void> => {
+  //   const resObj: resObj = {
+  //     apiId: "0506",
+  //     action: "GET",
+  //     version: "1.0",
+  //   };
+
+  //   try {
+  //     // Extract status from query parameters
+  //     const { status } = req.query;
+
+  //     // If status is provided, convert it to an array of numbers; otherwise, default to [0, 1, 2, 3]
+  //     const statusArray = status
+  //       ? (Array.isArray(status) ? status : [status]).map(Number)
+  //       : [0, 1, 2, 3];
+
+  //     // Fetch accounts based on the given statuses
+  //     const accounts = await this.accountsSummaryDAO.getAccountsByStatus(
+  //       statusArray
+  //     );
+
+  //     // Return the response with the fetched data
+  //     CommonRes.SUCCESS(
+  //       "Accounts retrieved successfully by status",
+  //       accounts,
+  //       resObj,
+  //       res
+  //     );
+  //   } catch (error) {
+  //     CommonRes.SERVER_ERROR(error, resObj, res);
+  //   }
+  // };
+
+
+
+  // .....................................
+  
   getAccountsByStatus = async (req: Request, res: Response): Promise<void> => {
     const resObj: resObj = {
       apiId: "0506",
@@ -518,22 +652,29 @@ export default class AccountsSummaryController {
     };
 
     try {
-      // Extract status from query parameters
-      const { status } = req.query;
+      // Extract parameters from query
+      const { status, conductor_id, startDate, endDate } = req.query;
 
-      // If status is provided, convert it to an array of numbers; otherwise, default to [0, 1, 2, 3]
+      // Convert status to an array of numbers or default to [0, 1, 2, 3]
       const statusArray = status
         ? (Array.isArray(status) ? status : [status]).map(Number)
         : [0, 1, 2, 3];
 
-      // Fetch accounts based on the given statuses
+      // Convert date parameters to Date objects or undefined
+      const start: Date | undefined = startDate ? new Date(startDate as string) : undefined;
+      const end: Date | undefined = endDate ? new Date(endDate as string) : undefined;
+
+      // Fetch accounts based on status, conductor_id, and date range
       const accounts = await this.accountsSummaryDAO.getAccountsByStatus(
-        statusArray
+        statusArray,
+        conductor_id as string,
+        start,
+        end
       );
 
       // Return the response with the fetched data
       CommonRes.SUCCESS(
-        "Accounts retrieved successfully by status",
+        "Accounts retrieved successfully by status, conductor_id, and date range",
         accounts,
         resObj,
         res
@@ -541,11 +682,9 @@ export default class AccountsSummaryController {
     } catch (error) {
       CommonRes.SERVER_ERROR(error, resObj, res);
     }
-  };
+};
 
-
-
-  // .....................................
+  
   getTotalAmountByConductorId_currentDate = async (
     req: Request,
     res: Response

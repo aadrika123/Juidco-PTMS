@@ -138,20 +138,53 @@ export default class AccountsSummaryDAO {
   //     });
   // }
 
-  async getUnvalidatedTransactions(statuses: number[]): Promise<any[]> {
-    const today = new Date();
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Start of today
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999)); // End of today
+  // async getUnvalidatedTransactions(statuses: number[]): Promise<any[]> {
+  //   const today = new Date();
+  //   const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Start of today
+  //   const endOfDay = new Date(today.setHours(23, 59, 59, 999)); // End of today
 
+  //   return prisma.accounts_summary.findMany({
+  //     where: {
+  //       status: {
+  //         in: statuses, // Get transactions where status is in the array [0, 1, 2, 3]
+  //       },
+  //       date: {
+  //         gte: startOfDay,
+  //         lte: endOfDay,
+  //       },
+  //     },
+  //     select: {
+  //       conductor_id: true,
+  //       date: true,
+  //       time: true,
+  //       total_amount: true,
+  //       conductor_name: true,
+  //       description: true,
+  //       transaction_id: true,
+  //       status: true,
+  //     },
+  //   });
+  // }
+
+
+  async getUnvalidatedTransactions(
+    statuses: number[],
+    conductor_id?: string,
+    startDate?: Date,
+    endDate?: Date
+): Promise<any[]> {
     return prisma.accounts_summary.findMany({
       where: {
         status: {
-          in: statuses, // Get transactions where status is in the array [0, 1, 2, 3]
+          in: statuses,
         },
-        date: {
-          gte: startOfDay,
-          lte: endOfDay,
-        },
+        ...(conductor_id && { conductor_id }),
+        ...(startDate && endDate && {
+          date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        }),
       },
       select: {
         conductor_id: true,
@@ -164,7 +197,8 @@ export default class AccountsSummaryDAO {
         status: true,
       },
     });
-  }
+}
+
 
   // DAO method to get scheduled buses and conductors for a specific date
   async getScheduledBusesAndConductors(date: Date): Promise<any[]> {
@@ -255,15 +289,36 @@ export default class AccountsSummaryDAO {
     }
   }
 
-  async getAccountsByStatus(statuses: number[]): Promise<any[]> {
+  // async getAccountsByStatus(statuses: number[]): Promise<any[]> {
+  //   return prisma.accounts_summary.findMany({
+  //     where: {
+  //       status: {
+  //         in: statuses, // Filter by multiple statuses
+  //       },
+  //     },
+  //   });
+  // }
+
+  async getAccountsByStatus(
+    statuses: number[],
+    conductor_id?: string,
+    startDate?: Date,
+    endDate?: Date
+): Promise<any[]> {
     return prisma.accounts_summary.findMany({
       where: {
-        status: {
-          in: statuses, // Filter by multiple statuses
-        },
+        status: { in: statuses },
+        ...(conductor_id && { conductor_id }),
+        ...(startDate && endDate && {
+          date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        }),
       },
     });
-  }
+}
+
 
 //   ..................................................
   async getTotalAmountScheduleConductor(): Promise<{
