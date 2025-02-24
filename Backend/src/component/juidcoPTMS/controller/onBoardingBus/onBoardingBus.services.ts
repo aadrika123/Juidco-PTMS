@@ -104,6 +104,7 @@ export default class OnBoardingBusServices {
 
       return CommonRes.SUCCESS("Successfully added the bus", data, resObj, res);
     } catch (err) {
+      console.log(err)
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
@@ -157,4 +158,81 @@ export default class OnBoardingBusServices {
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
+
+  getBusImage = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.busOnboarding.getBusImage(req);
+
+      if (!data) {
+        return CommonRes.NOT_FOUND("Data Not Found", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS(
+        "Successfully fetched",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
+  updateBusDetailsV2 = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.busOnboarding.updateBusDetailsV2(req);
+
+      if (!data) {
+        return CommonRes.NOT_FOUND("Update failed", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS(
+        "Successfully updated",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
+  getBusById = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const { id } = req.params
+      const data = await this.busOnboarding.getBusById(Number(id));
+
+      if (!data) {
+        return CommonRes.NOT_FOUND("Vehicle Not Found", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS(
+        "Successfully fetched the bus",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
 }

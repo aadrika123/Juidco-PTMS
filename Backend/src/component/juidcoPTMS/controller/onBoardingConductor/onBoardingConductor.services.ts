@@ -92,6 +92,7 @@ export default class OnBoardingConductorServices {
         res
       );
     } catch (err) {
+      console.log(err)
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
@@ -104,7 +105,7 @@ export default class OnBoardingConductorServices {
     };
 
     try {
-      const data = await this.constructorOnboarding.getConductorStatus();
+      const data = await this.constructorOnboarding.getConductorStatus(req);
 
       if (!data) {
         return CommonRes.NOT_FOUND("Conductor Not Found", data, resObj, res);
@@ -140,4 +141,81 @@ export default class OnBoardingConductorServices {
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
+
+  getConductorImage = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.constructorOnboarding.getConductorImage(req);
+
+      if (!data) {
+        return CommonRes.NOT_FOUND("Data Not Found", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS(
+        "Successfully fetched",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
+  getConductorById = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const { id } = req.params
+      const data = await this.constructorOnboarding.getConductorById(Number(id));
+
+      if (!data) {
+        return CommonRes.NOT_FOUND("Vehicle Not Found", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS(
+        "Successfully fetched the bus",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
+  updateConductorDetails = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.constructorOnboarding.updateConductorDetails(req);
+
+      if (!data) {
+        return CommonRes.NOT_FOUND("Conductor Not Found", data, resObj, res);
+      }
+
+      return CommonRes.SUCCESS(
+        "Successfully updated the Conductor details",
+        data,
+        resObj,
+        res
+      );
+    } catch (err) {
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
 }

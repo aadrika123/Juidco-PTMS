@@ -14,7 +14,7 @@ app.use(cors());
 // in latest body-parser use like below.
 app.use(express.urlencoded({ extended: true }));
 
-//connecting db
+// connecting db
 // client.connect((err: any) => {
 //   if (err) {
 //     console.log("connection error", err);
@@ -25,5 +25,6 @@ app.use(express.urlencoded({ extended: true }));
 
 /// JUIDCO_PTMS ///
 new PtmsRoute(app);
+
 
 export default app;

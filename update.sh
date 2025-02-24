@@ -1,6 +1,6 @@
 #!/bin/sh
 SERVER_PORT=6001
-DB_PASSWORD="Perfect%40%23%40%23%23%29%40%3F"
+DB_PASSWORD="Secure@2023%3F"
 
 installModules () {
     echo "Installing backend node modules ..."
