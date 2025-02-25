@@ -1,4 +1,14 @@
-import React from "react";
+import React from 'react';
+  
+  const App = () =>  {
+	return (
+	  <div>
+	  </div>
+	);
+  }
+  
+  export default App;
+  import React from "react";
 import Main from "./Components/Main";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Recipt from "./Components/Recipt";

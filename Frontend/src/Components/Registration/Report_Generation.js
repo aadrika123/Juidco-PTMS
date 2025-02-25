@@ -1,4 +1,14 @@
-import React from "react";
+import React from 'react';
+  
+  const Report_Generation = () =>  {
+	return (
+	  <div>
+	  </div>
+	);
+  }
+  
+  export default Report_Generation;
+  import React from "react";
 import background_image from "../../assets/background_image.png";
 import RMC_logo from "../../assets/RMC_LOGO.png";
 import bus from "../../assets/bus 1.png";

@@ -1,4 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+  
+  const Recipt = () =>  {
+	return (
+	  <div>
+	  </div>
+	);
+  }
+  
+  export default Recipt;
+  import React, { useState, useEffect } from 'react';
 import RMC_logo from '../assets/Recipt_RMC_LOGO.png';
 import bus from '../assets/bus 1_recipt.png';
 import { useLocation } from 'react-router-dom';
