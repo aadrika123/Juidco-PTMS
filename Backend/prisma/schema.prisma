@@ -18,11 +18,11 @@ model bus_master {
   registrationCert_doc Json
   status               String? @default("Not Scheduled")// ---> scheduled || not_scheduled
 
-  schedules scheduler[]
-  receipts  receipts[]
+  // schedules scheduler[]
+  // receipts  receipts[]
 
   created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  updated_at DateTime? @updatedAt @map("updated_at")
 }
 
 model conductor_master {
@@ -37,11 +37,11 @@ model conductor_master {
   email_id         String @unique
   cunique_id       String @unique
   adhar_doc        Json
-  adhar_no         String @unique
+  adhar_no         String 
   fitness_doc      Json
 
-  schedules scheduler[]
-  receipts  receipts[]
+  // schedules scheduler[]
+  // receipts  receipts[]
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
@@ -51,10 +51,10 @@ model scheduler {
   id Int @id @default(autoincrement())
 
   conductor_id String
-  conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
+  // conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
 
   bus_id    String
-  bus       bus_master @relation(fields: [bus_id], references: [register_no])
+  // bus       bus_master @relation(fields: [bus_id], references: [register_no])
   date      DateTime
   from_time Int
   to_time   Int
@@ -67,10 +67,10 @@ model receipts {
   id Int @id @default(autoincrement())
 
   conductor_id String
-  conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
+  // conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
 
   bus_id String
-  bus    bus_master @relation(fields: [bus_id], references: [register_no])
+  // bus    bus_master @relation(fields: [bus_id], references: [register_no])
 
   receipt_no String   @unique
   amount     Int
