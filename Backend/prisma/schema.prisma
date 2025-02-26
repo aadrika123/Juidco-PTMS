@@ -74,7 +74,7 @@ model receipts {
 
   bus_id       String
   bus          bus_master @relation(fields: [bus_id], references: [register_no])
-  receipt_no   String     @unique
+  receipt_no   String     
   amount       Int
   date         DateTime   @db.Date
   time         String
