@@ -40,8 +40,8 @@ model conductor_master {
   adhar_no         String  @unique
   fitness_doc      Json
 
-  schedules  scheduler[]
-  receipts   receipts[]
+  // schedules  scheduler[]
+  // receipts   receipts[]
   ulb_id     Int         @default(2)
   created_at DateTime    @default(now()) @map("created_at")
   updated_at DateTime    @updatedAt @map("updated_at")
@@ -51,7 +51,7 @@ model scheduler {
   id Int @id @default(autoincrement())
 
   conductor_id String
-  conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
+  // conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
 
   bus_id     String
   bus        bus_master @relation(fields: [bus_id], references: [register_no])
@@ -67,14 +67,14 @@ model receipts {
   id Int @id @default(autoincrement())
 
   conductor_id String
-  conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
+  // conductor    conductor_master @relation(fields: [conductor_id], references: [cunique_id])
 
   transaction_id String?
   transaction    accounts_summary? @relation(fields: [transaction_id], references: [transaction_id])
 
   bus_id       String
   bus          bus_master @relation(fields: [bus_id], references: [register_no])
-  receipt_no   String     
+  receipt_no   String     @unique
   amount       Int
   date         DateTime   @db.Date
   time         String
