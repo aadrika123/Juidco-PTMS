@@ -69,10 +69,14 @@ class ReceiptDao {
     });
   
     // Extract number from last receipt_no and increment
-    let newReceiptNo = "T00632676"; // Default value if no previous records exist
+    let newReceiptNo = "T000000001"; // Default value if no previous records exist
     if (lastReceipt?.receipt_no) {
       const lastNumber = parseInt(lastReceipt.receipt_no.replace("T", ""), 10);
-      newReceiptNo = `T${lastNumber + 1}`;
+      const incrementedNumber = lastNumber + 1;
+  
+      // Ensure minimum 9 characters and maximum 14 characters
+      const paddedNumber = incrementedNumber.toString().padStart(8, "0"); // Ensures at least 9 chars including "T"
+      newReceiptNo = `T${paddedNumber}`.slice(0, 14); // Ensures max 14 chars
     }
   
     console.log("Generated receipt_no:", newReceiptNo);
@@ -94,9 +98,9 @@ class ReceiptDao {
   
     return generateRes(data);
   };
+  
+  
 
-  
-  
 
   // ======================== GET RECEIPTS =========================================//
   get = async (req: Request) => {
