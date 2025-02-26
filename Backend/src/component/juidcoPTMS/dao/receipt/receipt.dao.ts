@@ -13,20 +13,6 @@ class ReceiptDao {
     console.log(req.body.data, "req.body.data");
 
 
-    // Check if receipt_no is unique
-    const existingReceipt = await prisma.receipts.findUnique({
-      where: { receipt_no: req.body.data.receipt_no },
-  });
-
-  if (existingReceipt) {
-      return generateRes({
-          status: false,
-          message: "Receipt number already exists, please use a unique receipt number.",
-      });
-  }
-
-  
-
     // const time = Number(req.body.data.time);
     //const date = new Date(`${req.body.data.date}T10:19:58.523Z`);
     const date = new Date(req.body.data.date);
@@ -39,7 +25,6 @@ class ReceiptDao {
     // console.log(scheduleRecord, "rec");
 
     // if (scheduleRecord.length <= 0) return;
-
 
     const data = await prisma.receipts.create({
       data: {
