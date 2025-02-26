@@ -16,6 +16,7 @@ class ReceiptDao {
     // const time = Number(req.body.data.time);
     //const date = new Date(`${req.body.data.date}T10:19:58.523Z`);
     const date = new Date(req.body.data.date);
+    console.log("date",date)
 
     // const scheduleRecord = await prisma.$queryRawUnsafe<any[]>(`
     // select * from scheduler where conductor_id=${req.body.data.conductor_id}
@@ -25,6 +26,7 @@ class ReceiptDao {
     // console.log(scheduleRecord, "rec");
 
     // if (scheduleRecord.length <= 0) return;
+    console.log("line number 29",req.body.data)
 
     const data = await prisma.receipts.create({
       data: {
@@ -42,10 +44,14 @@ class ReceiptDao {
     console.log(data, "after creating");
 
     const receipt_no = generateReceiptNumber(data.id);
+    console.log("receipt_no",receipt_no)
+    console.log("receipt_no",data.id)
+    console.log("receipt_noreceipt_no",receipt_no)
     const dataWithReceiptNo = await prisma.receipts.update({
       where: { id: data.id },
       data: { receipt_no },
     });
+    console.log("dataWithReceiptNodataWithReceiptNo",dataWithReceiptNo)
 
     return generateRes(dataWithReceiptNo);
   };
