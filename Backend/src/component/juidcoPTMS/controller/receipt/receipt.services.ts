@@ -54,7 +54,7 @@ class ReceiptServices {
 
     try {
       const setTime = req.body.data.time.replace(":", "").padStart(4, "0");
-      req.body.data.receipt_no = "123445";
+      // req.body.data.receipt_no = "123445";
       // req.body.data.date = new Date();
       req.body.data.time = setTime;
       // const receipt_No =
