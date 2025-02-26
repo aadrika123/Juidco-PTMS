@@ -7,54 +7,96 @@ const prisma = new PrismaClient();
 
 export const genrateDate = () => { };
 class ReceiptDao {
+  // post = async (req: Request) => {
+  //   const { ulb_id } = req.body.auth
+  //   console.log("before creating");
+  //   console.log(req.body.data, "req.body.data");
+
+
+  //   // const time = Number(req.body.data.time);
+  //   //const date = new Date(`${req.body.data.date}T10:19:58.523Z`);
+  //   const date = new Date(req.body.data.date);
+
+  //   // const scheduleRecord = await prisma.$queryRawUnsafe<any[]>(`
+  //   // select * from scheduler where conductor_id=${req.body.data.conductor_id}
+  //   // and from_time <= ${time} and to_time>= ${time}
+  //   // and date::date = '${req.body.data.date}'`);
+
+  //   // console.log(scheduleRecord, "rec");
+
+  //   // if (scheduleRecord.length <= 0) return;
+
+  //   const data = await prisma.receipts.create({
+  //     data: {
+  //       amount: req.body.data.amount,
+  //       bus_id: req.body.data.bus_id,
+  //       // bus: { connect: { register_no: scheduleRecord[0].bus_id } },
+  //       date: date,
+  //       conductor_id: req.body.data.conductor_id,
+  //       time: req.body.data.time,
+  //       receipt_no: req.body.data.receipt_no,
+  //       ulb_id: ulb_id
+  //       // conductor: { connect: { cunique_id: req.body.data.conductor_id } },
+  //     },
+  //   });
+  //   console.log(data, "after creating");
+
+  //   const receipt_no = generateReceiptNumber(data.id);
+  //   const dataWithReceiptNo = await prisma.receipts.update({
+  //     where: { id: data.id },
+  //     data: { receipt_no },
+  //   });
+
+  //   return generateRes(dataWithReceiptNo);
+  // };
+
+
+
+  
+
   post = async (req: Request) => {
-    const { ulb_id } = req.body.auth
-    console.log("before creating");
-    console.log(req.body.data, "req.body.data");
-
-
-    // const time = Number(req.body.data.time);
-    //const date = new Date(`${req.body.data.date}T10:19:58.523Z`);
-    const date = new Date(req.body.data.date);
-    console.log("date",date)
-
-    // const scheduleRecord = await prisma.$queryRawUnsafe<any[]>(`
-    // select * from scheduler where conductor_id=${req.body.data.conductor_id}
-    // and from_time <= ${time} and to_time>= ${time}
-    // and date::date = '${req.body.data.date}'`);
-
-    // console.log(scheduleRecord, "rec");
-
-    // if (scheduleRecord.length <= 0) return;
-    console.log("line number 29",req.body.data)
-
+    const { ulb_id } = req.body.auth;
+    console.log("Before creating");
+  
+    const { amount, bus_id, conductor_id, date, time } = req.body.data;
+    const formattedDate = new Date(date);
+    console.log("Formatted date:", formattedDate);
+  
+    // Fetch the last inserted receipt to get the last receipt_no
+    const lastReceipt = await prisma.receipts.findFirst({
+      orderBy: { id: "desc" }, // Get the latest receipt
+      select: { receipt_no: true }
+    });
+  
+    // Extract number from last receipt_no and increment
+    let newReceiptNo = "T00632676"; // Default value if no previous records exist
+    if (lastReceipt?.receipt_no) {
+      const lastNumber = parseInt(lastReceipt.receipt_no.replace("T", ""), 10);
+      newReceiptNo = `T${lastNumber + 1}`;
+    }
+  
+    console.log("Generated receipt_no:", newReceiptNo);
+  
+    // Create receipt with the new receipt_no
     const data = await prisma.receipts.create({
       data: {
-        amount: req.body.data.amount,
-        bus_id: req.body.data.bus_id,
-        // bus: { connect: { register_no: scheduleRecord[0].bus_id } },
-        date: date,
-        conductor_id: req.body.data.conductor_id,
-        time: req.body.data.time,
-        receipt_no: req.body.data.receipt_no,
-        ulb_id: ulb_id
-        // conductor: { connect: { cunique_id: req.body.data.conductor_id } },
-      },
+        amount,
+        bus_id,
+        date: formattedDate,
+        conductor_id,
+        time,
+        receipt_no: newReceiptNo, // Directly inserting incremented value
+        ulb_id
+      }
     });
-    console.log(data, "after creating");
-
-    const receipt_no = generateReceiptNumber(data.id);
-    console.log("receipt_no",receipt_no)
-    console.log("receipt_no",data.id)
-    console.log("receipt_noreceipt_no",receipt_no)
-    const dataWithReceiptNo = await prisma.receipts.update({
-      where: { id: data.id },
-      data: { receipt_no },
-    });
-    console.log("dataWithReceiptNodataWithReceiptNo",dataWithReceiptNo)
-
-    return generateRes(dataWithReceiptNo);
+  
+    console.log("Receipt created:", data);
+  
+    return generateRes(data);
   };
+
+  
+  
 
   // ======================== GET RECEIPTS =========================================//
   get = async (req: Request) => {
