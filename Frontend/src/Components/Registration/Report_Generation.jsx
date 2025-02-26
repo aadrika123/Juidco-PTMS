@@ -15,8 +15,10 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import Cookies from "js-cookie";
 
 export default function Report_Generation() {
+  const token = Cookies.get("accesstoken");
   const initialValues = {
     Conductor_Information: "",
     Date: "",
@@ -27,8 +29,8 @@ export default function Report_Generation() {
     Conductor_Information: Yup.string().required(
       "Conductor Information is required"
     ),
-    Date: Yup.string().required("Date is required"),
-    Month: Yup.string().required("Time is required"),
+    Date: Yup.string(),
+    Month: Yup.string(),
   });
   const navigate = useNavigate();
   const [loading, set_loading] = React.useState(false);
@@ -39,30 +41,49 @@ export default function Report_Generation() {
   const [openDialog, setOpenDialog] = React.useState(false); // State to control dialog
 
   const onSubmit = async (values, { setSubmitting }) => {
-    // Handle form submission here
-    console.log("Values function started ");
-    console.log("Values >> ", values);
+
     set_loading(true);
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/report/conductor-daywise`,
-        {
-          currentDate: values?.Date,
-          conductor_id: values?.Conductor_Information,
-        }
-      );
+
+    if (!values.Date && !values.Month) {
+      window.alert("Please select Date and Month");
       set_loading(false);
-      console.log(response.data.data);
-      set_report(response.data.data);
-      setOpenDialog(true);
-    } catch (error) {
+      window.location.reload();
+      return;
+    } else if (values.Date && values.Month) {
+      window.alert("Both Date and Month cannot be selected");
       set_loading(false);
-      set_Error(error.response.data);
-      set_openError(true);
+      window.location.reload();
+      return;
+    } else if (values.Date) {
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_BASE_URL}/report/conductor-daywise`,
+          {
+            currentDate: values?.Date,
+            conductor_id: values?.Conductor_Information,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        set_loading(false);
+        set_report(response.data.data);
+        setOpenDialog(true);
+      } catch (error) {
+        set_loading(false);
+        set_Error(error.response.data);
+        set_openError(true);
+      }
+    } else if (values.Month) {
+      window.alert("Please Wait... Under Development");
+      set_loading(false);
+      window.location.reload();
+      return;
     }
   };
 
-  console.log("Daily Report", report);
   const [ConductorOptions, setConductorOptions] = React.useState([]);
   const [conductor_details, set_conductor_details] = React.useState({
     name: "",
@@ -72,8 +93,15 @@ export default function Report_Generation() {
   useEffect(() => {
     // Fetch conductor information
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllConductorsList`) // Replace with your actual API endpoint
-      .then((response) => setConductorOptions(response.data.data))
+      .get(
+        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=10&page=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      ) // Replace with your actual API endpoint
+      .then((response) => setConductorOptions(response.data?.data?.data))
       .catch((error) => console.error("Error fetching conductor data:", error));
   }, []);
 
@@ -179,15 +207,15 @@ export default function Report_Generation() {
                                 "Conductor_Information",
                                 selectedValue
                               );
-                              if (selectedValue !== "") {
+                              if (selectedValue !== null) {
                                 const selectedConductor = ConductorOptions.find(
                                   (conductor) =>
-                                    conductor.cUniqueId === selectedValue
+                                    conductor.cunique_id == selectedValue
                                 );
                                 set_conductor_details({
-                                  name: `${selectedConductor.firstName} ${selectedConductor.lastName}`,
+                                  name: `${selectedConductor.first_name} ${selectedConductor.last_name}`,
                                   Age: selectedConductor.age,
-                                  Contact_Number: selectedConductor.mobileNo,
+                                  Contact_Number: selectedConductor.mobile_no,
                                 });
                               } else {
                                 set_conductor_details({
@@ -204,9 +232,9 @@ export default function Report_Generation() {
                             {ConductorOptions.map((conductor) => (
                               <option
                                 key={conductor.id}
-                                value={conductor.cUniqueId}
+                                value={conductor.cunique_id}
                               >
-                                {`${conductor.firstName} - ${conductor.cUniqueId}`}
+                                {`${conductor.first_name} - ${conductor.cunique_id}`}
                               </option>
                             ))}
                           </Field>
@@ -334,8 +362,8 @@ export default function Report_Generation() {
                   d="M3.39648 10.8436L7.70685 15.154L16.3276 5.91748"
                   stroke="white"
                   stroke-width="1.39091"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>
@@ -346,7 +374,7 @@ export default function Report_Generation() {
               onClick={() => {
                 navigate("/Conductor_report_page", {
                   state: {
-                    report: report,
+                    report: report.data,
                   },
                 });
               }}
@@ -379,8 +407,8 @@ export default function Report_Generation() {
                   d="M47.7261 13.0517L12.726 48.0517M12.7261 13.0517L47.7261 48.0517"
                   stroke="white"
                   stroke-width="3.75"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>

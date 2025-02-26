@@ -57,8 +57,8 @@ const CommonRes = Object.freeze({
     data: unknown,
     resObj: resObj,
     res: Response
-  ): Promise<object> => {
-    return sendResponse(
+  ): void => {
+    sendResponse(
       true,
       message,
       data,
@@ -103,6 +103,10 @@ const CommonRes = Object.freeze({
       resObj.version,
       res
     );
+  },
+
+  BAD_REQUEST: async (message: string, resObj: any, res: Response) => {
+    res.status(400).json({ message, resObj });
   },
 
   DEFAULT: "The underlying {kind} for model {model} does not exist.",

@@ -23,7 +23,7 @@ type TQuery = [
 export default class ConductorGenerateReportServices {
   public prisma = new PrismaClient();
 
-  constructor() {}
+  constructor() { }
 
   getDayCollection = async (req: Request, res: Response, apiId: string) => {
     const resObj: resObj = {
@@ -35,6 +35,7 @@ export default class ConductorGenerateReportServices {
     try {
       const { currentDate, conductor_id } = req.body;
       const intConductorId = parseInt(conductor_id);
+      const { ulb_id } = req.body.auth
 
       //validation
       await ConductorReportValidationSchema.validate(req.body);
@@ -56,12 +57,13 @@ export default class ConductorGenerateReportServices {
         FROM receipts r 
         WHERE r.conductor_id = ${intConductorId}
         AND r.date::date = ${setDate}::date
+        AND r.ulb_id = ${ulb_id}
         GROUP BY r.bus_id) rr
         
         left join 
         
         (select * from scheduler s
-        where s.date::date = ${setDate}::date and s.conductor_id = ${intConductorId}) ss 
+        where s.ulb_id=${ulb_id} and s.date::date = ${setDate}::date and s.conductor_id = ${intConductorId}) ss 
         
         on rr.bus_id = ss.bus_id);
      `;
@@ -116,6 +118,7 @@ export default class ConductorGenerateReportServices {
 
     try {
       const { time, conductor_id } = req.body;
+      const { ulb_id } = req.body.auth
 
       //validation
       await ConductorReportMonthlyValidationSchema.validate(req.body);
@@ -133,9 +136,11 @@ export default class ConductorGenerateReportServices {
       const query: TQuery = await this.prisma.$queryRaw`SELECT *
         from 
         receipts
-        where conductor_id = ${Number(
-          conductor_id
-        )} and EXTRACT(MONTH FROM date) = ${Number(
+        where 
+        ulb_id=${ulb_id} and
+        conductor_id = ${Number(
+        conductor_id
+      )} and EXTRACT(MONTH FROM date) = ${Number(
         onlyMonth
       )} and EXTRACT(YEAR FROM date) = ${Number(onlyYear)}
         `;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 import background_image from "../../assets/background_image_2.png";
@@ -6,6 +6,7 @@ import RMC_logo from "../../assets/RMC_LOGO.png";
 import bus from "../../assets/bus 1.png";
 import bus1 from "../../assets/bus-2.png";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+//import { TimePicker } from "@material-ui/pickers";
 
 import { useNavigate } from "react-router-dom";
 import {
@@ -17,6 +18,7 @@ import {
 } from "@mui/material";
 
 import * as Yup from "yup";
+import Scheduled_Table from "../Tables/Scheduled_Table";
 const initialValues = {
   Bus_information: "",
   Conductor_Information: "",
@@ -24,6 +26,7 @@ const initialValues = {
   In_Time: "",
   Out_Time: "",
 };
+import Cookies from "js-cookie";
 
 const validationSchema = Yup.object({
   Bus_information: Yup.string().required("Bus information is required"),
@@ -35,6 +38,8 @@ const validationSchema = Yup.object({
   Out_Time: Yup.string().required("Out Time is required"),
 });
 export default function ChangeScheduling() {
+  const token = Cookies.get("accesstoken");
+
   const [openDialog, setOpenDialog] = React.useState(false); // State to control success dialog
   const [openConfirmationDialog, setOpenConfirmationDialog] =
     React.useState(false); // State to control confirmation dialog
@@ -46,6 +51,7 @@ export default function ChangeScheduling() {
   const [success, set_success] = React.useState({});
   const [OpenError, set_openError] = React.useState(false);
   const [Error, set_Error] = React.useState({});
+  const [scheID, setScheID] = useState(null);
 
   const navigate = useNavigate();
 
@@ -54,10 +60,29 @@ export default function ChangeScheduling() {
     setOpenConfirmationDialog(true);
     setSubmitting(false);
   };
+  useEffect(() => {
+    const id = sessionStorage.getItem("id");
+    setScheID(id);
+  }, [Error]);
+
+
+  function generateTimeOptions(intervalMinutes) {
+    const timeOptions = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += intervalMinutes) {
+        const hourString = hour.toString().padStart(2, "0");
+        const minuteString = minute.toString().padStart(2, "0");
+        timeOptions.push(`${hourString}:${minuteString}`);
+      }
+    }
+    return timeOptions;
+  }
+
+  const timeOptions = generateTimeOptions(15);
 
   const handleConfirmation = async () => {
     set_loading(true);
-    console.log(Form_values);
+
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/schedule/create-new-schedule`,
@@ -67,24 +92,38 @@ export default function ChangeScheduling() {
           date: Form_values?.Date,
           from_time: Form_values?.In_Time,
           to_time: Form_values?.Out_Time,
+          is_scheduled: "Scheduled",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
+
+      if (response.data.message === false) {
+        if (scheID === null || scheID === "undefined") {
+          sessionStorage.setItem("id", response?.data?.data?.data?.id);
+        }
+        set_Error(response.data?.data?.data);
+        set_openError(true);
+      } else {
+        setOpenDialog(true);
+        set_success(response.data?.data);
+        sessionStorage.clear("id");
+        setScheID(null);
+        navigate("/ChangeScheduling-Main");
+      }
       set_loading(false);
-      console.log(response);
-      set_success(response.data?.data);
-      setOpenDialog(true);
     } catch (error) {
       set_loading(false);
-      set_Error(error.response.data);
-      set_openError(true);
     }
     setOpenConfirmationDialog(false);
   };
 
-  const Update_Schedule = async () => {
-    console.log("Updated Schedule button clicked");
+  const Update_Schedule = async (id) => {
     try {
-      const response = await axios.put(
+      const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/schedule/update-schedule`,
         {
           bus_no: Form_values?.Bus_information,
@@ -92,11 +131,22 @@ export default function ChangeScheduling() {
           date: Form_values?.Date,
           from_time: Form_values?.In_Time,
           to_time: Form_values?.Out_Time,
+          id: scheID,
+          is_scheduled: "Scheduled",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       set_openError(false);
       set_success(response.data?.data);
       setOpenDialog(true);
+
+      sessionStorage.clear("id");
+      setScheID(null);
+       navigate("/ChangeScheduling-Main");
     } catch (error) {
       set_loading(false);
       set_Error(error.response.data);
@@ -107,86 +157,33 @@ export default function ChangeScheduling() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList`) // Replace with your actual API endpoint
-      .then((response) => setBusOptions(response.data.data))
+      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=100&page=1`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }) // Replace with your actual API endpoint
+      .then((response) => {
+        setBusOptions(response.data.data.data);
+      })
       .catch((error) => console.error("Error fetching bus data:", error));
 
     // Fetch conductor information
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllConductorsList`) // Replace with your actual API endpoint
-      .then((response) => setConductorOptions(response.data.data))
+      .get(
+        `${process.env.REACT_APP_BASE_URL}/getAllConductorsList?limit=100&page=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      ) // Replace with your actual API endpoint
+      .then((response) => setConductorOptions(response.data.data.data))
       .catch((error) => console.error("Error fetching conductor data:", error));
   }, []);
 
   return (
-    <div className="flex items-center justify-center h-screen w-screen">
+    <>
       <div className="flex flex-1 flex-col bg-white h-screen ">
-        <div
-          onClick={() => navigate(-1)}
-          className="relative w-fit h-fit top-4 left-4 md:hidden"
-        >
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 96 96"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M54 15.1515L45.8098 8L0 48L45.8098 88L54 80.8485L16.3805 48L54 15.1515Z"
-              fill="#414141"
-            />
-          </svg>
-        </div>
-        <div className="flex h-[350px] md:h-[100px] pb-8 bg-white justify-center items-center md:justify-start rounded-b-[30px] border-b-[3px] border-l-0 border-r-0 shadow-md border-t-0">
-          <div className="flex flex-1 flex-col md:flex-row  justify-center  items-center">
-            <div className="flex flex-1 flex-col md:flex-row justify-between items-center">
-              <div className="flex flex-col md:flex-row">
-                <div className="flex  justify-center items-center">
-                  <img
-                    src={RMC_logo}
-                    alt="RMC Logo"
-                    className=" flex max-w-full mt-5 ml-5 mr-5 h-auto md:h-1/2"
-                  />
-                </div>
-                <div className="flex flex-col justify-center items-center">
-                  <div className="flex mt-5 ">
-                    <h2
-                      style={{ fontWeight: 500, fontSize: 20 }}
-                      className="text-[#585858]"
-                    >
-                      Ranchi Municipal Corporation
-                    </h2>
-                  </div>
-                  <div className="flex mt-2 mb-2 flex-row ">
-                    <h1 className="text-md font-bold text-gradient-to-b text-[#1436C3] bg-clip-text">
-                      Urban Transport
-                    </h1>
-                    <img
-                      src={bus}
-                      alt="Bus"
-                      className="ml-2 max-w-full h-auto md:h-5"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col flex-1  justify-center items-end">
-                <div className="flex flex-row mt-2 md:mt-8 md:mr-8">
-                  <h1 className="flex justify-center items-center text-2xl md:text-xl text-[#322F2F] font-semibold">
-                    Bus & Conductor Mapping
-                  </h1>
-                  <img
-                    src={bus1}
-                    alt="Bus"
-                    className="ml-2 max-w-full h-auto md:h-8"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="relative w-full flex-col overflow-y-auto">
           <div className="flex flex-col mt-5 w-full h-fit justify-center items-center ">
             <div className="flex flex-1 h-20 w-[80%] ">
@@ -249,11 +246,11 @@ export default function ChangeScheduling() {
                             <option className="flex flex-1" value=" ">
                               -Please Select-
                             </option>
-                            {ConductorOptions.map((conductor) => (
+                            {ConductorOptions?.map((conductor) => (
                               <option
                                 key={conductor.id}
-                                value={conductor.cUniqueId}
-                              >{`${conductor.firstName} - ${conductor.cUniqueId}`}</option>
+                                value={conductor.cunique_id}
+                              >{`${conductor.first_name}- ${conductor.cunique_id}`}</option>
                             ))}
                           </Field>
                           <ErrorMessage
@@ -289,10 +286,11 @@ export default function ChangeScheduling() {
                           <div className="flex flex-1 flex-col mt-8">
                             <label htmlFor="In_Time">In Time </label>
                             <Field
-                              as="input"
-                              type="time"
+                              as="select"
+                              //type="select"
                               id="In_Time"
                               name="In_Time"
+                              // format="HH:mm"
                               className="border border-gray-300 rounded-md px-3 py-4 mt-1 w-[80vw] md:w-auto"
                               style={{ boxShadow: "0 1px 4px #fff" }}
                               onFocus={(e) =>
@@ -301,7 +299,14 @@ export default function ChangeScheduling() {
                               onBlur={(e) =>
                                 (e.target.style.boxShadow = "none")
                               }
-                            />
+                            >
+                              <option value="">-Please Select-</option>
+                              {timeOptions.map((time, index) => (
+                                <option key={index} value={time}>
+                                  {time}
+                                </option>
+                              ))}
+                            </Field>
 
                             <ErrorMessage
                               name="In_Time"
@@ -312,7 +317,7 @@ export default function ChangeScheduling() {
                           <div className="flex flex-1 flex-col mt-8">
                             <label htmlFor="Out_Time">Out Time </label>
                             <Field
-                              as="input"
+                              as="select"
                               type="time"
                               id="Out_Time"
                               name="Out_Time"
@@ -321,10 +326,18 @@ export default function ChangeScheduling() {
                               onFocus={(e) =>
                                 (e.target.style.boxShadow = "0 1px 4px #000")
                               }
+                              
                               onBlur={(e) =>
                                 (e.target.style.boxShadow = "none")
                               }
-                            />
+                            >
+                              <option value="">-Please Select-</option>
+                              {timeOptions.map((time, index) => (
+                                <option key={index} value={time}>
+                                  {time}
+                                </option>
+                              ))}
+                            </Field>
 
                             <ErrorMessage
                               name="Out_Time"
@@ -337,13 +350,16 @@ export default function ChangeScheduling() {
                     </div>
                     <div className="flex flex-1 flex-row mt-5">
                       <div className="flex flex-1 justify-center items-center ">
-                        <div className="flex w-20 h-10 md:w-[80%] border border-[#4245D9] rounded-md shadow-md justify-center items-center">
+                        <div
+                          onClick={() => navigate(-1)}
+                          className="flex w-20 h-10 md:w-[80%] border border-[#4245D9] rounded-md shadow-md justify-center items-center cursor-pointer"
+                        >
                           <h2 className="flex text-[#4245D9] font-semibold">
                             Cancel
                           </h2>
                         </div>
                       </div>
-                      <div className="flex flex-1 justify-center items-center ">
+                      {/* <div className="flex flex-1 justify-center items-center ">
                         <div className="flex flex-1 justify-center items-center ">
                           <div className="flex w-20 h-10 md:w-[80%] border border-[#4245D9] rounded-md shadow-md justify-center items-center">
                             <h2 className="flex text-[#4245D9] font-semibold">
@@ -351,7 +367,7 @@ export default function ChangeScheduling() {
                             </h2>
                           </div>
                         </div>
-                      </div>
+                      </div> */}
                       <div className="flex flex-1 justify-center items-center ">
                         <div className="flex flex-1 justify-center items-center ">
                           <button
@@ -370,6 +386,7 @@ export default function ChangeScheduling() {
               </Formik>
             </div>
           </div>
+
           <div className="flex flex-1 justify-center items-center">
             <div className="flex mt-10 mb-5 w-fit justify-center items-center bg-white">
               <img
@@ -458,7 +475,9 @@ export default function ChangeScheduling() {
               <h2>Something went wrong</h2>
             </div>
             <div className="flex mt-5 flex-row justify-around">
-              <div className="flex ml-2 text-[#4A4545]">{Error?.message}</div>
+              <div className="flex ml-2 text-[#4A4545]">
+                {Error?.validation_error}
+              </div>
             </div>
           </div>
         </DialogContent>
@@ -466,7 +485,9 @@ export default function ChangeScheduling() {
           <Button
             variant="contained"
             color="secondary"
-            onClick={Update_Schedule}
+            onClick={() => {
+              Update_Schedule(Error?.data?.id);
+            }}
           >
             Update
           </Button>
@@ -480,6 +501,6 @@ export default function ChangeScheduling() {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 }

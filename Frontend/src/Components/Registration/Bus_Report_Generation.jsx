@@ -8,7 +8,16 @@ import * as Yup from "yup";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from "axios";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
+import Cookies from "js-cookie";
 export default function Report_Generation() {
+  const token = Cookies.get("accesstoken");
+
   const initialValues = {
     Bus_Information: "",
     Date: "",
@@ -22,10 +31,9 @@ export default function Report_Generation() {
   });
   const navigate = useNavigate();
   const onSubmit = (values, { setSubmitting }) => {
-    // Handle form submission here
-    console.log("Values function started ");
-    console.log("Values >> ", values);
+
     setSubmitting(false);
+    set_open_dialog(true);
   };
 
   const [BusOptions, set_BusOptions] = React.useState([]);
@@ -36,10 +44,16 @@ export default function Report_Generation() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList`) // Replace with ygetAllBusListur actual API endpoint
-      .then((response) => set_BusOptions(response.data.data))
+      .get(`${process.env.REACT_APP_BASE_URL}/getAllBusList?limit=10&page=1`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }) 
+      .then((response) => set_BusOptions(response.data.data?.data))
       .catch((error) => console.error("Error fetching conductor data:", error));
   }, []);
+
+  const [open_dialog, set_open_dialog] = React.useState(false);
 
   return (
     <div className="flex items-center justify-center h-screen w-screen">
@@ -157,7 +171,7 @@ export default function Report_Generation() {
                             <option className="flex flex-1" value="">
                               -Please Select-
                             </option>
-                            {BusOptions.map((Bus) => (
+                            {BusOptions?.map((Bus) => (
                               <option
                                 key={Bus.id}
                                 value={Bus.register_no}
@@ -273,6 +287,52 @@ export default function Report_Generation() {
           </div>
         </div>
       </div>
+      <Dialog open={open_dialog} onClose={() => set_open_dialog(false)}>
+        <DialogContent>
+          {/* <p>Your form has been submitted successfully.</p> */}
+          <div className="flex flex-1 flex-col justify-center items-center">
+            <div className="flex rounded-full bg-[#4338CA] h-20 w-20 justify-center items-center">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3.39648 10.8436L7.70685 15.154L16.3276 5.91748"
+                  stroke="white"
+                  stroke-width="1.39091"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div className="flex mt-5 text-xl font-semibold ml-10 mr-10">
+              <h2>Congratulation!! Report Generated</h2>
+            </div>
+            <button
+              onClick={() => {
+                navigate(
+                  "/Bus_report_page" /*  {
+                  state: {
+                    report: report,
+                  },
+                } */
+                );
+              }}
+              className="flex mt-5 flex-row justify-around"
+            >
+              <div className="flex flex-1 p-2 px-8 bg-[#4338CA] rounded-md shadow-lg text-white font-semibold">
+                View
+              </div>
+            </button>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => set_open_dialog(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

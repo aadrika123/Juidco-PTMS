@@ -25,7 +25,7 @@ class ReceiptRoute {
       );
     app
       .route(`${baseUrl}/passenger/day-wise`)
-      .get(responseTime, (req: Request, res: Response) =>
+      .post(responseTime, (req: Request, res: Response) =>
         receiptServices.passenger_status(req, res, "0102")
       );
   }

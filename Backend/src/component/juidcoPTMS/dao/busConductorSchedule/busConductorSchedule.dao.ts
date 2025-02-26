@@ -9,6 +9,8 @@ class BusConductorScheduleDao {
     const { bus_no, conductor_id, date, from_time, to_time, is_scheduled } =
       req.body;
 
+    const { ulb_id } = req.body.auth
+
     const setDate = new Date(date).toISOString();
 
     const setFromTime = Number(from_time.replace(":", "").padStart(4, "0"));
@@ -40,6 +42,7 @@ class BusConductorScheduleDao {
         date: setDate,
         from_time: setFromTime,
         to_time: setToTime,
+        ulb_id: ulb_id
       },
     });
 
@@ -66,7 +69,9 @@ class BusConductorScheduleDao {
     const conductor_name: string = String(req.query.conductor_name);
     const from_date: string = String(req.query.from_date);
     const to_date: string = String(req.query.to_date);
-
+  
+    const { ulb_id } = req.body.auth;
+  
     const query: Prisma.schedulerFindManyArgs = {
       skip: (page - 1) * limit,
       take: limit,
@@ -97,17 +102,22 @@ class BusConductorScheduleDao {
           },
         },
       },
+      where: { ulb_id }, // Always filter by ulb_id
     };
-
-    if (search !== "" && typeof search === "string" && search !== "undefined") {
-      query.where = {
+  
+    // Accumulating the `where` conditions
+    let whereConditions: Prisma.schedulerWhereInput = { ulb_id };
+  
+    // Handling the search filter
+    if (search && search !== "undefined") {
+      whereConditions = {
+        ...whereConditions,
         OR: [
           {
             bus: {
               register_no: { contains: search, mode: "insensitive" },
             },
           },
-
           {
             bus: {
               vin_no: { contains: search, mode: "insensitive" },
@@ -116,86 +126,77 @@ class BusConductorScheduleDao {
         ],
       };
     }
-
-    if (bus_no !== "" && typeof bus_no === "string" && bus_no !== "undefined") {
-      query.where = {
-        OR: [
-          {
-            bus: {
-              register_no: { equals: bus_no, mode: "insensitive" },
-            },
-          },
-        ],
+  
+    // Handling the bus_no filter
+    if (bus_no && bus_no !== "undefined") {
+      whereConditions = {
+        ...whereConditions,
+        bus: {
+          register_no: { equals: bus_no, mode: "insensitive" },
+        },
       };
     }
-
+  
+    // Handling the date range filter for bus_no
     if (
-      bus_no !== "" &&
-      typeof bus_no === "string" &&
+      bus_no &&
+      from_date &&
+      to_date &&
       bus_no !== "undefined" &&
-      from_date !== "" &&
-      typeof from_date === "string" &&
       from_date !== "undefined" &&
-      to_date !== "" &&
-      typeof to_date === "string" &&
       to_date !== "undefined"
     ) {
-      query.where = {
-        OR: [
-          {
-            bus: {
-              register_no: { equals: bus_no, mode: "insensitive" },
-            },
-            date: {
-              gte: new Date(from_date),
-              lte: new Date(to_date),
-            },
-          },
-        ],
+      whereConditions = {
+        ...whereConditions,
+        bus: {
+          register_no: { equals: bus_no, mode: "insensitive" },
+        },
+        date: {
+          gte: new Date(from_date),
+          lte: new Date(to_date),
+        },
       };
     }
-
-    if (
-      conductor_id !== "" &&
-      typeof bus_no === "string" &&
-      conductor_id !== "undefined"
-    ) {
-      query.where = {
-        OR: [
-          {
-            conductor: {
-              cunique_id: { equals: conductor_id, mode: "insensitive" },
-            },
-          },
-        ],
+  
+    // Handling the conductor_id filter
+    if (conductor_id && conductor_id !== "undefined") {
+      whereConditions = {
+        ...whereConditions,
+        conductor: {
+          cunique_id: { equals: conductor_id, mode: "insensitive" },
+        },
       };
     }
-
-    if (
-      conductor_name !== "" &&
-      typeof conductor_name === "string" &&
-      conductor_name !== "undefined"
-    ) {
-      query.where = {
-        OR: [
-          {
-            conductor: {
-              first_name: { equals: conductor_name, mode: "insensitive" },
-            },
-          },
-        ],
+  
+    // Handling the conductor_name filter
+    if (conductor_name && conductor_name !== "undefined") {
+      whereConditions = {
+        ...whereConditions,
+        conductor: {
+          first_name: { contains: conductor_name, mode: "insensitive" },
+        },
       };
     }
+  
+    // Finalizing the query where clause
+    query.where = whereConditions;
+  
+    // Perform the transaction: fetching data and count
     const [data, count] = await prisma.$transaction([
       prisma.scheduler.findMany(query),
-      prisma.scheduler.count({where: query.where}),
+      prisma.scheduler.count({ where: whereConditions }),
     ]);
+  
+    // Return the response
     return generateRes({ data, count, page, limit });
   };
+  
 
   updateScheduleBusConductor = async (req: Request) => {
     const { id, bus_no, conductor_id, date, from_time, to_time, is_scheduled } =
       req.body;
+
+    const { ulb_id } = req.body.auth
 
     const setDate = new Date(date).toISOString();
 
@@ -222,6 +223,7 @@ class BusConductorScheduleDao {
       await prisma.bus_master.update({
         data: {
           status: is_scheduled,
+          ulb_id: ulb_id
         },
         where: {
           register_no: bus_no,
@@ -245,12 +247,14 @@ class BusConductorScheduleDao {
 
   todaySchedulesBuses = async (req: Request) => {
     const curr_date = String(req.body.curr_date);
+    const { ulb_id } = req.body.auth
     const data = await prisma.$queryRawUnsafe(`
       SELECT 
         COUNT(DISTINCT sche.bus_id)::INT AS scheduled_buses,
         COUNT(DISTINCT bm.register_no)::INT - COUNT(DISTINCT sche.bus_id)::INT AS absent_buses
       FROM bus_master AS bm
-      LEFT JOIN scheduler AS sche ON bm.register_no = sche.bus_id AND sche.date = '${curr_date}';
+      LEFT JOIN scheduler AS sche ON bm.register_no = sche.bus_id AND sche.date = '${curr_date}' and sche.ulb_id=${ulb_id}
+      where bm.ulb_id=${ulb_id};
     `);
 
     return generateRes(data);
@@ -258,10 +262,11 @@ class BusConductorScheduleDao {
 
   getBusScheduleConductor = async (req: Request) => {
     const { conductor_id, date, from_time, to_time } = req.body;
+    const { ulb_id } = req.body.auth;
 
     const query: string = `
 	    select conductor_id, bus_id, created_at, updated_at, from_time, to_time from scheduler
-    	where conductor_id = '${conductor_id}' AND date = '${date}' and from_time <= '${from_time}' and '${to_time}' <= to_time;
+    	where ulb_id=${ulb_id} and conductor_id = '${conductor_id}' AND date = '${date}' and from_time <= '${from_time}' and '${to_time}' <= to_time;
     `;
 
     const data = await prisma.$queryRawUnsafe<any[]>(query);
