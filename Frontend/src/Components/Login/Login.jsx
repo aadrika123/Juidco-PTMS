@@ -9,6 +9,7 @@ import { Container, Box, Button } from "@mui/material";
 import PasswordInput from "./PasswordInput"; 
 import ApiHeader from "../api/ApiHeader";
 import ProjectApiList from "../api/ProjectApiList";
+import CryptoJS from "crypto-js";
 
 const Login = () => {
   const [errorMsg, setErrorMsg] = useState();
@@ -31,6 +32,25 @@ const Login = () => {
     password: Yup.string().required("Password is required"),
   });
 
+  function encryptPassword(plainPassword) {
+  const secretKey = "c2ec6f788fb85720bf48c8cc7c2db572596c585a15df18583e1234f147b1c2897aad12e7bebbc4c03c765d0e878427ba6370439d38f39340d7e";
+
+  const key = CryptoJS.enc.Latin1.parse(
+    CryptoJS.SHA256(secretKey).toString(CryptoJS.enc.Latin1)
+  );
+
+  const ivString = CryptoJS.SHA256(secretKey).toString().substring(0, 16);
+  const iv = CryptoJS.enc.Latin1.parse(ivString);
+
+  const encrypted = CryptoJS.AES.encrypt(plainPassword, key, {
+    iv: iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+
+  return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+}
+
   const handleLogin = async (values) => {
     try {
       setLoading(true);
@@ -39,7 +59,7 @@ const Login = () => {
         method: "POST",
         data: {
           email: values.user_id,
-          password: values.password,
+          password: encryptPassword(values.password),
           type: window.ReactNativeWebView ? "mobile" : null,
           moduleId: 18,
           // type: 'mobile',
@@ -147,6 +167,10 @@ const Login = () => {
                       className="flex flex-1  border rounded-md px-3 py-4 w-full focus:outline-none focus:border-blue-500"
                       error={touched.user_id && !!errors.user_id}
                       helperText={touched.user_id && errors.user_id}
+                      autoComplete="new-Username" 
+                      onCopy={(e) => e.preventDefault()}
+                      onPaste={(e) => e.preventDefault()}
+                      onCut={(e) => e.preventDefault()}
                     />
                   </div>
                   <Field
@@ -157,6 +181,10 @@ const Login = () => {
                     fullWidth
                     error={touched.password && !!errors.password}
                     helperText={touched.password && errors.password}
+                    autoComplete="new-password"
+                    onCopy={(e) => e.preventDefault()}
+                    onPaste={(e) => e.preventDefault()}
+                    onCut={(e) => e.preventDefault()}
                   />
                 </div>
                 <div className="my-4">
