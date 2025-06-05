@@ -12,6 +12,7 @@ import {
 import Jhar from "./assets/jhant.png";
 import useModulePermission from "./Components/common/Hooks/useModulePermission";
 import { UseServiceCheck } from "./Components/common/Hooks/UseServiceCheck";
+import AutoLogout from "./utils/AutoLogout";
 
 function App() {
   UseServiceCheck();
@@ -55,7 +56,9 @@ function App() {
 
   return (
     <>
+     <AutoLogout>
       <AppRoutes access_token={access_token} userType={userType} />
+    </AutoLogout>
 
       <Dialog
         open={open}
