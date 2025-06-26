@@ -10,13 +10,21 @@ import PasswordInput from "./PasswordInput";
 import ApiHeader from "../api/ApiHeader";
 import ProjectApiList from "../api/ProjectApiList";
 import CryptoJS from "crypto-js";
+import UseCaptchaGenerator from "./UseCaptchaGenerator";
 
 const Login = () => {
   const [errorMsg, setErrorMsg] = useState();
   const [deviceType, setDeviceType] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [captcha, setCaptcha] = useState("");
 
   const { getMenuByModule } = ProjectApiList();
+  const {
+    captchaInputField,
+    captchaImage,
+    verifyCaptcha,
+    generateRandomCaptcha,
+  } = UseCaptchaGenerator();
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -197,6 +205,25 @@ const Login = () => {
                     >
                       Forgot Password
                     </span>
+                  </div>
+                </div>
+                <div className="my-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <img src={captchaImage} className="border rounded w-44 h-14" />
+                    <button
+                      type="button"
+                      onClick={generateRandomCaptcha}
+                      className="text-xs text-blue-500"
+                    >
+                      Reload Captcha
+                    </button>
+                  </div>
+                  {/* Replace formik-based captcha input with plain input */}
+                  <div className="mt-2">
+                    {captchaInputField({
+                      value: captcha,
+                      onChange: (e) => setCaptcha(e.target.value),
+                    })}
                   </div>
                 </div>
                 <Button
