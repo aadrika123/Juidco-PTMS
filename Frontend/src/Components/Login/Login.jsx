@@ -17,6 +17,7 @@ const Login = () => {
   const [deviceType, setDeviceType] = useState(null);
   const [loading, setLoading] = useState(false);
   const [captcha, setCaptcha] = useState("");
+  const [captchaError, setCaptchaError] = useState  (null);
 
   const { getMenuByModule } = ProjectApiList();
   const {
@@ -60,6 +61,13 @@ const Login = () => {
 }
 
   const handleLogin = async (values) => {
+    if (!verifyCaptcha(captcha)) {
+      setCaptchaError("Captcha is incorrect");
+      generateRandomCaptcha(); 
+      return;
+    } else {
+      setCaptchaError(null); 
+    }
     try {
       setLoading(true);
       const res = await axios({
@@ -218,12 +226,15 @@ const Login = () => {
                       Reload Captcha
                     </button>
                   </div>
-                  {/* Replace formik-based captcha input with plain input */}
+
                   <div className="mt-2">
                     {captchaInputField({
                       value: captcha,
                       onChange: (e) => setCaptcha(e.target.value),
                     })}
+                    {captchaError && (
+                      <p className="text-sm text-red-500 mt-1">{captchaError}</p>
+                    )}
                   </div>
                 </div>
                 <Button
