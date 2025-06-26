@@ -1,7 +1,7 @@
 // AutoLogout.js
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { logout } from '../redux/slice/slice'; // adjust path as needed
+import { logout } from '../redux/slice/slice';
 import { useNavigate } from 'react-router-dom';
 
 const AutoLogout = ({ children, timeout = 30 * 60 * 1000 }) => {
