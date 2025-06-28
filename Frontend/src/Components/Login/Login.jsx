@@ -183,7 +183,7 @@ const Login = () => {
                       className="flex flex-1  border rounded-md px-3 py-4 w-full focus:outline-none focus:border-blue-500"
                       error={touched.user_id && !!errors.user_id}
                       helperText={touched.user_id && errors.user_id}
-                      autoComplete="new-Username" 
+                      autoComplete="off" 
                       onCopy={(e) => e.preventDefault()}
                       onPaste={(e) => e.preventDefault()}
                       onCut={(e) => e.preventDefault()}
@@ -197,7 +197,7 @@ const Login = () => {
                     fullWidth
                     error={touched.password && !!errors.password}
                     helperText={touched.password && errors.password}
-                    autoComplete="new-password"
+                    autoComplete="off"
                     onCopy={(e) => e.preventDefault()}
                     onPaste={(e) => e.preventDefault()}
                     onCut={(e) => e.preventDefault()}
