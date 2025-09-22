@@ -4,7 +4,7 @@ import { generateRes } from "../../../../util/generateRes";
 const prisma = new PrismaClient();
 
 class PrimeDashboardDao {
-  getDashboardData = async () => {
+  getDashboardData = async (ulb_id: number) => {
 
     const currentDate = new Date()
 
@@ -18,7 +18,8 @@ class PrimeDashboardDao {
 
     const totalAmountOfTheDay = await prisma.receipts.aggregate({
       where: {
-        date: currentDate
+        date: currentDate,
+        ulb_id: ulb_id
       },
       _sum: {
         amount: true
@@ -30,7 +31,8 @@ class PrimeDashboardDao {
         date: {
           gte: currentFinancialYearStart,
           lte: currentFinancialYearEnd,
-        }
+        },
+        ulb_id: ulb_id
       },
       _sum: {
         amount: true
@@ -42,7 +44,8 @@ class PrimeDashboardDao {
         date: {
           gte: currentFinancialYearStart,
           lte: currentFinancialYearEnd,
-        }
+        },
+        ulb_id: ulb_id
       },
       _count: true
     })

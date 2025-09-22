@@ -20,7 +20,17 @@ class primeDashboardServices {
     };
 
     try {
-      const data = await this.primeDashboardDao.getDashboardData();
+      const { ulbId } = req.query;
+      const ulbIdNum = ulbId !== undefined ? Number(ulbId) : undefined;
+      if (ulbIdNum === undefined || isNaN(ulbIdNum)) {
+        return CommonRes.NOT_FOUND(
+          "Invalid ulbId provided",
+          null,
+          resObj,
+          res
+        );
+      }
+      const data = await this.primeDashboardDao.getDashboardData(ulbIdNum);
       if (!data) {
         return CommonRes.NOT_FOUND(
           resMessage(this.initMsg).NOT_FOUND,
