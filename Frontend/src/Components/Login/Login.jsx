@@ -63,11 +63,12 @@ const Login = () => {
   const handleLogin = async (values) => {
     if (!verifyCaptcha(captcha)) {
       setCaptchaError("Captcha is incorrect");
-      generateRandomCaptcha(); 
+      generateRandomCaptcha();
       return;
     } else {
-      setCaptchaError(null); 
+      setCaptchaError(null);
     }
+
     try {
       setLoading(true);
       const res = await axios({
@@ -78,9 +79,14 @@ const Login = () => {
           password: encryptPassword(values.password),
           type: window.ReactNativeWebView ? "mobile" : null,
           moduleId: 18,
-          // type: 'mobile',
         },
       });
+
+      if (res?.data?.status === false) {
+        // if backend sends success:false for wrong credentials
+        setErrorMsg(res?.data?.message || "Invalid username or password");
+        return;
+      }
 
       if (res) {
         fetchMenuList();
@@ -103,25 +109,29 @@ const Login = () => {
         localStorage.setItem("ulbIduserMobile", userDetails?.mobile);
         localStorage.setItem("conductorId", userDetails?.user_name);
 
-       
         if (userDetails?.user_type === "Admin") {
           window.location.replace("/ptms/dashboard");
         } else if (userDetails?.user_type === "TC") {
           window.location.replace("/ptms/conductor_dashboard");
         } else if (userDetails?.user_type === "Employee") {
           window.location.replace("/ptms/accountant-view");
-          // window.location.replace("/ptms/dashboard");
         } else {
-          window.location.replace("/");
+          window.location.replace("/ptms");
         }
       }
     } catch (error) {
-      setErrorMsg("Something Went Wrong!!");
+      // Check backend error response
+      if (error.response && error.response.status === 401) {
+        setErrorMsg("Invalid username or password");
+      } else {
+        setErrorMsg("Something went wrong, please try again.");
+      }
       console.log(error);
     } finally {
       setLoading(false);
     }
   };
+
 
   const fetchMenuList = async () => {
     let requestBody = {
