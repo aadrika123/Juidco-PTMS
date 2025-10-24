@@ -1,18 +1,76 @@
 import React, { useEffect, useState } from "react";
+import ProjectApiList from "../api/ProjectApiList";
+import axios from "axios";
+import CryptoJS from "crypto-js";
+
+const { api_captcha } = ProjectApiList();
+
+function decryptCaptcha(encryptedCaptcha) {
+    const secretKey = "c2ec6f788fb85720bf48c8cc7c2db572596c585a15df18583e1234f147b1c2897aad12e7bebbc4c03c765d0e878427ba6370439d38f39340d7e";
+
+    const key = CryptoJS.enc.Latin1.parse(
+        CryptoJS.SHA256(secretKey).toString(CryptoJS.enc.Latin1)
+    );
+
+    const ivString = CryptoJS.SHA256(secretKey).toString().substring(0, 16);
+    const iv = CryptoJS.enc.Latin1.parse(ivString);
+
+    const decrypted = CryptoJS.AES.decrypt(encryptedCaptcha, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+    });
+
+    return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
+function encryptCaptcha(plainCaptcha) {
+    const secretKey = "c2ec6f788fb85720bf48c8cc7c2db572596c585a15df18583e1234f147b1c2897aad12e7bebbc4c03c765d0e878427ba6370439d38f39340d7e";
+
+    const key = CryptoJS.enc.Latin1.parse(
+        CryptoJS.SHA256(secretKey).toString(CryptoJS.enc.Latin1)
+    );
+
+    const ivString = CryptoJS.SHA256(secretKey).toString().substring(0, 16);
+    const iv = CryptoJS.enc.Latin1.parse(ivString);
+
+    const encrypted = CryptoJS.AES.encrypt(plainCaptcha, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+    });
+
+    return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+}
 
 const UseCaptchaGenerator = () => {
-    const [captcha, setCaptcha] = useState("");
+    const [captchaData, setCaptchaData] = useState({ captcha_id: "", captcha_code: "" });
     const [captchaImage, setCaptchaImage] = useState("");
+    const [decryptedCaptcha, setDecryptedCaptcha] = useState("");
 
-    const generateRandomCaptcha = () => {
-        const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Avoid confusing characters
-        const captchaText = Array.from(
-            { length: 6 },
-            () => characters[Math.floor(Math.random() * characters.length)]
-        ).join("");
-        setCaptcha(captchaText);
-        drawCaptcha(captchaText);
+    const generateRandomCaptcha = async () => {
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_AUTH_URL}/login-Captcha`, {}, {
+                headers: { Accept: "application/json" }
+            });
+
+            if (response.data.status) {
+                const decrypted = decryptCaptcha(response.data.data.captcha_code);
+                setCaptchaData({
+                    captcha_id: response.data.data.captcha_id,
+                    captcha_code: response.data.data.captcha_code
+                });
+                setDecryptedCaptcha(decrypted);
+                drawCaptcha(decrypted);
+            }
+        } catch (error) {
+            console.error("Error fetching captcha:", error);
+        }
     };
+
+    useEffect(() => {
+        generateRandomCaptcha();
+    }, []);
 
     const drawCaptcha = (captchaText) => {
         const canvas = document.createElement("canvas");
@@ -59,18 +117,9 @@ const UseCaptchaGenerator = () => {
         setCaptchaImage(canvas.toDataURL());
     };
 
-    useEffect(() => {
-        generateRandomCaptcha();
-    }, []);
+    const getCaptchaData = () => captchaData;
 
-    const verifyCaptcha = (userInput) => {
-        if (userInput === captcha) {
-            return true;
-        } else {
-            generateRandomCaptcha();
-            return false;
-        }
-    };
+    const getEncryptedCaptcha = (userInput) => encryptCaptcha(userInput);
 
     // ✅ Updated to accept plain props instead of Formik
     const captchaInputField = ({ value, onChange }) => (
@@ -92,10 +141,10 @@ const UseCaptchaGenerator = () => {
 
     return {
         captchaInputField,
-        captcha,
         captchaImage,
-        verifyCaptcha,
         generateRandomCaptcha,
+        getCaptchaData,
+        getEncryptedCaptcha,
     };
 };
 

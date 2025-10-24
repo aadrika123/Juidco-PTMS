@@ -23,8 +23,9 @@ const Login = () => {
   const {
     captchaInputField,
     captchaImage,
-    verifyCaptcha,
     generateRandomCaptcha,
+    getCaptchaData,
+    getEncryptedCaptcha,
   } = UseCaptchaGenerator();
 
   useEffect(() => {
@@ -61,14 +62,8 @@ const Login = () => {
 }
 
   const handleLogin = async (values) => {
-    if (!verifyCaptcha(captcha)) {
-      setCaptchaError("Captcha is incorrect");
-      generateRandomCaptcha();
-      return;
-    } else {
-      setCaptchaError(null);
-    }
-
+    const captchaData = getCaptchaData();
+    
     try {
       setLoading(true);
       const res = await axios({
@@ -77,8 +72,9 @@ const Login = () => {
         data: {
           email: values.user_id,
           password: encryptPassword(values.password),
-          type: window.ReactNativeWebView ? "mobile" : null,
-          moduleId: 18,
+          moduleId: 20,
+          captcha_code: getEncryptedCaptcha(captcha),
+          captcha_id: captchaData.captcha_id,
         },
       });
 
@@ -236,26 +232,22 @@ const Login = () => {
                       Reload Captcha
                     </button>
                   </div>
-
-                  <div className="mt-2">
-                    {captchaInputField({
-                      value: captcha,
-                      onChange: (e) => setCaptcha(e.target.value),
-                    })}
-                    {captchaError && (
-                      <p className="text-sm text-red-500 mt-1">{captchaError}</p>
-                    )}
-                  </div>
+                  {captchaInputField({ value: captcha, onChange: (e) => setCaptcha(e.target.value) })}
+                  {captchaError && (
+                    <div className="text-red-500 text-sm mt-1">{captchaError}</div>
+                  )}
                 </div>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{ backgroundColor: "#665DD9" }}
-                  fullWidth
-                  disabled={loading}
-                >
-                  {loading ? "Loading..." : "Log in"}
-                </Button>
+                <div className="my-4">
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    disabled={loading}
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md"
+                  >
+                    {loading ? "Logging in..." : "Login"}
+                  </Button>
+                </div>
               </Form>
             )}
           </Formik>

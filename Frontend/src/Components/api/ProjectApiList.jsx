@@ -9,6 +9,7 @@ export default function ProjectApiList() {
     api_getFreeMenuList: `${baseUrl}/api/menu/by-module`,
     //WARD LIST
     api_login: `${baseUrl}/api/login`,
+    api_captcha: `${baseUrl}/api/login-Captcha`,
 
     // 19 API TO GET WORKFLOW BASIC INFO LIKE PERMISSIONS/WORKFLOW-CANDIDATES
     api_workflowInfo: `${baseUrl}/api/workflow/role-map/workflow-info`,
