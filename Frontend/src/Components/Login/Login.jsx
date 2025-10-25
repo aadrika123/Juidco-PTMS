@@ -11,6 +11,7 @@ import ApiHeader from "../api/ApiHeader";
 import ProjectApiList from "../api/ProjectApiList";
 import CryptoJS from "crypto-js";
 import UseCaptchaGenerator from "./UseCaptchaGenerator";
+import useSystemUniqueID from "../common/Hooks/useSystemUniqueId";
 
 const Login = () => {
   const [errorMsg, setErrorMsg] = useState();
@@ -27,6 +28,8 @@ const Login = () => {
     getCaptchaData,
     getEncryptedCaptcha,
   } = UseCaptchaGenerator();
+  
+  const { fingerprint } = useSystemUniqueID();
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -75,6 +78,7 @@ const Login = () => {
           moduleId: 20,
           captcha_code: getEncryptedCaptcha(captcha),
           captcha_id: captchaData.captcha_id,
+          systemUniqueId: fingerprint,
         },
       });
 
@@ -209,7 +213,7 @@ const Login = () => {
                     onCut={(e) => e.preventDefault()}
                   />
                 </div>
-                <div className="my-4">
+                {/* <div className="my-4">
                   <div className="flex flex-col items-center justify-center flex-wrap gap-x-2 gap-y-2 w-full poppins ">
                     <span
                       className="text-gray-700 text-sm font-semibold cursor-pointer w-full text-center"
@@ -220,7 +224,7 @@ const Login = () => {
                       Forgot Password
                     </span>
                   </div>
-                </div>
+                </div> */}
                 <div className="my-4">
                   <div className="flex justify-between items-center mb-2">
                     <img src={captchaImage} className="border rounded w-44 h-14" />
