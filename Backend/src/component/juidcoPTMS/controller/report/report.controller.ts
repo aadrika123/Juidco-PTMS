@@ -132,6 +132,35 @@ class ReportController {
     }
   };
 
+  generateAllReports1 = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "POST",
+      version: "1.0",
+    };
+
+    try {
+      const data = await this.reportDao.generateAllReports1(req);
+      if (data === "null") {
+        return CommonRes.NOT_FOUND(
+          resMessage(this.initMsg).NOT_FOUND,
+          data,
+          resObj,
+          res
+        );
+      }
+
+      return CommonRes.SUCCESS(
+        resMessage(this.initMsg).FOUND,
+        data,
+        resObj,
+        res
+      );
+    } catch (error) {
+      return CommonRes.SERVER_ERROR(error, resObj, res);
+    }
+  };
+
   demographicCount = async (req: Request, res: Response, apiId: string) => {
     const resObj: resObj = {
       apiId,

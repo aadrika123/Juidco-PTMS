@@ -9,6 +9,12 @@ import {
   Paper,
   TextField,
   Button,
+  Pagination,
+  Stack,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -28,11 +34,23 @@ export default function CollectionReport() {
   const [toDate, setToDate] = useState("");
   const [finalFromDate, setfinalFromDate] = useState("");
   const [finalToDate, setfinalToDate] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalCollectionAmount, setTotalCollectionAmount] = useState(0);
 
-  const fetchReportData = async () => {
+  const fetchReportData = async (page = 1) => {
+    if (!fromDate || !toDate) {
+      alert("Please select both From Date and To Date");
+      return;
+    }
+
+    console.log("this is the current page data : ", page)
+
     try {
+      set_loading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/report/all`,
+        `${process.env.REACT_APP_BASE_URL}/report/all-conductors?page=${currentPage}&limit=${limit}`,
         {
           from_date: fromDate,
           to_date: toDate,
@@ -45,20 +63,71 @@ export default function CollectionReport() {
       );
       if (response.data?.data == null) {
         console.log("data is null");
+        setData([]);
       } else {
         setData(response?.data?.data?.data);
-        setfinalFromDate(fromDate)
-        setfinalToDate(toDate)
+        setfinalFromDate(fromDate);
+        setfinalToDate(toDate);
+        setTotalPage(response?.data?.data?.totalPage);
+        setCurrentPage(response?.data?.data?.currentPage);
+        setTotalCollectionAmount(response?.data?.data?.grandTotalCollectionAmount || 0);
       }
     } catch (error) {
       console.error("Error fetching report data", error);
+      setData([]);
+    } finally {
       set_loading(false);
     }
   };
-  /*  useEffect(() => {
-    fetchReportData();
-  }, [fromDate, toDate]);
- */
+
+  const handlePageChange = (event, value) => {
+
+
+    setCurrentPage(value);
+    fetchReportData(value);
+  };
+
+
+
+  const handleLimitChange = async (event) => {
+    const newLimit = event.target.value;
+    setLimit(newLimit);
+
+    // Only fetch if we have both dates
+    if (fromDate && toDate) {
+      setCurrentPage(1);
+      try {
+        set_loading(true);
+        const response = await axios.post(
+          `${process.env.REACT_APP_BASE_URL}/report/all-conductors?page=1&limit=${newLimit}`,
+          {
+            from_date: fromDate,
+            to_date: toDate,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.data?.data == null) {
+          console.log("data is null");
+        } else {
+          setData(response?.data?.data?.data);
+          setTotalPage(response?.data?.data?.totalPage);
+          setCurrentPage(response?.data?.data?.currentPage);
+          setTotalCollectionAmount(response?.data?.data?.grandTotalCollectionAmount || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching report data", error);
+      } finally {
+        set_loading(false);
+      }
+    }
+  };
+
+
+
   const downloadReport = () => {
     const doc = new jsPDF();
     const columns = [
@@ -79,7 +148,7 @@ export default function CollectionReport() {
         rowData.push(cellData);
       });
       data.push(rowData);
-      
+
     });
 
     autoTable(doc, {
@@ -89,6 +158,7 @@ export default function CollectionReport() {
 
     doc.save("Report.pdf");
   };
+
 
 
   return (
@@ -194,6 +264,7 @@ export default function CollectionReport() {
             </div>
           </div>
         </div>
+        <div className="w-full px-3 font-semibold">Total Amout : {totalCollectionAmount}</div>
         <div className="flex flex-1 w-full">
           <TableContainer>
             <Table id="data-table" stickyHeader>
@@ -225,10 +296,10 @@ export default function CollectionReport() {
                         {/* {new Date(row?.data?.date).toLocaleDateString()} */}
                         {finalFromDate} to {finalToDate}
                       </TableCell>
-                      <TableCell>{row?.data?.receipt_count}</TableCell>
-                      <TableCell>Rs. {row?.data?.total_amount}</TableCell>
+                      <TableCell>{row?.receipt_count}</TableCell>
+                      <TableCell>Rs. {row?.total_amount}</TableCell>
                       <TableCell>{row.conductor_id}</TableCell>
-                      <TableCell>{row?.data?.bus_no}</TableCell>
+                      <TableCell>{row?.bus_no}</TableCell>
                     </TableRow>
                   ))
                 )}
@@ -236,6 +307,35 @@ export default function CollectionReport() {
             </Table>
           </TableContainer>
         </div>
+        {data?.length > 0 && (
+          <div className="flex justify-end mx-10 my-4 items-center w-full py-4 gap-4 text-purple-500">
+            <FormControl sx={{ minWidth: 120 }} size="small" >
+              <InputLabel id="rows-per-page-label">Rows per page</InputLabel>
+              <Select
+                labelId="rows-per-page-label"
+                value={limit}
+                label="Rows per page"
+                onChange={handleLimitChange}
+              >
+                <MenuItem value={5}>5</MenuItem>
+                <MenuItem value={10}>10</MenuItem>
+                <MenuItem value={25}>25</MenuItem>
+                <MenuItem value={50}>50</MenuItem>
+                <MenuItem value={100}>100</MenuItem>
+              </Select>
+            </FormControl>
+            <Stack spacing={2}>
+              <Pagination
+                count={totalPage}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                shape="rounded"
+                size="large"
+              />
+            </Stack>
+          </div>
+        )}
       </div>
     </div>
   );
