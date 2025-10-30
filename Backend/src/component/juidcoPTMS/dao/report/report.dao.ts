@@ -343,6 +343,76 @@ class ReportDao {
 
     return generateRes(all_conductor_data);
   };
+
+
+
+  generateAllReports1 = async (req: Request) => {
+  const { from_date, to_date } = req.body;
+  const { ulb_id } = req.body.auth;
+  const limit: number = Number(req.query.limit) || 10;
+  const page: number = Number(req.query.page) || 1;
+
+  const offset = (page - 1) * limit;
+
+  const baseCondition = `
+    FROM receipts
+    JOIN bus_master as pa on pa.register_no = receipts.bus_id
+    JOIN conductor_master as cm on cm.cunique_id = receipts.conductor_id
+    WHERE receipts.ulb_id = '${ulb_id}'
+    ${from_date && to_date ? `AND date BETWEEN '${from_date}' AND '${to_date}'` : ""}
+  `;
+
+  // 🔹 Query for paginated grouped data
+  const qr_data = `
+    SELECT
+      COUNT(receipt_no)::INT AS receipt_count,
+      SUM(amount)::INT AS total_amount,
+      receipts.conductor_id, 
+      pa.register_no as bus_no,
+      cm.first_name,
+      cm.last_name,
+      cm.age,
+      cm.adhar_no,
+      cm.mobile_no,
+      pa.register_no,
+      pa.vin_no
+    ${baseCondition}
+    GROUP BY receipts.conductor_id, pa.register_no, cm.id, pa.id
+    LIMIT $1 OFFSET $2
+  `;
+
+  // 🔹 Query for total grouped count (for pagination)
+  const qr_count = `
+    SELECT COUNT(*)::INT as total
+    FROM (
+      SELECT receipts.conductor_id
+      ${baseCondition}
+      GROUP BY receipts.conductor_id, pa.register_no, cm.id, pa.id
+    ) as subquery
+  `;
+
+  // 🔹 Query for overall total amount (no group, no limit)
+  const qr_total_amount = `
+    SELECT COALESCE(SUM(amount), 0)::INT as grand_total
+    ${baseCondition}
+  `;
+
+  const [all_conductor, totalCount, totalAmount] = await prisma.$transaction([
+    prisma.$queryRawUnsafe<any[]>(qr_data, limit, offset),
+    prisma.$queryRawUnsafe<any[]>(qr_count),
+    prisma.$queryRawUnsafe<any[]>(qr_total_amount),
+  ]);
+
+  const count = totalCount[0]?.total || 0;
+  const grandTotal = totalAmount[0]?.grand_total || 0;
+
+  return {
+    ...generateRes(all_conductor ?? [], count, page, limit),
+    grandTotalCollectionAmount: grandTotal, // 👈 extra field added
+  };
+};
+
+
   //   ------------------------- GET ALL REPORT COLLECITON ----------------------------//
 
   demographicCount = async (req: Request) => {
