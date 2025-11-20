@@ -85,6 +85,8 @@ const Login = () => {
       if (res?.data?.status === false) {
         // if backend sends success:false for wrong credentials
         setErrorMsg(res?.data?.message || "Invalid username or password");
+        generateRandomCaptcha(); // Reload captcha on invalid credentials
+        setCaptcha(""); // Clear captcha input
         return;
       }
 
@@ -123,6 +125,8 @@ const Login = () => {
       // Check backend error response
       if (error.response && error.response.status === 401) {
         setErrorMsg("Invalid username or password");
+        generateRandomCaptcha(); // Reload captcha on 401 error
+        setCaptcha(""); // Clear captcha input
       } else {
         setErrorMsg("Something went wrong, please try again.");
       }
