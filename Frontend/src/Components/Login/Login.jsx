@@ -91,14 +91,16 @@ const Login = () => {
       }
 
       if (res) {
-        fetchMenuList();
-
         const userDetails = res?.data?.data?.userDetails;
         const { token } = res?.data?.data;
+        
+        // Set token first for API calls
         Cookies.set("accesstoken", token, { expires: 1 });
+        localStorage.setItem("token", token);
+        
+        await fetchMenuList();
 
         localStorage.setItem("ulbId", userDetails?.ulb_id);
-        localStorage.setItem("token", token);
         localStorage.setItem("userType", userDetails?.user_type);
         localStorage.setItem("userName", userDetails?.user_name);
 
@@ -145,10 +147,14 @@ const Login = () => {
     try {
       // Make API request
       const res = await axios.post(getMenuByModule, requestBody, ApiHeader());
-
+      
+      console.log("Menu API Response:", res?.data);
       let data = res?.data;
-
-      localStorage.setItem("menuList", res?.data?.data?.permission);
+      
+      if (data?.data?.permission) {
+        localStorage.setItem("menuList", JSON.stringify(data.data.permission));
+        // console.log("MenuList saved:", JSON.stringify(data.data.permission));
+      }
 
       if (data?.data?.userDetails && data?.data?.permission) {
         let newdata = JSON.stringify(data?.data?.userDetails);
@@ -161,7 +167,7 @@ const Login = () => {
           localStorage.setItem("userPermission", newPermission);
         }
       } else {
-        console.error("Missing required data in the API response.");
+        console.error("Missing required data in the API response.", data);
       }
     } catch (error) {
       console.error("Error fetching menu list", error);
