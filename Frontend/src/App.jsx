@@ -12,6 +12,9 @@ import {
 import Jhar from "./assets/jhant.png";
 import useModulePermission from "./Components/common/Hooks/useModulePermission";
 import { UseServiceCheck } from "./Components/common/Hooks/UseServiceCheck";
+import AutoLogout from "./utils/AutoLogout";
+import AuthGaurd from "./Components/AuthGaurd.jsx";
+import Login_main from "./Components/Login/Login_main";
 
 function App() {
   UseServiceCheck();
@@ -55,7 +58,15 @@ function App() {
 
   return (
     <>
-      <AppRoutes access_token={access_token} userType={userType} />
+      {!access_token ? (
+        <Login_main />
+      ) : (
+        <AutoLogout>
+          <AuthGaurd>
+            <AppRoutes access_token={access_token} userType={userType} />
+          </AuthGaurd>
+        </AutoLogout>
+      )}
 
       <Dialog
         open={open}

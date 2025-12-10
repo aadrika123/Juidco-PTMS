@@ -9,13 +9,27 @@ import { Container, Box, Button } from "@mui/material";
 import PasswordInput from "./PasswordInput"; 
 import ApiHeader from "../api/ApiHeader";
 import ProjectApiList from "../api/ProjectApiList";
+import CryptoJS from "crypto-js";
+import UseCaptchaGenerator from "./UseCaptchaGenerator";
+import useSystemUniqueID from "../common/Hooks/useSystemUniqueId";
 
 const Login = () => {
   const [errorMsg, setErrorMsg] = useState();
   const [deviceType, setDeviceType] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [captcha, setCaptcha] = useState("");
+  const [captchaError, setCaptchaError] = useState  (null);
 
   const { getMenuByModule } = ProjectApiList();
+  const {
+    captchaInputField,
+    captchaImage,
+    generateRandomCaptcha,
+    getCaptchaData,
+    getEncryptedCaptcha,
+  } = UseCaptchaGenerator();
+  
+  const { fingerprint } = useSystemUniqueID();
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -31,7 +45,28 @@ const Login = () => {
     password: Yup.string().required("Password is required"),
   });
 
+  function encryptPassword(plainPassword) {
+  const secretKey = "c2ec6f788fb85720bf48c8cc7c2db572596c585a15df18583e1234f147b1c2897aad12e7bebbc4c03c765d0e878427ba6370439d38f39340d7e";
+
+  const key = CryptoJS.enc.Latin1.parse(
+    CryptoJS.SHA256(secretKey).toString(CryptoJS.enc.Latin1)
+  );
+
+  const ivString = CryptoJS.SHA256(secretKey).toString().substring(0, 16);
+  const iv = CryptoJS.enc.Latin1.parse(ivString);
+
+  const encrypted = CryptoJS.AES.encrypt(plainPassword, key, {
+    iv: iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+
+  return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+}
+
   const handleLogin = async (values) => {
+    const captchaData = getCaptchaData();
+    
     try {
       setLoading(true);
       const res = await axios({
@@ -39,22 +74,33 @@ const Login = () => {
         method: "POST",
         data: {
           email: values.user_id,
-          password: values.password,
-          type: window.ReactNativeWebView ? "mobile" : null,
-          moduleId: 18,
-          // type: 'mobile',
+          password: encryptPassword(values.password),
+          moduleId: 20,
+          captcha_code: getEncryptedCaptcha(captcha),
+          captcha_id: captchaData.captcha_id,
+          systemUniqueId: fingerprint,
         },
       });
 
-      if (res) {
-        fetchMenuList();
+      if (res?.data?.status === false) {
+        // if backend sends success:false for wrong credentials
+        setErrorMsg(res?.data?.message || "Invalid username or password");
+        generateRandomCaptcha(); // Reload captcha on invalid credentials
+        setCaptcha(""); // Clear captcha input
+        return;
+      }
 
+      if (res) {
         const userDetails = res?.data?.data?.userDetails;
         const { token } = res?.data?.data;
+        
+        // Set token first for API calls
         Cookies.set("accesstoken", token, { expires: 1 });
+        localStorage.setItem("token", token);
+        
+        await fetchMenuList();
 
         localStorage.setItem("ulbId", userDetails?.ulb_id);
-        localStorage.setItem("token", token);
         localStorage.setItem("userType", userDetails?.user_type);
         localStorage.setItem("userName", userDetails?.user_name);
 
@@ -67,25 +113,31 @@ const Login = () => {
         localStorage.setItem("ulbIduserMobile", userDetails?.mobile);
         localStorage.setItem("conductorId", userDetails?.user_name);
 
-       
         if (userDetails?.user_type === "Admin") {
           window.location.replace("/ptms/dashboard");
         } else if (userDetails?.user_type === "TC") {
           window.location.replace("/ptms/conductor_dashboard");
         } else if (userDetails?.user_type === "Employee") {
           window.location.replace("/ptms/accountant-view");
-          // window.location.replace("/ptms/dashboard");
         } else {
-          window.location.replace("/");
+          window.location.replace("/ptms");
         }
       }
     } catch (error) {
-      setErrorMsg("Something Went Wrong!!");
+      // Check backend error response
+      if (error.response && error.response.status === 401) {
+        setErrorMsg("Invalid username or password");
+        generateRandomCaptcha(); // Reload captcha on 401 error
+        setCaptcha(""); // Clear captcha input
+      } else {
+        setErrorMsg("Something went wrong, please try again.");
+      }
       console.log(error);
     } finally {
       setLoading(false);
     }
   };
+
 
   const fetchMenuList = async () => {
     let requestBody = {
@@ -95,10 +147,14 @@ const Login = () => {
     try {
       // Make API request
       const res = await axios.post(getMenuByModule, requestBody, ApiHeader());
-
+      
+      console.log("Menu API Response:", res?.data);
       let data = res?.data;
-
-      localStorage.setItem("menuList", res?.data?.data?.permission);
+      
+      if (data?.data?.permission) {
+        localStorage.setItem("menuList", JSON.stringify(data.data.permission));
+        // console.log("MenuList saved:", JSON.stringify(data.data.permission));
+      }
 
       if (data?.data?.userDetails && data?.data?.permission) {
         let newdata = JSON.stringify(data?.data?.userDetails);
@@ -111,7 +167,7 @@ const Login = () => {
           localStorage.setItem("userPermission", newPermission);
         }
       } else {
-        console.error("Missing required data in the API response.");
+        console.error("Missing required data in the API response.", data);
       }
     } catch (error) {
       console.error("Error fetching menu list", error);
@@ -147,6 +203,10 @@ const Login = () => {
                       className="flex flex-1  border rounded-md px-3 py-4 w-full focus:outline-none focus:border-blue-500"
                       error={touched.user_id && !!errors.user_id}
                       helperText={touched.user_id && errors.user_id}
+                      autoComplete="off" 
+                      onCopy={(e) => e.preventDefault()}
+                      onPaste={(e) => e.preventDefault()}
+                      onCut={(e) => e.preventDefault()}
                     />
                   </div>
                   <Field
@@ -157,9 +217,13 @@ const Login = () => {
                     fullWidth
                     error={touched.password && !!errors.password}
                     helperText={touched.password && errors.password}
+                    autoComplete="off"
+                    onCopy={(e) => e.preventDefault()}
+                    onPaste={(e) => e.preventDefault()}
+                    onCut={(e) => e.preventDefault()}
                   />
                 </div>
-                <div className="my-4">
+                {/* <div className="my-4">
                   <div className="flex flex-col items-center justify-center flex-wrap gap-x-2 gap-y-2 w-full poppins ">
                     <span
                       className="text-gray-700 text-sm font-semibold cursor-pointer w-full text-center"
@@ -170,16 +234,34 @@ const Login = () => {
                       Forgot Password
                     </span>
                   </div>
+                </div> */}
+                <div className="my-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <img src={captchaImage} className="border rounded w-44 h-14" />
+                    <button
+                      type="button"
+                      onClick={generateRandomCaptcha}
+                      className="text-xs text-blue-500"
+                    >
+                      Reload Captcha
+                    </button>
+                  </div>
+                  {captchaInputField({ value: captcha, onChange: (e) => setCaptcha(e.target.value) })}
+                  {captchaError && (
+                    <div className="text-red-500 text-sm mt-1">{captchaError}</div>
+                  )}
                 </div>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{ backgroundColor: "#665DD9" }}
-                  fullWidth
-                  disabled={loading}
-                >
-                  {loading ? "Loading..." : "Log in"}
-                </Button>
+                <div className="my-4">
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    disabled={loading}
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md"
+                  >
+                    {loading ? "Logging in..." : "Login"}
+                  </Button>
+                </div>
               </Form>
             )}
           </Formik>

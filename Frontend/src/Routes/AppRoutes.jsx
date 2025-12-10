@@ -42,7 +42,7 @@ const AppRoutes = ({ access_token, userType }) => {
 
   return (
     <Routes>
-      <Route path="/" element={<Login_main />} />
+      {/* <Route path="/" element={<Login_main />} /> */}
       <Route
         path="/service-restriction"
         element={<PrivateRoute element={ServiceRestrictionLayout} />}

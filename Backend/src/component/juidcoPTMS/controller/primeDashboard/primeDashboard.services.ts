@@ -20,7 +20,12 @@ class primeDashboardServices {
     };
 
     try {
-      const data = await this.primeDashboardDao.getDashboardData();
+      const { ulbId } = req.query;
+
+      const data = await this.primeDashboardDao.getDashboardData(
+        ulbId ? Number(ulbId) : undefined
+      );
+
       if (!data) {
         return CommonRes.NOT_FOUND(
           resMessage(this.initMsg).NOT_FOUND,
@@ -40,7 +45,6 @@ class primeDashboardServices {
       return CommonRes.SERVER_ERROR(error, resObj, res);
     }
   };
-
 }
 
 export default primeDashboardServices;
