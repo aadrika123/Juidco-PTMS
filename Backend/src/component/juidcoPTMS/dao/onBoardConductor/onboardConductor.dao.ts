@@ -77,7 +77,7 @@ class ConductorOnBoarding {
     };
 
     const data = await prisma.conductor_master.create(query);
-    return generateRes(data);
+    return generateRes({...data, is_ptms: true });
   };
 
   getAllConductorList = async (req: Request) => {
