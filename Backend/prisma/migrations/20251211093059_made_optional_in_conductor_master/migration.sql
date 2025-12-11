@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "conductor_master" ALTER COLUMN "last_name" DROP NOT NULL,
+ALTER COLUMN "age" DROP NOT NULL,
+ALTER COLUMN "blood_grp" DROP NOT NULL,
+ALTER COLUMN "mobile_no" DROP NOT NULL,
+ALTER COLUMN "emergency_mob_no" DROP NOT NULL,
+ALTER COLUMN "adhar_doc" DROP NOT NULL,
+ALTER COLUMN "fitness_doc" DROP NOT NULL;

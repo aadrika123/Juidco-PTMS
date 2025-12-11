@@ -34,8 +34,8 @@ class ConductorOnBoarding {
       fitness_doc,
     } = req.body as TOnBoardingConductorData;
 
-    const { ulb_id } = req.body.auth
-
+    // const { ulb_id } = req.body.auth
+    const { ulb_id = 2 } = req.body?.auth || {};
     const isExistingConductor = await prisma.conductor_master.findUnique({
       where: { adhar_no },
     });
@@ -277,33 +277,96 @@ class ConductorOnBoarding {
     return generateRes(data);
   };
 
-  updateConductorDetails = async (req: Request) => {
-    const {
-      id,
-      mobileNo,
-      emergencyMobNo,
-    } = req.body;
+updateConductorDetails = async (req: Request) => {
+  const {
+    id,
+    firstName,
+    middleName,
+    lastName,
+    age,
+    bloodGrp,
+    emergencyMobNo,
+    adhar_doc,
+    adhar_no,
+    fitness_doc,
+    ulb_id,
+  } = req.body;
 
-    if (!id) {
-      throw new Error('ID is required')
-    }
+  // require id only
+  if (!id) {
+    return generateRes({
+      error_type: "VALIDATION",
+      validation_error: "ID is required",
+    });
+  }
 
-    if (!mobileNo && !emergencyMobNo) {
-      throw new Error('No data provided to update')
-    }
+  // helper: treat empty string as not provided
+  const isProvided = (v: any) =>
+    typeof v !== "undefined" && !(typeof v === "string" && v.trim() === "");
 
-    const query: Prisma.conductor_masterUpdateArgs = {
-      data: {
-        ...(mobileNo && { mobile_no: mobileNo }),
-        ...(emergencyMobNo && { emergency_mob_no: emergencyMobNo })
-      },
+  // IMPORTANT: ignore emailId and mobileNo if client sends them.
+  // If you prefer to reject requests that include those fields, we can change this to return a validation error.
+
+  // If adhar_no provided, check uniqueness excluding current record
+  if (isProvided(req.body.adhar_no)) {
+    const existingAdhar = await prisma.conductor_master.findFirst({
       where: {
-        id: id,
+        adhar_no: req.body.adhar_no,
+        NOT: { id },
       },
-    };
+    });
+
+    if (existingAdhar) {
+      return generateRes({
+        error_type: "VALIDATION",
+        validation_error: "Aadhar Already Exist",
+      });
+    }
+  }
+
+  // build update object only with provided (non-empty) fields, excluding email & mobile
+  const updateData: Prisma.conductor_masterUpdateInput = {
+    ...(isProvided(firstName) && { first_name: firstName }),
+    ...(isProvided(middleName) && { middle_name: middleName }),
+    ...(isProvided(lastName) && { last_name: lastName }),
+    ...(isProvided(age) && { age }),
+    ...(isProvided(bloodGrp) && { blood_grp: bloodGrp }),
+    ...(isProvided(emergencyMobNo) && { emergency_mob_no: emergencyMobNo }),
+    ...(isProvided(adhar_doc) && { adhar_doc }),
+    ...(isProvided(req.body.adhar_no) && { adhar_no: req.body.adhar_no }),
+    ...(isProvided(fitness_doc) && { fitness_doc }),
+    // allow explicit null for ulb_id if caller passes null, otherwise skip
+    ...(typeof ulb_id !== "undefined" && { ulb_id }),
+  };
+
+  // If nothing provided (only id or only email/mobile present which are ignored), return validation response.
+  if (Object.keys(updateData).length === 0) {
+    return generateRes({
+      error_type: "VALIDATION",
+      validation_error: "No updatable fields provided",
+    });
+  }
+
+  const query: Prisma.conductor_masterUpdateArgs = {
+    data: updateData,
+    where: { id },
+  };
+
+  try {
     const data = await prisma.conductor_master.update(query);
     return generateRes(data);
-  };
+  } catch (err: any) {
+    if (err?.code === "P2025") {
+      return generateRes({
+        error_type: "VALIDATION",
+        validation_error: "Conductor not found",
+      });
+    }
+    // rethrow or transform into server error per your conventions
+    throw err;
+  }
+};
+
 
   getConductorById = async (id: number) => {
     const data = await prisma.conductor_master.findFirst({

@@ -37,7 +37,7 @@ export default class OnBoardingConductorRoute {
       );
 
     app
-      .route(`${baseUrl}/conductor/update/`)
+      .route(`${baseUrl}/conductor/update`)
       .post((req: Request, res: Response) =>
         onBoardingConductorServices.updateConductorDetails(req, res, "0206")
       );

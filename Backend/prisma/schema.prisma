@@ -29,16 +29,16 @@ model conductor_master {
   id               Int     @id @default(autoincrement())
   first_name       String
   middle_name      String?
-  last_name        String
-  age              String
-  blood_grp        String
-  mobile_no        String
-  emergency_mob_no String
+  last_name        String?
+  age              String?
+  blood_grp        String?
+  mobile_no        String?
+  emergency_mob_no String?
   email_id         String  @unique
   cunique_id       String  @unique
-  adhar_doc        Json
+  adhar_doc        Json?
   adhar_no         String  @unique
-  fitness_doc      Json
+  fitness_doc      Json?
 
   schedules  scheduler[]
   receipts   receipts[]
