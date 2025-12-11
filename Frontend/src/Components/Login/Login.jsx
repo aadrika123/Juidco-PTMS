@@ -75,7 +75,7 @@ const Login = () => {
         data: {
           email: values.user_id,
           password: encryptPassword(values.password),
-          moduleId: 20,
+          moduleId: 18,
           captcha_code: getEncryptedCaptcha(captcha),
           captcha_id: captchaData.captcha_id,
           systemUniqueId: fingerprint,

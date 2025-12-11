@@ -62,9 +62,9 @@ function App() {
         <Login_main />
       ) : (
         <AutoLogout>
-          <AuthGaurd>
+          {/* <AuthGaurd> */}
             <AppRoutes access_token={access_token} userType={userType} />
-          </AuthGaurd>
+          {/* </AuthGaurd> */}
         </AutoLogout>
       )}
 
