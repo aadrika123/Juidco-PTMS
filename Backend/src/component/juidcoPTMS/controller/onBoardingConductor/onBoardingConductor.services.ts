@@ -14,62 +14,74 @@ export default class OnBoardingConductorServices {
     this.constructorOnboarding = new ConductorOnBoarding();
   }
 
-  onBoardingNewConductor = async (
-    req: Request,
-    res: Response,
-    apiId: string
-  ) => {
-    const resObj: resObj = {
-      apiId,
-      action: "GET",
-      version: "1.0",
-    };
+ onBoardingNewConductor = async (
+  req: Request,
+  res: Response,
+  apiId: string
+) => {
+  const resObj: resObj = {
+    apiId,
+    action: "GET",
+    version: "1.0",
+  };
 
-    try {
-      const { adhar_doc, fitness_doc } = req.body;
+  try {
+    const { adhar_doc, fitness_doc } = req.body;
 
-      // ---------------------------- VALIDATION --------------------------------------------//
-      //validation of request body with files and json
-      const isValidated =
-        await OnBoardingConductorDataValidationSchema.validate(req.body);
+    // ---------------------------- VALIDATION --------------------------------------------//
+    // validation of request body with files and json
+    const isValidated =
+      await OnBoardingConductorDataValidationSchema.validate(req.body);
 
-      if (!Object.keys(isValidated).length) {
-        return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);
-      }
+    if (!Object.keys(isValidated).length) {
+      return CommonRes.VALIDATION_ERROR("Validation error", resObj, res);
+    }
 
-      if (!Object.keys(fitness_doc).length) {
-        return CommonRes.VALIDATION_ERROR(
-          "fitness_doc is required",
-          resObj,
-          res
-        );
-      }
+    // helper: safely check empty object / null / undefined
+    const isEmptyObj = (v: any) =>
+      v == null || (typeof v === "object" && Object.keys(v).length === 0);
 
-      if (!Object.keys(adhar_doc).length) {
-        return CommonRes.VALIDATION_ERROR("adhar_doc is required", resObj, res);
-      }
-
-      const data = await this.constructorOnboarding.onBoardingNewConductor(req);
-
-      if (data.error_type === "VALIDATION") {
-        return CommonRes.VALIDATION_ERROR(
-          "Conductor Already Registered",
-          resObj,
-          res
-        );
-      }
-
-      // ---------------------------- VALIDATION --------------------------------------------//
-      return CommonRes.SUCCESS(
-        "Successfully registered the conductor",
-        data,
+    // Make docs OPTIONAL:
+    // - if client did NOT send these keys -> OK (they can upload later)
+    // - if client sent these keys but they're empty -> return validation error
+    if (Object.prototype.hasOwnProperty.call(req.body, "fitness_doc") && isEmptyObj(fitness_doc)) {
+      return CommonRes.VALIDATION_ERROR(
+        "fitness_doc is required when provided",
         resObj,
         res
       );
-    } catch (err) {
-      return CommonRes.SERVER_ERROR(err, resObj, res);
     }
-  };
+
+    if (Object.prototype.hasOwnProperty.call(req.body, "adhar_doc") && isEmptyObj(adhar_doc)) {
+      return CommonRes.VALIDATION_ERROR(
+        "adhar_doc is required when provided",
+        resObj,
+        res
+      );
+    }
+
+    const data = await this.constructorOnboarding.onBoardingNewConductor(req);
+
+    if (data.error_type === "VALIDATION") {
+      return CommonRes.VALIDATION_ERROR(
+        "Conductor Already Registered",
+        resObj,
+        res
+      );
+    }
+
+    // ---------------------------- VALIDATION --------------------------------------------//
+    return CommonRes.SUCCESS(
+      "Successfully registered the conductor",
+      data,
+      resObj,
+      res
+    );
+  } catch (err) {
+    return CommonRes.SERVER_ERROR(err, resObj, res);
+  }
+};
+
 
   getAllConductorList = async (req: Request, res: Response, apiId: string) => {
     const resObj: resObj = {
