@@ -14,18 +14,26 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-
   const [pollutionDoc, setPollutionDoc] = useState("");
   const [taxCopyDoc, setTaxCopyDoc] = useState("");
   const [fetchedData, setFetchedData] = useState("");
 
-  //Image Data
-  const [firstInput, setFirstInput] = useState(null);
-  const [secondInput, setSecondInput] = useState(null);
+  // Form Data
+  const [formData, setFormData] = useState({
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    age: "",
+    bloodGrp: "",
+    emergencyMobNo: "",
+    adhar_no: "",
+  });
 
-  // Input Data
+  // File Data
   const [firstBuffer, setFirstBuffer] = useState(null);
   const [secondBuffer, setSecondBuffer] = useState(null);
+  const [adharDoc, setAdharDoc] = useState(null);
+  const [fitnessDoc, setFitnessDoc] = useState(null);
 
 
 
@@ -112,13 +120,17 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
   const updateInputValues = async () => {
     setIsLoading(true);
     try {
+      const payload = {
+        id: dataId,
+        ...formData,
+      };
+
+      if (adharDoc) payload.adhar_doc = adharDoc;
+      if (fitnessDoc) payload.fitness_doc = fitnessDoc;
+
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/conductor/update`,
-        {
-          id: dataId,
-          mobileNo: firstInput,
-          emergencyMobNo: secondInput,
-        },
+        payload,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -129,7 +141,6 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
       if (response?.data?.status == "Error") {
         console.log("Error Occured");
       } else {
-        const responseData = response?.data?.data;
         setIsLoading(false);
         setEditModal(false);
       }
@@ -139,13 +150,13 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
   };
 
   const handleImageUpload = async (value, field) => {
-    const formData = new FormData();
-    formData.append("img", value);
+    const uploadFormData = new FormData();
+    uploadFormData.append("img", value);
 
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/common/img-upload`,
-        formData,
+        uploadFormData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -164,10 +175,29 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
         if (field == "tax") {
           setSecondBuffer(responseData);
         }
+        if (field == "adhar") {
+          setAdharDoc({
+            fileName: value.name,
+            fileUrl: responseData
+          });
+        }
+        if (field == "fitness") {
+          setFitnessDoc({
+            fileName: value.name,
+            fileUrl: responseData
+          });
+        }
       }
     } catch (error) {
       console.error("Error making POST request:", error);
     }
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   useEffect(() => {
@@ -183,9 +213,22 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
         }
       )
       .then((res) => {
-        setFetchedData(res.data?.data);
-        setPollutionDoc(res.data?.data?.pollution_doc?.buffer);
-        setTaxCopyDoc(res.data?.data?.taxCopy_doc?.buffer);
+        const data = res.data?.data;
+        setFetchedData(data);
+        setPollutionDoc(data?.pollution_doc?.buffer);
+        setTaxCopyDoc(data?.taxCopy_doc?.buffer);
+        
+        if (page === "conductor") {
+          setFormData({
+            firstName: data?.first_name || "",
+            middleName: data?.middle_name || "",
+            lastName: data?.last_name || "",
+            age: data?.age || "",
+            bloodGrp: data?.blood_grp || "",
+            emergencyMobNo: data?.emergency_mob_no || "",
+            adhar_no: data?.adhar_no || "",
+          });
+        }
       });
   }, []);
 
@@ -214,49 +257,155 @@ function EditModal({ handleCancel, page, dataId, setEditModal }) {
               {fetchedData?.cunique_id}
             </h1>
           </div>
-          <div className="flex mt-10">   
-            
-            <div className="flex flex-col">
-              <label className="mb-2 ml-4">
-                {page === "bus"
-                  ? "Pollution Certificate"
-                  : "Enter Phone Number"}
-                <span className="text-red-500">*</span>
-              </label>
-              <input
-                type={page === "bus" ? "file" : "number"}
-                className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
-                onChange={(e) => {
-                  if (page === "bus") {
-                    handleImageUpload(e.target.files[0], "pollution"); // Handle file upload for first input
-                  } else {
-                    const value = e.target.value;
-                    if (value.length <= 10) {
-                      setFirstInput(value);
-                    }
-                  }
-                }}
-              />
+          {page === "bus" ? (
+            <div className="flex mt-10">
+              <div className="flex flex-col">
+                <label className="mb-2 ml-4">
+                  Pollution Certificate
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="file"
+                  className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
+                  onChange={(e) => handleImageUpload(e.target.files[0], "pollution")}
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="mb-2 ml-4">
+                  Tax Copy
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="file"
+                  className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
+                  onChange={(e) => handleImageUpload(e.target.files[0], "tax")}
+                />
+              </div>
             </div>
-
-            <div className="flex flex-col">
-              <label className="mb-2 ml-4">
-                {page === "bus" ? "Tax Copy" : "Enter Emergency Phone Number"}
-                <span className="text-red-500">*</span>
-              </label>
-              <input
-                type={page === "bus" ? "file" : "number"}
-                className="border border-gray-300 px-3 py-4 rounded-md focus:outline-none ml-4 mr-4 transition duration-300"
-                onChange={(e) => {
-                  if (page === "bus") {
-                    handleImageUpload(e.target.files[0], "tax"); // Handle file upload for second input
-                  } else {
-                    setSecondInput(e.target.value); // Handle text input for second input
-                  }
-                }}
-              />
+          ) : (
+            <div className="px-4 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                  <label className="mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={fetchedData?.email_id || ""}
+                    className="border border-gray-300 px-3 py-2 rounded-md bg-gray-100 cursor-not-allowed"
+                    readOnly
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="mb-2">Mobile Number</label>
+                  <input
+                    type="tel"
+                    value={fetchedData?.mobile_no || ""}
+                    className="border border-gray-300 px-3 py-2 rounded-md bg-gray-100 cursor-not-allowed"
+                    readOnly
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                  <label className="mb-2">First Name <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    value={formData.firstName}
+                    className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none"
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="mb-2">Middle Name</label>
+                  <input
+                    type="text"
+                    value={formData.middleName}
+                    className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none"
+                    onChange={(e) => handleInputChange('middleName', e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                  <label className="mb-2">Last Name <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none"
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="mb-2">Age <span className="text-red-500">*</span></label>
+                  <input
+                    type="number"
+                    value={formData.age}
+                    className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none"
+                    onChange={(e) => handleInputChange('age', e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                  <label className="mb-2">Blood Group</label>
+                  <select
+                    value={formData.bloodGrp}
+                    className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none"
+                    onChange={(e) => handleInputChange('bloodGrp', e.target.value)}
+                  >
+                    <option value="">Select Blood Group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="mb-2">Emergency Mobile No <span className="text-red-500">*</span></label>
+                  <input
+                    type="tel"
+                    value={formData.emergencyMobNo}
+                    maxLength="10"
+                    className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none"
+                    onChange={(e) => handleInputChange('emergencyMobNo', e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <label className="mb-2">Aadhar Number <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={formData.adhar_no}
+                  maxLength="12"
+                  className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none"
+                  onChange={(e) => handleInputChange('adhar_no', e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                  <label className="mb-2">Aadhar Document</label>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none"
+                    onChange={(e) => handleImageUpload(e.target.files[0], "adhar")}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="mb-2">Fitness Document</label>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none"
+                    onChange={(e) => handleImageUpload(e.target.files[0], "fitness")}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
+          )}
           <div className="flex flex-col m-8">
             <div className="flex  space-x-5">
               <div>
