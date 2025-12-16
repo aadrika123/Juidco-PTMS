@@ -15,6 +15,8 @@ const ImgModal = ({ imageUrl, type, isLoading }) => {
       if (buffer && mime) {
         const blob = new Blob([new Uint8Array(buffer)], { type: mime });
         setImageSrc(URL.createObjectURL(blob));
+      } else if (doc?.fileUrl?.imageUrl) {
+        setImageSrc(doc.fileUrl.imageUrl);
       } else if (doc?.imageUrl) {
         setImageSrc(doc.imageUrl);
       } else {
@@ -75,13 +77,22 @@ const ImgModal = ({ imageUrl, type, isLoading }) => {
                   <CircularIndeterminate />
                 </div>
               ) : imageSrc ? (
-                <img
-                  src={imageSrc}
-                  alt={`${type} Document`}
-                  className="max-h-[80vh] max-w-full rounded-lg object-contain"
-                />
+                imageSrc.toLowerCase().includes('.pdf') ? (
+                  <iframe
+                    src={imageSrc}
+                    title={`${type} Document`}
+                    className="w-full h-[80vh] rounded-lg"
+                    frameBorder="0"
+                  />
+                ) : (
+                  <img
+                    src={imageSrc}
+                    alt={`${type} Document`}
+                    className="max-h-[80vh] max-w-full rounded-lg object-contain"
+                  />
+                )
               ) : (
-                <p className="text-gray-500 text-center">No image available</p>
+                <p className="text-gray-500 text-center">No document available</p>
               )}
             </div>
           </div>
