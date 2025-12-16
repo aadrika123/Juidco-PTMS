@@ -80,9 +80,6 @@ const ConductorOnboarding_Table = () => {
   const [loading, set_loading] = useState(false);
 
   const [editModal, setEditModal] = useState(false);
-  const [imageId, setImageId] = useState('');
-  const [imgBufferData, setImgBufferData] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
   const [dataId, setDataId] = useState('');
   const [loadingState, setLoadingState] = useState('noData'); // 'noData', 'loading', 'loaded'
 
@@ -125,20 +122,7 @@ const ConductorOnboarding_Table = () => {
   }, [debouncedSearchQuery,editModal]);
 
 
-  useEffect(() => {
-    setIsLoading(true);
-    axios
-      .get(`${process.env.REACT_APP_BASE_URL}/conductor/image/${imageId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }) // Replace with your actual API endpoint
-      .then((response) => {
-        setIsLoading(false);
-        setImgBufferData(response?.data?.data);
-      })
-      .catch((error) => console.error('Error fetching bus data:', error));
-  }, [imageId]);
+
 
   // const fetchScheduledData = async () => {
   //   set_loading(true);
@@ -431,18 +415,18 @@ const ConductorOnboarding_Table = () => {
                     <TableCell>{data?.blood_grp}</TableCell>
                     <TableCell>{data?.age}</TableCell>
 
-                    <TableCell onClick={()=>{setImageId(data?.id)}}>
+                    <TableCell>
                       <ImgModal
-                        imageUrl={imgBufferData}
+                        imageUrl={{ fitness_doc: data?.fitness_doc }}
                         type={'fitness'}
-                        isLoading={isLoading}
+                        isLoading={false}
                       />
                     </TableCell>
-                    <TableCell onClick={()=>{setImageId(data?.id)}}>
+                    <TableCell>
                       <ImgModal
-                        imageUrl={imgBufferData}
+                        imageUrl={{ adhar_doc: data?.adhar_doc }}
                         type={'adhar'}
-                        isLoading={isLoading}
+                        isLoading={false}
                       />
                     </TableCell>
                     <TableCell>
