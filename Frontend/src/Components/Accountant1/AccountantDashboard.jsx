@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import Header from "../Header/Header";
+import NewHeader from "../Components/Header/NewHeader";
 import AccountantSidebar from "./AccountantSidebar";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 
@@ -10,7 +11,7 @@ export default function AccountantDashboard({ children }) {
 
   return (
     <>
-      <Header hide={hide} set_hide={setHide} heading={"Urban Transport"} />
+      <NewHeader hide={hide} set_hide={setHide} heading={"Urban Transport"} />
       <div className="flex flex-1 flex-row h-[90vh]">
         <div className={`${hide ? "hidden" : "flex"}`}>
           <AccountantSidebar />

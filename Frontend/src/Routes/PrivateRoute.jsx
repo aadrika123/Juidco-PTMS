@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import Header from "../Components/Header/Header";
 import Sidebar from "../Components/Dashboard/Sidebar";
 import { motion } from "framer-motion";
+import NewHeader from "../Components/Header/NewHeader";
 
 const PrivateRoute = ({ element: Component }) => {
   const token = Cookies.get("accesstoken");
@@ -37,7 +38,7 @@ const PrivateRoute = ({ element: Component }) => {
       ) : (
         <div className="flex flex-1 flex-col h-[100vh]">
           <div className="flex  h-fit w-full">
-            <Header
+            <NewHeader
               hide={hide}
               set_hide={setHide}
               heading={"Public Transport Management System"}
